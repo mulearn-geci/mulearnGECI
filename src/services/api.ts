@@ -130,6 +130,7 @@ export const eventsAPI = {
     
     const response = await fetch(`${API_BASE_URL}/events?${params}`);
     if (!response.ok) {
+      console.log("API Base URL:", API_BASE_URL);
       throw new Error('Failed to fetch events');
     }
     return response.json();
