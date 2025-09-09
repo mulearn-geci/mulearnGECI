@@ -7,11 +7,11 @@ export function Execom() {
     {
       name: 'Prof. Rejin R',
       position: 'Campus Enabler',
-      image: './src/img/rejin.jpg',
+      image: './src/img/Rejin.jpg',
       bio: 'Supporting the community with vision and dedication to foster innovation and collaboration.',
-      linkedin: '#',
-      email: '#',
-      github: '#'
+      linkedin: 'https://www.linkedin.com/in/rejin-rajan-779841113/',
+      email: 'rejin@gecidukki.ac.in',
+      github: 'https://github.com/rejinr89'
     },
     {
       name: 'Albert George',
@@ -27,7 +27,7 @@ export function Execom() {
       position: 'Technical Lead',
       image: './src/img/anandhu.jpg',
       bio: 'Leading the technical team and driving innovation in our projects.',
-        linkedin: 'https://www.linkedin.com/in/anandhu-s-uthaman-a44bb3309?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
+      linkedin: 'https://www.linkedin.com/in/anandhu-s-uthaman-a44bb3309?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
       email: 'anandhuuthaman@gmail.com',
       github: 'https://github.com/AnandhusUthaman'
     },
