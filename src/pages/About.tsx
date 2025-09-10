@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, Eye, Heart, Users, Award, Rocket } from 'lucide-react';
+import Group from '../img/mulearnGroup.jpg';
 
 export function About() {
   const values = [
@@ -26,40 +27,40 @@ export function About() {
     }
   ];
 
-  const team = [
-    {
-      name: 'Arjun Krishnan',
-      position: 'Community Lead',
-      image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400',
-      bio: 'Computer Science student passionate about building inclusive tech communities.'
-    },
-    {
-      name: 'Priya Sharma',
-      position: 'Technical Lead',
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400',
-      bio: 'Full-stack developer with expertise in modern web technologies and AI.'
-    },
-    {
-      name: 'Rahul Menon',
-      position: 'Events Coordinator',
-      image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
-      bio: 'Event management specialist focused on creating engaging learning experiences.'
-    },
-    {
-      name: 'Sneha Patel',
-      position: 'Design Lead',
-      image: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=400',
-      bio: 'UI/UX designer passionate about creating beautiful and functional user experiences.'
-    }
-  ];
+  // const team = [
+  //   {
+  //     name: 'Arjun Krishnan',
+  //     position: 'Community Lead',
+  //     image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400',
+  //     bio: 'Computer Science student passionate about building inclusive tech communities.'
+  //   },
+  //   {
+  //     name: 'Priya Sharma',
+  //     position: 'Technical Lead',
+  //     image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400',
+  //     bio: 'Full-stack developer with expertise in modern web technologies and AI.'
+  //   },
+  //   {
+  //     name: 'Rahul Menon',
+  //     position: 'Events Coordinator',
+  //     image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400',
+  //     bio: 'Event management specialist focused on creating engaging learning experiences.'
+  //   },
+  //   {
+  //     name: 'Sneha Patel',
+  //     position: 'Design Lead',
+  //     image: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=400',
+  //     bio: 'UI/UX designer passionate about creating beautiful and functional user experiences.'
+  //   }
+  // ];
 
-  const milestones = [
-    { year: '2023', title: 'Foundation', description: 'µLearn community was established with 50 founding members.' },
-    { year: '2023', title: 'First Event', description: 'Successfully hosted our first tech workshop with 100+ participants.' },
-    { year: '2024', title: 'Growth', description: 'Expanded to 300+ members and launched multiple learning tracks.' },
-    { year: '2024', title: 'Recognition', description: 'Received "Best Student Community" award from the institution.' },
-    { year: '2025', title: 'Innovation', description: 'Launched industry partnerships and internship programs.' }
-  ];
+  // const milestones = [
+  //   { year: '2023', title: 'Foundation', description: 'µLearn community was established with 50 founding members.' },
+  //   { year: '2023', title: 'First Event', description: 'Successfully hosted our first tech workshop with 100+ participants.' },
+  //   { year: '2024', title: 'Growth', description: 'Expanded to 300+ members and launched multiple learning tracks.' },
+  //   { year: '2024', title: 'Recognition', description: 'Received "Best Student Community" award from the institution.' },
+  //   { year: '2025', title: 'Innovation', description: 'Launched industry partnerships and internship programs.' }
+  // ];
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -118,7 +119,7 @@ export function About() {
               className="relative"
             >
               <img
-                src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=800"
+                src={Group}
                 alt="Team collaboration"
                 className="rounded-xl shadow-lg"
               />
