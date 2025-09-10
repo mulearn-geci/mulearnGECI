@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.REACT_APP_URL || 'http://localhost:5000';
+const API_BASE_URL = 'https://mulearngeci.onrender.com';
 
 export const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return '';
