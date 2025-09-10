@@ -16,6 +16,23 @@ const eventRoutes = require('./routes/events');
 const contactRoutes = require('./routes/contact');
 const dashboardRoutes = require('./routes/dashboard');
 
+// Cors Config
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://mulearngeci.vercel.app"
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
 // Import middleware
 const logger = require('./utils/logger');
 
@@ -39,14 +56,6 @@ const limiter = rateLimit({
   }
 });
 app.use('/api/', limiter);
-
-// CORS configuration
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? (process.env.FRONTEND_URL || 'http://localhost:3000')
-    : ['http://localhost:3000', 'http://localhost:5173'],
-  credentials: true
-}));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
