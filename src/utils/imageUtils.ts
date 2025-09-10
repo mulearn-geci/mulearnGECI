@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://mulearngeci.onrender.com';
+const API_BASE_URL = 'http://localhost:5000';
 
 export const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return '';

@@ -1,8 +1,4 @@
-// Vite exposes env vars on the client as import.meta.env and requires the VITE_ prefix.
-// Replace CRA-style `process.env.REACT_APP_*` with `import.meta.env.VITE_*` so the
-// correct value is baked into the build on Vercel/Render. Fallback to a relative
-// `/api` so the frontend can call the same host when proxied or served together.
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || '/api';
+const API_BASE_URL =  import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Get auth token from localStorage
 const getAuthToken = () => {
