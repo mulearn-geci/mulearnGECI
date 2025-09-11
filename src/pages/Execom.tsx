@@ -1,13 +1,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Award, Target, Linkedin, Mail, Github } from 'lucide-react';
+import Anandhu from '../img/anandhu.jpg';
+import Navya from '../img/NavyaMariamJohn.jpg';
+import Nidhin from '../img/Nidhin.jpg';
+import Shimna from '../img/shimna.jpg';
+import Ihsaan from '../img/ihsaan.jpg';
+import Adithyan from '../img/steam.jpg';
+import Avani from '../img/avani.jpg';
+import Jeevan from '../img/JEEVANPRAKASH.jpeg';
+import Albert from '../img/albert.jpeg';
+import Rejin from '../img/Rejin.jpg';
+import Nicholas from '../img/nicho.jpg';
 
 export function Execom() {
   const execomMembers = [
     {
       name: 'Prof. Rejin R',
       position: 'Campus Enabler',
-      image: './src/img/Rejin.jpg',
+      image: {Rejin},
       bio: 'Supporting the community with vision and dedication to foster innovation and collaboration.',
       linkedin: 'https://www.linkedin.com/in/rejin-rajan-779841113/',
       email: 'rejin@gecidukki.ac.in',
@@ -16,7 +27,7 @@ export function Execom() {
     {
       name: 'Albert George',
       position: 'Campus Lead',
-      image: './src/img/albert.JPEG',
+      image: {Albert},
       bio: 'Supporting strategic initiatives and driving technical excellence across all projects.',
       linkedin: 'https://www.linkedin.com/in/albert-george-a40101231',
       email: 'albertkavil@gmail.com',
@@ -25,7 +36,7 @@ export function Execom() {
     {
       name: 'Anandhu S Uthaman',
       position: 'Technical Lead',
-      image: './src/img/anandhu.jpg',
+      image: {Anandhu},
       bio: 'Leading the technical team and driving innovation in our projects.',
       linkedin: 'https://www.linkedin.com/in/anandhu-s-uthaman-a44bb3309?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
       email: 'anandhuuthaman@gmail.com',
@@ -34,7 +45,7 @@ export function Execom() {
     {
       name: 'Navya Mariam John',
       position: 'Women In Tech Lead',
-      image: './src/img/NavyaMariamJohn.jpg',
+      image: {Navya},
       bio: 'Empowering women in tech and fostering a supportive environment for their growth.',
       linkedin: 'https://www.linkedin.com/in/navya-mariam-john-72b905315?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
       email: 'navyamariam16@gmail.com',
@@ -43,7 +54,7 @@ export function Execom() {
     {
       name: 'Nicholas Roy',
       position: 'Community Lead',
-      image: './src/img/nicho.jpg',
+      image: {Nicholas},
       bio: 'Organizing engaging events and workshops to enhance learning experiences.',
       linkedin: 'https://www.linkedin.com/in/karthik-nair-0000000000?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
       email: 'Rizzupnick@gmail.com',
@@ -52,7 +63,7 @@ export function Execom() {
     {
       name: 'Nidhin Gireesh',
       position: 'Community Lead 2 ',
-      image: './src/img/Nidhin.jpg',
+      image: {Nidhin},
       bio: 'Organizing engaging events and workshops to enhance learning experiences.',
       linkedin: 'https://www.linkedin.com/in/nidhingireesh?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
       email: 'nidhingireesh12345@gmail.com',
@@ -61,7 +72,7 @@ export function Execom() {
     {
       name: 'Shimna B',
       position: 'Creative Lead',
-      image: './src/img/shimna.jpg',
+      image: {Shimna},
       bio: 'Creating visual identity and ensuring consistent design across all platforms.',
       linkedin: 'https://www.linkedin.com/in/shimna-b-b26a502aa?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
       email: 'shimna1701@gmail.com',
@@ -70,7 +81,7 @@ export function Execom() {
     {
       name: 'K S Mohammed Ihsaan',
       position: 'Interest Group Lead',
-      image: './src/img/ihsaan.jpg',
+      image: {Ihsaan},
       bio: 'Leading interest groups and fostering collaboration across diverse areas.',
       linkedin: 'www.linkedin.com/in/ihsaanmoh',
       email: 'ihsaanmoh8@gmail.com',
@@ -79,7 +90,7 @@ export function Execom() {
     {
       name: 'Adithyan VS',
       position: 'Discord Lead',
-      image: './src/img/steam.jpg',
+      image: {Adithyan},
       bio: 'Managing the Discord server and fostering a vibrant community.',
       linkedin: '',
       email: 'adithyanvs107@gmail.com',
@@ -89,7 +100,7 @@ export function Execom() {
     {
       name: 'Avani M U',
       position: 'Content Lead',
-      image: './src/img/avani.jpg',
+      image: {Avani},
       bio: 'Creating engaging content and managing social media presence.',
       linkedin: 'https://www.linkedin.com/in/avani-m-u-630882305?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
       email: 'Avanimu2005@gmail.com',
@@ -98,7 +109,7 @@ export function Execom() {
     {
       name: 'Jeevan Prakash',
       position: 'Media Lead',
-      image: './src/img/JEEVANPRAKASH.JPEG',
+      image: {Jeevan},
       bio: 'Creating engaging content and managing social media presence.',
       linkedin: 'https://www.linkedin.com/in/jeevanpksh/',
       email: 'J3257p@gmail.com',
