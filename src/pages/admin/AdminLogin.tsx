@@ -149,7 +149,7 @@ export function AdminLogin() {
             </div>
           </form>
 
-          <div className="mt-6">
+          {/* <div className="mt-6">
             <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md p-4">
               <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Demo Credentials:</h4>
               <p className="text-sm text-blue-700 dark:text-blue-300">
@@ -157,7 +157,7 @@ export function AdminLogin() {
                 Password: admin123
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
       </motion.div>
     </div>
