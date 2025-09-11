@@ -46,7 +46,7 @@ app.use('/api/', limiter);
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? (process.env.FRONTEND_URL || 'http://localhost:3000')
-    : ['http://localhost:3000', 'http://localhost:5173'],
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://mulearngeci.vercel.app'],
   credentials: true
 }));
 
