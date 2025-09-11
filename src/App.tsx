@@ -20,6 +20,7 @@ import { EditPost } from './pages/admin/EditPost';
 import { EditEvent } from './pages/admin/EditEvent';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -94,6 +95,7 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
