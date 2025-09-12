@@ -149,6 +149,9 @@ app.listen(PORT, () => {
   
   // Create default admin user after server starts
   setTimeout(createDefaultAdmin, 2000);
+
+  // ✅ Start cron job after server starts
+  require('./scheduler');
 });
 
 // Graceful shutdown

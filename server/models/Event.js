@@ -155,11 +155,15 @@ eventSchema.pre('save', function(next) {
       .replace(/^-|-$/g, '') + '-' + Date.now();
   }
   
-  // Auto-update status based on date
+  // Auto-update status based on date + time
   const now = new Date();
-  const eventDate = new Date(this.date);
-  
-  if (eventDate < now && this.status === 'upcoming') {
+  let eventDateTime = new Date(this.date);
+  if (this.time) {
+    const [hours, minutes] = this.time.split(':').map(Number);
+    eventDateTime.setHours(hours || 0, minutes || 0, 0, 0);
+  }
+
+  if (eventDateTime < now && this.status === 'upcoming') {
     this.status = 'completed';
   }
   
