@@ -16,6 +16,7 @@ export function Header() {
     { name: 'Gallery', href: '/gallery' },
     { name: 'Timeline', href: '/timeline' },
     { name: 'Execom', href: '/execom' },
+    { name: 'Alumni', href: '/alumni' },
     { name: 'Theme', href: '/theme' },
     { name: 'About', href: '/about' },
     { name: 'Contact Us', href: '/contact' },

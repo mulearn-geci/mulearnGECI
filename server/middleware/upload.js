@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure upload directories exist
-const uploadDirs = ['uploads', 'uploads/posts', 'uploads/events', 'uploads/users'];
+const uploadDirs = ['uploads', 'uploads/posts', 'uploads/events', 'uploads/users', 'uploads/execom'];
 uploadDirs.forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -22,6 +22,8 @@ const storage = multer.diskStorage({
       uploadPath += 'events/';
     } else if (req.baseUrl.includes('/users')) {
       uploadPath += 'users/';
+    } else if (req.baseUrl.includes('/execom')) {
+      uploadPath += 'execom/';
     }
     
     cb(null, uploadPath);
@@ -32,33 +34,27 @@ const storage = multer.diskStorage({
     const extension = path.extname(file.originalname);
     const baseName = path.basename(file.originalname, extension)
       .replace(/[^a-zA-Z0-9]/g, '-')
-      .substring(0, 20);
+      .substring(0, 25);
     
     cb(null, `${baseName}-${uniqueSuffix}${extension}`);
   }
 });
 
-// File filter
+// File filter for images
 const fileFilter = (req, file, cb) => {
-  // Check file type
   if (file.mimetype.startsWith('image/')) {
-    // Check file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      cb(new Error('File size too large. Maximum size is 5MB.'), false);
-    } else {
-      cb(null, true);
-    }
+    cb(null, true);
   } else {
     cb(new Error('Only image files are allowed.'), false);
   }
 };
 
-// Configure multer
+// Configure multer (50MB limit)
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-    files: 1 // Single file upload
+    fileSize: 50 * 1024 * 1024, // 50MB limit
+    files: 1
   },
   fileFilter: fileFilter
 });
@@ -69,7 +65,7 @@ const handleUploadError = (error, req, res, next) => {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'File size too large. Maximum size is 5MB.'
+        message: 'File size too large. Maximum size is 50MB.'
       });
     } else if (error.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({

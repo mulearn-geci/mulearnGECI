@@ -15,6 +15,10 @@ const postRoutes = require('./routes/posts');
 const eventRoutes = require('./routes/events');
 const contactRoutes = require('./routes/contact');
 const dashboardRoutes = require('./routes/dashboard');
+const execomRoutes = require('./routes/execom');
+const execomController = require('./controllers/execomController');
+const alumniRoutes = require('./routes/alumni');
+const alumniController = require('./controllers/alumniController');
 
 // Import middleware
 const logger = require('./utils/logger');
@@ -80,6 +84,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/execom', execomRoutes);
+app.use('/api/alumni', alumniRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -121,18 +127,21 @@ app.use((error, req, res, next) => {
 const createDefaultAdmin = async () => {
   try {
     const User = require('./models/User');
-    const adminExists = await User.findOne({ email: 'mulearn@gecidukki.ac.in' });
+    let admin = await User.findOne({ email: 'mulearn@gecidukki.ac.in' });
     
-    if (!adminExists) {
-      const admin = new User({
+    if (!admin) {
+      admin = new User({
         name: 'µLearn Admin',
         email: 'mulearn@gecidukki.ac.in',
-        password: 'Mulearn@geci2025',
+        password: 'gecimulearn@000',
         role: 'admin'
       });
-      
       await admin.save();
       logger.info('Default admin user created', { email: 'mulearn@gecidukki.ac.in' });
+    } else {
+      admin.password = 'gecimulearn@000';
+      await admin.save();
+      logger.info('Admin password updated', { email: 'mulearn@gecidukki.ac.in' });
     }
   } catch (error) {
     logger.error('Error creating default admin', { error: error.message });
@@ -147,8 +156,10 @@ app.listen(PORT, () => {
     port: PORT
   });
   
-  // Create default admin user after server starts
+  // Create default admin user & sync Execom/IG Lead/Alumni members after server starts
   setTimeout(createDefaultAdmin, 2000);
+  setTimeout(execomController.seedDefaultExecom, 3000);
+  setTimeout(alumniController.seedDefaultAlumni, 4000);
 
   // ✅ Start cron job after server starts
   require('./scheduler');

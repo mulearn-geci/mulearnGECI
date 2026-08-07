@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
 import { Events } from './pages/Events';
 import { Execom } from './pages/Execom';
+import { Alumni } from './pages/Alumni';
 import { Theme } from './pages/Theme';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
@@ -14,6 +15,8 @@ import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminPosts } from './pages/admin/AdminPosts';
 import { AdminEvents } from './pages/admin/AdminEvents';
+import { AdminExecom } from './pages/admin/AdminExecom';
+import { AdminAlumni } from './pages/admin/AdminAlumni';
 import { CreatePost } from './pages/admin/CreatePost';
 import { CreateEvent } from './pages/admin/CreateEvent';
 import { EditPost } from './pages/admin/EditPost';
@@ -33,6 +36,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/events" element={<Events />} />
               <Route path="/execom" element={<Execom />} />
+              <Route path="/alumni" element={<Alumni />} />
               <Route path="/theme" element={<Theme />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
@@ -60,6 +64,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AdminEvents />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/execom" 
+                element={
+                  <ProtectedRoute>
+                    <AdminExecom />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/alumni" 
+                element={
+                  <ProtectedRoute>
+                    <AdminAlumni />
                   </ProtectedRoute>
                 } 
               />

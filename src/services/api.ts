@@ -239,3 +239,144 @@ export const contactAPI = {
     return response.json();
   }
 };
+
+// Execom API
+export const execomAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_BASE_URL}/execom`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch Execom members');
+    }
+    return response.json();
+  },
+
+  getById: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/execom/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch Execom member');
+    }
+    return response.json();
+  },
+
+  create: async (formData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/execom`, {
+      method: 'POST',
+      headers: createFileUploadHeaders(),
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to create Execom member');
+    }
+    return response.json();
+  },
+
+  update: async (id: string, formData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/execom/${id}`, {
+      method: 'PUT',
+      headers: createFileUploadHeaders(),
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update Execom member');
+    }
+    return response.json();
+  },
+
+  delete: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/execom/${id}`, {
+      method: 'DELETE',
+      headers: createAuthHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete Execom member');
+    }
+    return response.json();
+  },
+
+  reorder: async (orders: { id: string; order: number }[]) => {
+    const response = await fetch(`${API_BASE_URL}/execom/reorder`, {
+      method: 'PUT',
+      headers: createAuthHeaders(),
+      body: JSON.stringify({ orders }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to reorder Execom members');
+    }
+    return response.json();
+  }
+};
+
+// Alumni API
+export const alumniAPI = {
+  getAll: async (year?: string) => {
+    const params = new URLSearchParams();
+    if (year) params.append('year', year);
+    
+    const response = await fetch(`${API_BASE_URL}/alumni?${params}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch alumni members');
+    }
+    return response.json();
+  },
+
+  getById: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/alumni/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch alumni member');
+    }
+    return response.json();
+  },
+
+  create: async (formData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/alumni`, {
+      method: 'POST',
+      headers: createFileUploadHeaders(),
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to create alumni member');
+    }
+    return response.json();
+  },
+
+  update: async (id: string, formData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/alumni/${id}`, {
+      method: 'PUT',
+      headers: createFileUploadHeaders(),
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update alumni member');
+    }
+    return response.json();
+  },
+
+  delete: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/alumni/${id}`, {
+      method: 'DELETE',
+      headers: createAuthHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete alumni member');
+    }
+    return response.json();
+  },
+
+  reorder: async (orders: { id: string; order: number }[]) => {
+    const response = await fetch(`${API_BASE_URL}/alumni/reorder`, {
+      method: 'PUT',
+      headers: createAuthHeaders(),
+      body: JSON.stringify({ orders }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to reorder alumni members');
+    }
+    return response.json();
+  }
+};

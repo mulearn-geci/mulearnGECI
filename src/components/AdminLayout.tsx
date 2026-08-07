@@ -4,6 +4,8 @@ import {
   LayoutDashboard, 
   FileText, 
   Calendar, 
+  Users,
+  GraduationCap,
   LogOut,
   Menu,
   X
@@ -24,6 +26,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Posts', href: '/admin/posts', icon: FileText },
     { name: 'Events', href: '/admin/events', icon: Calendar },
+    { name: 'Execom Team', href: '/admin/execom', icon: Users },
+    { name: 'Alumni Network', href: '/admin/alumni', icon: GraduationCap },
   ];
 
   const isActive = (path: string) => {
