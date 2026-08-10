@@ -102,22 +102,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/execom', execomRoutes);
-app.use('/api/alumni', alumniRoutes);
+// API Routes (supports both /api/* and /* for Vercel serverless functions)
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/posts', '/posts'], postRoutes);
+app.use(['/api/events', '/events'], eventRoutes);
+app.use(['/api/contact', '/contact'], contactRoutes);
+app.use(['/api/dashboard', '/dashboard'], dashboardRoutes);
+app.use(['/api/execom', '/execom'], execomRoutes);
+app.use(['/api/alumni', '/alumni'], alumniRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    dbConnected: mongoose.connection.readyState >= 1
   });
 });
 
