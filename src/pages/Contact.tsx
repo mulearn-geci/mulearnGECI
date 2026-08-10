@@ -292,7 +292,7 @@ export function Contact() {
                 <div>
                   <button 
                     onClick={() => handleQuickAction(action.action)}
-                    className="w-full sm:w-auto min-w-[140px] bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                    className="w-full sm:w-auto min-w-[140px] bg-gradient-to-r from-blue-600 to-blue-700 text-white px-7 py-3 rounded-xl font-semibold text-sm hover:from-blue-500 hover:to-blue-600 transition-all duration-300 shadow-[0_10px_25px_-5px_rgba(37,99,235,0.4)] hover:shadow-[0_18px_35px_-5px_rgba(37,99,235,0.55)] hover:-translate-y-1 active:translate-y-0 active:shadow-md cursor-pointer border border-blue-400/20"
                   >
                     {action.action}
                   </button>
