@@ -129,6 +129,11 @@ const authController = {
     }
   },
 
+  // Logout user
+  logout: async (req, res) => {
+    return sendSuccess(res, 'Logged out successfully');
+  },
+
   // Change password
   changePassword: async (req, res) => {
     try {
