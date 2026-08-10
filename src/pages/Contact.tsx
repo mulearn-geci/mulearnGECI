@@ -280,19 +280,23 @@ export function Contact() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between"
               >
-                <div className="bg-blue-100 dark:bg-blue-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <action.icon className="h-8 w-8 text-blue-600 dark:text-blue-300" />
+                <div>
+                  <div className="bg-blue-100 dark:bg-blue-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <action.icon className="h-8 w-8 text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{action.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed text-sm">{action.description}</p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{action.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{action.description}</p>
-                <button 
-                  onClick={() => handleQuickAction(action.action)}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200"
-                >
-                  {action.action}
-                </button>
+                <div>
+                  <button 
+                    onClick={() => handleQuickAction(action.action)}
+                    className="w-full sm:w-auto min-w-[140px] bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                  >
+                    {action.action}
+                  </button>
+                </div>
               </motion.div>
             ))}
           </div>
