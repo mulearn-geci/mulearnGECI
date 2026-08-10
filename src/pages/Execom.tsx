@@ -73,13 +73,13 @@ export function Execom() {
   }, []);
 
   const resolveMemberImage = (member: ExecomMember): string => {
-    if (member.image && (member.image.startsWith('/uploads/') || member.image.startsWith('http'))) {
+    if (member.image && member.image.trim() !== '') {
       return getImageUrl(member.image);
     }
     if (defaultImageMap[member.name]) {
       return defaultImageMap[member.name];
     }
-    return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=600';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=2563eb&color=fff&size=500`;
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>, member: ExecomMember) => {
