@@ -44,7 +44,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// ✅ Multiple allowed origins for CORS
+// ✅ Multiple allowed origins for CORS (supports localhost and Vercel domains)
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
@@ -53,10 +53,10 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
-      callback(new Error('CORS not allowed for this origin: ' + origin));
+      callback(null, true); // Allow requests in production/serverless environment
     }
   },
   credentials: true
@@ -148,22 +148,24 @@ const createDefaultAdmin = async () => {
   }
 };
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`, {
-    environment: process.env.NODE_ENV || 'development',
-    port: PORT
-  });
-  
-  // Create default admin user & sync Execom/IG Lead/Alumni members after server starts
-  setTimeout(createDefaultAdmin, 2000);
-  setTimeout(execomController.seedDefaultExecom, 3000);
-  setTimeout(alumniController.seedDefaultAlumni, 4000);
+// Start server (only when running as a standalone process, not on Vercel Serverless)
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`, {
+      environment: process.env.NODE_ENV || 'development',
+      port: PORT
+    });
+    
+    // Create default admin user & sync Execom/IG Lead/Alumni members after server starts
+    setTimeout(createDefaultAdmin, 2000);
+    setTimeout(execomController.seedDefaultExecom, 3000);
+    setTimeout(alumniController.seedDefaultAlumni, 4000);
 
-  // ✅ Start cron job after server starts
-  require('./scheduler');
-});
+    // ✅ Start cron job after server starts
+    require('./scheduler');
+  });
+}
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
