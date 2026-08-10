@@ -95,10 +95,15 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`, {
-    ip: req.ip,
-    userAgent: req.get('User-Agent')
-  });
+  try {
+    const clientIp = req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || '';
+    logger.info(`${req.method} ${req.path}`, {
+      ip: clientIp,
+      userAgent: req.get('User-Agent') || ''
+    });
+  } catch (err) {
+    // Ignore logging errors in serverless
+  }
   next();
 });
 
