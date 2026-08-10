@@ -28,7 +28,12 @@ export function Contact() {
         window.location.href = '/events';
         break;
       case 'Get Help':
-        // alert('Get help functionality - opening support chat');
+        const formElement = document.getElementById('contact-form');
+        if (formElement) {
+          formElement.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.location.href = '/contact#contact-form';
+        }
         break;
       default:
         alert(`Action: ${action}`);
@@ -111,7 +116,7 @@ export function Contact() {
       </section>
 
       {/* Contact Form & Info */}
-      <section className="py-16">
+      <section id="contact-form" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
