@@ -1,5 +1,8 @@
-import app from '../server/server.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
-export default async function handler(req, res) {
+const app = require('../server/server.js');
+
+export default function handler(req, res) {
   return app(req, res);
 }
