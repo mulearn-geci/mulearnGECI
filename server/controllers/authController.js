@@ -106,8 +106,8 @@ const authController = {
         }
       });
     } catch (error) {
-      logger.error('Login error', { error: error.message });
-      return sendError(res, 500, 'Server error during login');
+      console.error('Login error:', error);
+      return sendError(res, 500, `Login error: ${error.message}`);
     }
   },
 
