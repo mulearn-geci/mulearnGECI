@@ -9,7 +9,8 @@ const router = express.Router();
 // Rate limiting for contact form
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // limit each IP to 3 contact form submissions per windowMs
+  max: 20, // limit each IP to 20 contact form submissions per windowMs
+  validate: { trustProxy: false },
   message: {
     success: false,
     message: 'Too many contact form submissions, please try again later.'
