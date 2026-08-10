@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) {
-    return;
+    return true;
   }
 
   const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://mulearn_db_user:KqUswMcR3edtcZkx@mulearn-cluster.lkod39g.mongodb.net/mulearn?retryWrites=true&w=majority';
@@ -11,21 +11,15 @@ const connectDB = async () => {
     const conn = await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 8000,
+      serverSelectionTimeoutMS: 5000,
+      bufferCommands: false,
     });
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
-    
-    mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
-    });
-
+    return true;
   } catch (error) {
     console.error('Database connection failed:', error.message);
+    return false;
   }
 };
 

@@ -28,10 +28,26 @@ const app = express();
 // Trust proxy for Vercel / reverse proxy deployment
 app.set('trust proxy', 1);
 
+// Health check endpoint (placed before DB middleware for fast responses)
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    dbConnected: mongoose.connection.readyState >= 1
+  });
+});
+
 // Connect to MongoDB & ensure connection on serverless requests
 connectDB();
 app.use('/api', async (req, res, next) => {
-  await connectDB();
+  if (req.path === '/health') return next();
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('DB middleware connection error:', err.message);
+  }
   next();
 });
 
