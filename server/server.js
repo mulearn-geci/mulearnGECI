@@ -66,7 +66,7 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.'
   }
 });
-app.use('/api/', limiter);
+app.use('/api', limiter);
 
 // ✅ Multiple allowed origins for CORS (supports localhost and Vercel domains)
 const allowedOrigins = [
@@ -122,7 +122,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // 404 handler for API routes
-app.use('/api/(.*)', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: 'API endpoint not found'
