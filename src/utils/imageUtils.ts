@@ -32,6 +32,11 @@ export const formatGoogleDriveUrl = (url: string): string => {
 export const getImageUrl = (imagePath: string): string => {
   if (!imagePath) return '';
   
+  // Return Base64 Data URLs directly
+  if (imagePath.startsWith('data:')) {
+    return imagePath;
+  }
+  
   // Convert Google Drive link or ID if applicable
   if (imagePath.includes('drive.google.com') || imagePath.includes('googleusercontent.com')) {
     return formatGoogleDriveUrl(imagePath);
