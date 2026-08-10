@@ -142,8 +142,13 @@ const execomController = {
       }
       return sendSuccess(res, 'Execom members retrieved successfully', members);
     } catch (error) {
-      logger.error('Get Execom error', { error: error.message });
-      return sendError(res, 500, 'Failed to fetch Execom members');
+      console.error('Get Execom error:', error);
+      return res.status(200).json({
+        success: false,
+        errorType: 'ExecomFetchError',
+        message: error.message,
+        stack: error.stack
+      });
     }
   },
 
