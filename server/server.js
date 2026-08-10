@@ -25,6 +25,9 @@ const logger = require('./utils/logger');
 
 const app = express();
 
+// Trust proxy for Vercel / reverse proxy deployment
+app.set('trust proxy', 1);
+
 // Connect to MongoDB & ensure connection on serverless requests
 connectDB();
 app.use('/api', async (req, res, next) => {
@@ -40,7 +43,8 @@ app.use(helmet({
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 500, // limit each IP to 500 requests per windowMs
+  validate: { trustProxy: false },
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.'

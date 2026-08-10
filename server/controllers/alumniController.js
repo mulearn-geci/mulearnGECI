@@ -70,7 +70,11 @@ const alumniController = {
       if (req.query.year) {
         filter.graduationYear = req.query.year;
       }
-      const alumni = await Alumni.find(filter).sort({ order: 1, createdAt: 1 });
+      let alumni = await Alumni.find(filter).sort({ order: 1, createdAt: 1 });
+      if (alumni.length === 0) {
+        await alumniController.seedDefaultAlumni();
+        alumni = await Alumni.find(filter).sort({ order: 1, createdAt: 1 });
+      }
       return sendSuccess(res, 'Alumni members retrieved successfully', alumni);
     } catch (error) {
       logger.error('Get Alumni error', { error: error.message });

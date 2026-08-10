@@ -135,7 +135,11 @@ const execomController = {
       if (req.query.category) {
         filter.category = req.query.category;
       }
-      const members = await Execom.find(filter).sort({ order: 1, createdAt: 1 });
+      let members = await Execom.find(filter).sort({ order: 1, createdAt: 1 });
+      if (members.length === 0) {
+        await execomController.seedDefaultExecom();
+        members = await Execom.find(filter).sort({ order: 1, createdAt: 1 });
+      }
       return sendSuccess(res, 'Execom members retrieved successfully', members);
     } catch (error) {
       logger.error('Get Execom error', { error: error.message });
