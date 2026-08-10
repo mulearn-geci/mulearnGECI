@@ -60,7 +60,7 @@ export function Contact() {
     {
       icon: Phone,
       title: 'Call Us',
-      details: '+91 90373 26395',
+      details: '+91 6282 089 432',
       description: 'Mon-Fri from 9am to 6pm'
     },
     {
