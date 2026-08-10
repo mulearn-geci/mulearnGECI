@@ -66,11 +66,11 @@ export function Footer() {
                 <Gamepad2 className="h-5 w-5" />
               </a>
               <a 
-                href="https://www.instagram.com/mulearn.official/?hl=en" 
+                href="https://www.instagram.com/mulearn.geci?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 dark:text-gray-400 hover:text-white transition-colors"
-                onClick={() => window.open('https://www.instagram.com/mulearn.official/?hl=en', '_blank')}
+                onClick={() => window.open('https://www.instagram.com/mulearn.geci?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', '_blank')}
               >
                 <Instagram className="h-5 w-5" />
               </a>
