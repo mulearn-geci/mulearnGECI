@@ -96,6 +96,11 @@ export function Execom() {
         return;
       }
     }
+
+    if (defaultImageMap[member.name] && target.src !== defaultImageMap[member.name]) {
+      target.src = defaultImageMap[member.name];
+      return;
+    }
     
     target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=2563eb&color=fff&size=500`;
   };
