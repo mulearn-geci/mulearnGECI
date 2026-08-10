@@ -22,6 +22,11 @@ module.exports = (req, res) => {
     });
   }
 
+  // Prepend /api if Vercel stripped /api prefix from req.url
+  if (req.url && !req.url.startsWith('/api')) {
+    req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
+  }
+
   try {
     return app(req, res);
   } catch (err) {
