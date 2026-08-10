@@ -191,15 +191,17 @@ if (!process.env.VERCEL) {
   });
 }
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  process.exit(0);
-});
+// Graceful shutdown (only when running standalone server)
+if (!process.env.VERCEL) {
+  process.on('SIGTERM', () => {
+    logger.info('SIGTERM received, shutting down gracefully');
+    process.exit(0);
+  });
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  process.exit(0);
-});
+  process.on('SIGINT', () => {
+    logger.info('SIGINT received, shutting down gracefully');
+    process.exit(0);
+  });
+}
 
 module.exports = app;
