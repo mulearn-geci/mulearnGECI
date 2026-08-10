@@ -1,31 +1,5 @@
-let app;
-let initError = null;
+import app from '../server/server.js';
 
-try {
-  app = require('../server/server.js');
-} catch (error) {
-  initError = error;
-  console.error('Failed to initialize Express server in api/index.js:', error);
+export default async function handler(req, res) {
+  return app(req, res);
 }
-
-module.exports = async (req, res) => {
-  if (initError) {
-    return res.status(500).json({
-      success: false,
-      error: 'Vercel Serverless Initialization Error',
-      message: initError.message,
-      stack: initError.stack
-    });
-  }
-
-  try {
-    return app(req, res);
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: 'Vercel Request Handling Error',
-      message: err.message,
-      stack: err.stack
-    });
-  }
-};
