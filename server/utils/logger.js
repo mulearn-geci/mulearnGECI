@@ -1,10 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 
-// Ensure logs directory exists
+// Ensure logs directory exists (only if not in serverless environment)
 const logsDir = path.join(__dirname, '../logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
+if (!process.env.VERCEL) {
+  try {
+    if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir, { recursive: true });
+    }
+  } catch (err) {
+    // Ignore read-only filesystem errors
+  }
 }
 
 const getTimestamp = () => {
@@ -21,16 +27,21 @@ const writeLog = (level, message, meta = {}) => {
 
   const logString = JSON.stringify(logEntry) + '\n';
   
-  // Write to console
+  // Always log to console (captured by Vercel logs)
   console.log(`[${logEntry.timestamp}] ${level.toUpperCase()}: ${message}`);
   
-  // Write to file
-  const logFile = path.join(logsDir, `${level}.log`);
-  fs.appendFileSync(logFile, logString);
-  
-  // Also write to combined log
-  const combinedLogFile = path.join(logsDir, 'combined.log');
-  fs.appendFileSync(combinedLogFile, logString);
+  // Write to log files only when running as standalone server
+  if (!process.env.VERCEL) {
+    try {
+      const logFile = path.join(logsDir, `${level}.log`);
+      fs.appendFileSync(logFile, logString);
+      
+      const combinedLogFile = path.join(logsDir, 'combined.log');
+      fs.appendFileSync(combinedLogFile, logString);
+    } catch (err) {
+      // Ignore filesystem errors in serverless
+    }
+  }
 };
 
 const logger = {

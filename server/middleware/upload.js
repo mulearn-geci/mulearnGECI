@@ -4,11 +4,17 @@ const fs = require('fs');
 
 // Ensure upload directories exist
 const uploadDirs = ['uploads', 'uploads/posts', 'uploads/events', 'uploads/users', 'uploads/execom'];
-uploadDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
+if (!process.env.VERCEL) {
+  uploadDirs.forEach(dir => {
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch (err) {
+      // Ignore read-only filesystem errors in serverless environments
+    }
+  });
+}
 
 // Configure storage
 const storage = multer.diskStorage({
