@@ -41,12 +41,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await authAPI.login(email, password);
-      const { token, user: userData } = response;
+      const payload = response.data || response;
+      const { token, user: userData } = payload;
       
       const user: User = {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name
+        id: userData ? (userData.id || userData._id) : '',
+        email: userData ? userData.email : email,
+        name: userData ? userData.name : 'Admin'
       };
       
       setUser(user);
