@@ -1,47 +1,45 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
-// Ensure upload directories exist
-const uploadDirs = ['uploads', 'uploads/posts', 'uploads/events', 'uploads/users', 'uploads/execom'];
-if (!process.env.VERCEL) {
-  uploadDirs.forEach(dir => {
-    try {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-    } catch (err) {
-      // Ignore read-only filesystem errors in serverless environments
-    }
-  });
-}
+const os = require('os');
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let uploadPath = 'uploads/';
-    
-    // Determine upload path based on route
+    let baseDir = process.env.VERCEL ? path.join(os.tmpdir(), 'uploads') : 'uploads';
+    let subFolder = '';
+
     if (req.baseUrl.includes('/posts')) {
-      uploadPath += 'posts/';
+      subFolder = 'posts';
     } else if (req.baseUrl.includes('/events')) {
-      uploadPath += 'events/';
+      subFolder = 'events';
     } else if (req.baseUrl.includes('/users')) {
-      uploadPath += 'users/';
+      subFolder = 'users';
     } else if (req.baseUrl.includes('/execom')) {
-      uploadPath += 'execom/';
+      subFolder = 'execom';
+    } else if (req.baseUrl.includes('/alumni')) {
+      subFolder = 'alumni';
     }
-    
-    cb(null, uploadPath);
+
+    const targetDir = subFolder ? path.join(baseDir, subFolder) : baseDir;
+
+    try {
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+    } catch (err) {
+      console.error('Directory creation warning:', err.message);
+    }
+
+    cb(null, targetDir);
   },
   filename: (req, file, cb) => {
-    // Generate unique filename
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
+    const extension = path.extname(file.originalname) || '.jpg';
     const baseName = path.basename(file.originalname, extension)
       .replace(/[^a-zA-Z0-9]/g, '-')
       .substring(0, 25);
-    
+
     cb(null, `${baseName}-${uniqueSuffix}${extension}`);
   }
 });
@@ -59,7 +57,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
+    fileSize: 50 * 1024 * 1024,
     files: 1
   },
   fileFilter: fileFilter
@@ -84,29 +82,53 @@ const handleUploadError = (error, req, res, next) => {
         message: 'Unexpected file field.'
       });
     }
-  } else if (error.message) {
+  } else if (error && error.message) {
     return res.status(400).json({
       success: false,
       message: error.message
     });
   }
-  
+
   next(error);
 };
 
-// Helper function to delete file
+// Helper function to safely delete file
 const deleteFile = (filePath) => {
+  if (!filePath || typeof filePath !== 'string' || filePath.startsWith('data:') || filePath.startsWith('http')) {
+    return;
+  }
   try {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+    const fullPath = path.join(__dirname, '..', cleanPath);
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
     }
   } catch (error) {
-    console.error('Error deleting file:', error);
+    // Ignore deletion errors on serverless environments
   }
+};
+
+// Helper to convert uploaded file into Base64 Data URL or clean URL
+const processUploadedFile = (file, defaultFolder = 'alumni') => {
+  if (!file) return '';
+  try {
+    if (file.path && fs.existsSync(file.path)) {
+      const buffer = fs.readFileSync(file.path);
+      try { fs.unlinkSync(file.path); } catch (e) {}
+      return `data:${file.mimetype || 'image/jpeg'};base64,${buffer.toString('base64')}`;
+    }
+  } catch (err) {
+    console.error('Error converting file to Base64:', err.message);
+  }
+  if (file.filename) {
+    return `/uploads/${defaultFolder}/${file.filename}`;
+  }
+  return '';
 };
 
 module.exports = {
   upload,
   handleUploadError,
-  deleteFile
+  deleteFile,
+  processUploadedFile
 };

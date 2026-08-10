@@ -1,6 +1,6 @@
 const Alumni = require('../models/Alumni');
 const { sendSuccess, sendError, sendCreated, sendNotFound } = require('../utils/responseHandler');
-const { deleteFile } = require('../middleware/upload');
+const { deleteFile, processUploadedFile } = require('../middleware/upload');
 const logger = require('../utils/logger');
 
 const defaultAlumni = [
@@ -116,7 +116,7 @@ const alumniController = {
 
       let imagePath = '';
       if (req.file) {
-        imagePath = `/${req.file.path.replace(/\\/g, '/')}`;
+        imagePath = processUploadedFile(req.file, 'alumni');
       } else if (req.body.image) {
         imagePath = req.body.image;
       }
@@ -171,10 +171,10 @@ const alumniController = {
       } = req.body;
 
       if (req.file) {
-        if (member.image && member.image.startsWith('/uploads/')) {
+        if (member.image) {
           deleteFile(member.image);
         }
-        member.image = `/${req.file.path.replace(/\\/g, '/')}`;
+        member.image = processUploadedFile(req.file, 'alumni');
       } else if (req.body.image !== undefined) {
         member.image = req.body.image;
       }

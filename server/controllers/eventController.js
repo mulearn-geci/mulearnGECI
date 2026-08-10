@@ -1,6 +1,6 @@
 const Event = require('../models/Event');
 const { sendSuccess, sendError, sendCreated } = require('../utils/responseHandler');
-const { deleteFile } = require('../middleware/upload');
+const { deleteFile, processUploadedFile } = require('../middleware/upload');
 const logger = require('../utils/logger');
 
 const eventController = {
@@ -96,7 +96,7 @@ const eventController = {
         title,
         description,
         content,
-        image: `/uploads/events/${req.file.filename}`,
+        image: processUploadedFile(req.file, 'events'),
         imageAlt: imageAlt || title,
         date: new Date(date),
         time,
@@ -183,10 +183,10 @@ const eventController = {
       // Update image if new one is uploaded
       if (req.file) {
         // Delete old image
-        if (event.image && event.image.startsWith('/uploads/')) {
-          deleteFile(event.image.substring(1));
+        if (event.image) {
+          deleteFile(event.image);
         }
-        event.image = `/uploads/events/${req.file.filename}`;
+        event.image = processUploadedFile(req.file, 'events');
       }
 
       await event.save();

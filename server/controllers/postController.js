@@ -1,6 +1,6 @@
 const Post = require('../models/Post');
 const { sendSuccess, sendError, sendCreated } = require('../utils/responseHandler');
-const { deleteFile } = require('../middleware/upload');
+const { deleteFile, processUploadedFile } = require('../middleware/upload');
 const logger = require('../utils/logger');
 
 const postController = {
@@ -98,7 +98,7 @@ const postController = {
 
       const post = new Post({
         title,
-        image: `/uploads/posts/${req.file.filename}`,
+        image: processUploadedFile(req.file, 'posts'),
         imageAlt: imageAlt || title,
         tags: tags ? JSON.parse(tags) : [],
         status: status || 'draft',
@@ -149,10 +149,10 @@ const postController = {
       // Update image if new one is uploaded
       if (req.file) {
         // Delete old image
-        if (post.image && post.image.startsWith('/uploads/')) {
-          deleteFile(post.image.substring(1));
+        if (post.image) {
+          deleteFile(post.image);
         }
-        post.image = `/uploads/posts/${req.file.filename}`;
+        post.image = processUploadedFile(req.file, 'posts');
       }
 
       await post.save();

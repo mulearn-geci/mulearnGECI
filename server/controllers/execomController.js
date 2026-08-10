@@ -1,6 +1,6 @@
 const Execom = require('../models/Execom');
 const { sendSuccess, sendError, sendCreated, sendNotFound } = require('../utils/responseHandler');
-const { deleteFile } = require('../middleware/upload');
+const { deleteFile, processUploadedFile } = require('../middleware/upload');
 const logger = require('../utils/logger');
 
 const defaultMembers = [
@@ -168,7 +168,7 @@ const execomController = {
 
       let imagePath = '';
       if (req.file) {
-        imagePath = `/${req.file.path.replace(/\\/g, '/')}`;
+        imagePath = processUploadedFile(req.file, 'execom');
       } else if (req.body.image) {
         imagePath = req.body.image;
       }
@@ -208,10 +208,10 @@ const execomController = {
       const { name, position, category, domain, phone, bio, linkedin, email, github, instagram, order, isActive } = req.body;
 
       if (req.file) {
-        if (member.image && member.image.startsWith('/uploads/') && !member.image.startsWith('/uploads/execom/')) {
+        if (member.image) {
           deleteFile(member.image);
         }
-        member.image = `/${req.file.path.replace(/\\/g, '/')}`;
+        member.image = processUploadedFile(req.file, 'execom');
       } else if (req.body.image !== undefined) {
         member.image = req.body.image;
       }
