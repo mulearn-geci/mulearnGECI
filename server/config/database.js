@@ -1,23 +1,32 @@
 const mongoose = require('mongoose');
 
+let isConnecting = null;
+
 const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) {
+  if (mongoose.connection.readyState === 1) {
     return true;
+  }
+
+  if (isConnecting) {
+    await isConnecting;
+    return mongoose.connection.readyState === 1;
   }
 
   const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://mulearn_db_user:KqUswMcR3edtcZkx@mulearn-cluster.lkod39g.mongodb.net/mulearn?retryWrites=true&w=majority';
 
   try {
-    const conn = await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    isConnecting = mongoose.connect(mongoURI, {
       serverSelectionTimeoutMS: 5000,
-      bufferCommands: false,
+      bufferCommands: true,
     });
+
+    const conn = await isConnecting;
+    isConnecting = null;
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return true;
   } catch (error) {
+    isConnecting = null;
     console.error('Database connection failed:', error.message);
     return false;
   }
