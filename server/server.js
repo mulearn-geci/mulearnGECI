@@ -25,8 +25,12 @@ const logger = require('./utils/logger');
 
 const app = express();
 
-// Connect to MongoDB
+// Connect to MongoDB & ensure connection on serverless requests
 connectDB();
+app.use('/api', async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // Security middleware
 app.use(helmet({
