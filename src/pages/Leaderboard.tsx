@@ -77,7 +77,7 @@ const DEPARTMENTS = ['All', 'CSE', 'IT', 'ECE', 'EEE', 'ME', 'RAI', 'Alumni'];
 
 export function Leaderboard() {
   const [members, setMembers] = useState<LeaderboardMember[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('All');
   const [viewMode, setViewMode] = useState<'rope' | 'grid' | 'table'>('rope');
