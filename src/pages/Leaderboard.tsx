@@ -19,8 +19,15 @@ export interface LeaderboardMember {
   is_alumni: boolean;
   ig_count: number;
   lc_count: number;
-  avatar?: string;
 }
+
+// Helper to extract student initials (e.g. Roshan Alexander -> RA)
+const getInitials = (name: string): string => {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
 
 // High quality mock dataset based on exact CSV columns provided by user
 const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
@@ -36,8 +43,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'CSE',
     is_alumni: false,
     ig_count: 8,
-    lc_count: 5,
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400'
+    lc_count: 5
   },
   {
     full_name: 'Rahul K',
@@ -51,8 +57,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'CSE',
     is_alumni: true,
     ig_count: 6,
-    lc_count: 4,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400'
+    lc_count: 4
   },
   {
     full_name: 'Ananya S',
@@ -66,8 +71,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'ECE',
     is_alumni: false,
     ig_count: 5,
-    lc_count: 3,
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400'
+    lc_count: 3
   },
   {
     full_name: 'Vaisakh M',
@@ -81,7 +85,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'EEE',
     is_alumni: false,
     ig_count: 7,
-    lc_count: 2,
+    lc_count: 2
   },
   {
     full_name: 'Devika Nair',
@@ -95,7 +99,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'CSE',
     is_alumni: false,
     ig_count: 4,
-    lc_count: 3,
+    lc_count: 3
   },
   {
     full_name: 'Nidhin Joseph',
@@ -109,7 +113,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'ME',
     is_alumni: false,
     ig_count: 3,
-    lc_count: 2,
+    lc_count: 2
   },
   {
     full_name: 'Avani R',
@@ -123,7 +127,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'ECE',
     is_alumni: false,
     ig_count: 4,
-    lc_count: 2,
+    lc_count: 2
   },
   {
     full_name: 'Jeevan Prakash',
@@ -137,7 +141,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'MR',
     is_alumni: false,
     ig_count: 2,
-    lc_count: 1,
+    lc_count: 1
   },
   {
     full_name: 'Anandhu V',
@@ -151,7 +155,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'CSE',
     is_alumni: false,
     ig_count: 3,
-    lc_count: 1,
+    lc_count: 1
   },
   {
     full_name: 'Rejin Thomas',
@@ -165,7 +169,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'EEE',
     is_alumni: false,
     ig_count: 2,
-    lc_count: 1,
+    lc_count: 1
   },
   {
     full_name: 'Shimna K',
@@ -179,7 +183,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'ME',
     is_alumni: false,
     ig_count: 2,
-    lc_count: 1,
+    lc_count: 1
   },
   {
     full_name: 'Nicho John',
@@ -193,7 +197,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'MR',
     is_alumni: false,
     ig_count: 1,
-    lc_count: 1,
+    lc_count: 1
   },
   {
     full_name: 'Ihsaan Ahmed',
@@ -207,7 +211,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'CSE',
     is_alumni: false,
     ig_count: 1,
-    lc_count: 0,
+    lc_count: 0
   },
   {
     full_name: 'Navya Mariam John',
@@ -221,7 +225,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
     department: 'ECE',
     is_alumni: false,
     ig_count: 1,
-    lc_count: 0,
+    lc_count: 0
   }
 ];
 
@@ -259,7 +263,7 @@ export function Leaderboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
       
-      {/* ─── Hero Banner & Stats (Unified Styling) ────────────────────────── */}
+      {/* ─── Hero Banner & Stats ─────────────────────────────────────────── */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white dark:from-gray-900 dark:to-gray-900 dark:text-blue-100 py-16 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -442,19 +446,15 @@ export function Leaderboard() {
                           >
                             <div className={`flex items-center space-x-3 ${isEven ? 'flex-row-reverse space-x-reverse' : 'flex-row'}`}>
                               
-                              {/* Avatar / Badge */}
+                              {/* Avatar Badge with Name Initials */}
                               <div className="relative flex-shrink-0">
-                                <div className={`w-12 h-12 rounded-full overflow-hidden border-2 flex items-center justify-center font-bold text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white ${
+                                <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-extrabold text-sm bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md ${
                                   member.rank === 1 ? 'border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)]' :
-                                  member.rank === 2 ? 'border-slate-400 shadow-sm' :
-                                  member.rank === 3 ? 'border-amber-600 shadow-sm' :
+                                  member.rank === 2 ? 'border-slate-400' :
+                                  member.rank === 3 ? 'border-amber-600' :
                                   'border-blue-500/40'
                                 }`}>
-                                  {member.avatar ? (
-                                    <img src={member.avatar} alt={member.full_name} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <span>{member.full_name.slice(0, 2).toUpperCase()}</span>
-                                  )}
+                                  <span>{getInitials(member.full_name)}</span>
                                 </div>
                                 
                                 {/* Rank Tag */}
@@ -553,12 +553,8 @@ export function Leaderboard() {
                     </div>
 
                     <div className="text-center mb-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500/40 mx-auto mb-3 flex items-center justify-center font-bold text-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
-                        {member.avatar ? (
-                          <img src={member.avatar} alt={member.full_name} className="w-full h-full object-cover" />
-                        ) : (
-                          <span>{member.full_name.slice(0, 2).toUpperCase()}</span>
-                        )}
+                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500/40 mx-auto mb-3 flex items-center justify-center font-extrabold text-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md">
+                        <span>{getInitials(member.full_name)}</span>
                       </div>
                       <h3 className="font-bold text-base text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {member.full_name}
@@ -615,12 +611,8 @@ export function Leaderboard() {
                           </td>
                           <td className="py-4 px-6">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-xs text-gray-800 dark:text-white flex-shrink-0">
-                                {member.avatar ? (
-                                  <img src={member.avatar} alt={member.full_name} className="w-full h-full object-cover" />
-                                ) : (
-                                  <span>{member.full_name.slice(0, 2).toUpperCase()}</span>
-                                )}
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-extrabold text-xs text-white flex-shrink-0 shadow-sm">
+                                <span>{getInitials(member.full_name)}</span>
                               </div>
                               <div>
                                 <p className="font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{member.full_name}</p>
@@ -673,12 +665,8 @@ export function Leaderboard() {
 
               {/* Character Header */}
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 flex items-center justify-center font-bold text-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white flex-shrink-0">
-                  {selectedMember.avatar ? (
-                    <img src={selectedMember.avatar} alt={selectedMember.full_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span>{selectedMember.full_name.slice(0, 2).toUpperCase()}</span>
-                  )}
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 flex items-center justify-center font-extrabold text-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex-shrink-0 shadow-md">
+                  <span>{getInitials(selectedMember.full_name)}</span>
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white">{selectedMember.full_name}</h3>
