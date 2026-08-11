@@ -506,8 +506,12 @@ export function Leaderboard() {
                     const isEven = index % 2 === 0;
                     
                     return (
-                      <div
+                      <motion.div
                         key={member.muid}
+                        initial={{ opacity: 0, x: isEven ? -35 : 35 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: '-30px' }}
+                        transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.3) }}
                         className="relative flex items-center w-full"
                       >
                         {/* Rope Node Indicator */}
@@ -589,7 +593,7 @@ export function Leaderboard() {
                             </div>
                           </motion.div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
