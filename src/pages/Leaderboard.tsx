@@ -273,7 +273,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
   }
 ];
 
-const DEPARTMENTS = ['All', 'CSE', 'ECE', 'EEE', 'ME', 'RAI', 'Alumni'];
+const DEPARTMENTS = ['All', 'CSE', 'IT', 'ECE', 'EEE', 'ME', 'RAI', 'Alumni'];
 
 export function Leaderboard() {
   const [members, setMembers] = useState<LeaderboardMember[]>(INITIAL_LEADERBOARD_DATA);
