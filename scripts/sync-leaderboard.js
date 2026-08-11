@@ -11,8 +11,8 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 
-const MULEARN_EMAIL = process.env.MULEARN_EMAIL || 'mulearn@gecidukki.ac.in';
-const MULEARN_PASSWORD = process.env.MULEARN_PASSWORD || 'gecimulearn@000';
+const MULEARN_EMAIL = process.env.MULEARN_EMAIL || 'mulearngeci@mulearn';
+const MULEARN_PASSWORD = process.env.MULEARN_PASSWORD || 'Gecimulearn2025';
 const SYNC_SECRET = process.env.LEADERBOARD_SYNC_SECRET || 'mulearn-geci-sync-secret-2026';
 const BACKEND_API_URL = process.env.BACKEND_API_URL || 'https://mulearn-geci-mu.vercel.app/api/leaderboard/sync';
 
@@ -143,22 +143,25 @@ async function runSyncBot() {
     await page.waitForTimeout(3000);
 
     // 2. Fill login credentials if inputs exist
-    const emailInput = page.locator('input[type="email"], input[name="email"], input[placeholder*="email" i], input[placeholder*="muid" i]');
+    const emailInput = page.locator('input[placeholder*="email" i], input[placeholder*="muid" i], input[type="email"], input[type="text"]');
     if (await emailInput.count() > 0) {
-      console.log('🔑 Filling email/username...');
+      console.log('🔑 Filling Email or MuID (mulearngeci@mulearn)...');
       await emailInput.first().fill(MULEARN_EMAIL);
 
-      const passwordInput = page.locator('input[type="password"], input[name="password"]');
+      const passwordInput = page.locator('input[type="password"]');
       if (await passwordInput.count() > 0) {
-        console.log('🔑 Filling password...');
+        console.log('🔑 Filling Password...');
         await passwordInput.first().fill(MULEARN_PASSWORD);
       }
 
-      const submitBtn = page.locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign In"), button:has-text("Submit")');
+      const submitBtn = page.locator('button:has-text("Sign in"), button:has-text("Sign In"), button[type="submit"]');
       if (await submitBtn.count() > 0) {
-        console.log('🚀 Clicking Submit...');
-        await submitBtn.first().click();
-        await page.waitForTimeout(4000);
+        console.log('🚀 Clicking Sign in button...');
+        await Promise.all([
+          page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
+          submitBtn.first().click()
+        ]);
+        await page.waitForTimeout(3000);
       }
     }
 

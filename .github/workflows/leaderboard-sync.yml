@@ -27,8 +27,8 @@ jobs:
 
       - name: Execute Automated Sync Bot
         env:
-          MULEARN_EMAIL: ${{ secrets.MULEARN_EMAIL || 'mulearn@gecidukki.ac.in' }}
-          MULEARN_PASSWORD: ${{ secrets.MULEARN_PASSWORD || 'gecimulearn@000' }}
+          MULEARN_EMAIL: ${{ secrets.MULEARN_EMAIL || 'mulearngeci@mulearn' }}
+          MULEARN_PASSWORD: ${{ secrets.MULEARN_PASSWORD || 'Gecimulearn2025' }}
           LEADERBOARD_SYNC_SECRET: ${{ secrets.LEADERBOARD_SYNC_SECRET || 'mulearn-geci-sync-secret-2026' }}
           BACKEND_API_URL: 'https://mulearn-geci-mu.vercel.app/api/leaderboard/sync'
         run: node scripts/sync-leaderboard.js
