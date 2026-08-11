@@ -18,12 +18,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install Playwright & Browsers
-        run: |
-          npm install playwright
-          npx playwright install chromium --with-deps
+      - name: Install All Dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium Browser
+        run: npx playwright install chromium --with-deps
 
       - name: Execute Automated Sync Bot
         env:
