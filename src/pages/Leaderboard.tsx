@@ -44,6 +44,11 @@ const getDeptAbbreviation = (deptStr: string | null | undefined): string => {
   if (!str || str === '-' || upper === 'NONE' || upper === 'N/A' || upper === 'NULL' || upper === 'NO DEPARTMENT') {
     return '';
   }
+  // Reject Level strings (e.g. "LVL3", "LVL5", "LEVEL 4") shifted from CSV columns
+  if (upper.startsWith('LVL') || upper.startsWith('LEVEL') || /^LVL\d+/i.test(upper)) {
+    return '';
+  }
+
   if (upper.includes('ELECTRICAL AND ELECTRONICS') || upper.includes('ELECTRICAL & ELECTRONICS') || upper === 'EEE' || upper.includes('ELECTRICAL')) return 'EEE';
   if (upper.includes('ELECTRONICS AND COMMUNICATION') || upper.includes('ELECTRONICS & COMMUNICATION') || upper === 'ECE' || upper.includes('ELECTRONICS')) return 'ECE';
   if (upper.includes('INFORMATION TECHNOLOGY') || upper === 'IT' || upper.includes('INFORMATION')) return 'IT';
@@ -52,7 +57,7 @@ const getDeptAbbreviation = (deptStr: string | null | undefined): string => {
   if (upper.includes('MECHATRONICS') || upper === 'MR') return 'MR';
   
   if (['CSE', 'ECE', 'EEE', 'ME', 'MR', 'IT'].includes(upper)) return upper;
-  return upper.slice(0, 4);
+  return '';
 };
 
 // Compute dynamic level based on Karma XP
