@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
 import { Events } from './pages/Events';
+import { Leaderboard } from './pages/Leaderboard';
 import { Execom } from './pages/Execom';
 import { Alumni } from './pages/Alumni';
 import { Theme } from './pages/Theme';
@@ -35,6 +36,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/execom" element={<Execom />} />
               <Route path="/alumni" element={<Alumni />} />
               <Route path="/theme" element={<Theme />} />
