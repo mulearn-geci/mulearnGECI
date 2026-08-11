@@ -79,23 +79,23 @@ export function AdminLeaderboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto px-2 sm:px-6 py-4 sm:py-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2">
-            <Trophy className="w-7 h-7 text-amber-500" />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2.5">
+            <Trophy className="w-7 h-7 text-amber-500 flex-shrink-0" />
             <span>Leaderboard Data Sync & Management</span>
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Automated daily sync runs at 12:00 AM IST. You can also upload a CSV manually below.
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+            Automated daily sync runs at <span className="font-semibold text-gray-700 dark:text-gray-300">12:00 AM IST</span>. You can also upload a CSV manually below.
           </p>
         </div>
 
         <button
           onClick={fetchStats}
           disabled={loading || syncing}
-          className="inline-flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+          className="inline-flex items-center justify-center space-x-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm disabled:opacity-50 flex-shrink-0"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Stats</span>
@@ -119,24 +119,24 @@ export function AdminLeaderboard() {
       )}
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex items-center space-x-4">
-          <div className="bg-blue-100 dark:bg-blue-900/40 p-4 rounded-2xl text-blue-600 dark:text-blue-400">
-            <Users className="w-8 h-8" />
+          <div className="bg-blue-100 dark:bg-blue-900/40 p-4 rounded-2xl text-blue-600 dark:text-blue-400 flex-shrink-0">
+            <Users className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div>
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Active Leaderboard Records</p>
-            <p className="text-2xl font-extrabold text-gray-900 dark:text-white">{stats.totalStudents} Students</p>
+          <div className="min-w-0">
+            <p className="text-[11px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">Active Leaderboard Records</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white truncate">{stats.totalStudents} Students</p>
           </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm flex items-center space-x-4">
-          <div className="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-2xl text-amber-600 dark:text-amber-400">
-            <Database className="w-8 h-8" />
+          <div className="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-2xl text-amber-600 dark:text-amber-400 flex-shrink-0">
+            <Database className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div>
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Last Database Sync</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-white">{stats.lastUpdated}</p>
+          <div className="min-w-0">
+            <p className="text-[11px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">Last Database Sync</p>
+            <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">{stats.lastUpdated}</p>
           </div>
         </div>
       </div>
