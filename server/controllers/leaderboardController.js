@@ -26,14 +26,14 @@ function getDeptAbbreviation(deptStr) {
     return '';
   }
 
+  if (upper.includes('ROBOTICS') || upper.includes('ARTIFICIAL INTELLIGENCE') || upper === 'RAI') return 'RAI';
   if (upper.includes('ELECTRICAL AND ELECTRONICS') || upper.includes('ELECTRICAL & ELECTRONICS') || upper === 'EEE' || upper.includes('ELECTRICAL')) return 'EEE';
   if (upper.includes('ELECTRONICS AND COMMUNICATION') || upper.includes('ELECTRONICS & COMMUNICATION') || upper === 'ECE' || upper.includes('ELECTRONICS')) return 'ECE';
   if (upper.includes('INFORMATION TECHNOLOGY') || upper === 'IT' || upper.includes('INFORMATION')) return 'IT';
   if (upper.includes('COMPUTER SCIENCE AND ENGINEERING') || upper.includes('COMPUTER SCIENCE & ENGINEERING') || upper.includes('COMPUTER SCIENCE') || upper === 'CSE' || upper.includes('COMPUTER')) return 'CSE';
   if (upper.includes('MECHANICAL ENGINEERING') || upper.includes('MECHANICAL') || upper === 'ME') return 'ME';
-  if (upper.includes('MECHATRONICS') || upper === 'MR') return 'MR';
   
-  if (['CSE', 'ECE', 'EEE', 'ME', 'MR', 'IT'].includes(upper)) return upper;
+  if (['CSE', 'ECE', 'EEE', 'ME', 'RAI', 'IT'].includes(upper)) return upper;
   return '';
 }
 
