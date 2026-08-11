@@ -257,80 +257,78 @@ export function Leaderboard() {
   const avgKarma = Math.round(totalKarma / sortedMembers.length);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white selection:bg-blue-600 selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
       
-      {/* ─── Hero Banner & Stats ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-950 via-gray-900 to-gray-950 border-b border-gray-800/80 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-        
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
+      {/* ─── Hero Banner & Stats (Unified Styling) ────────────────────────── */}
+      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white dark:from-gray-900 dark:to-gray-900 dark:text-blue-100 py-16 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/30 px-4 py-1.5 rounded-full text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4"
+            className="inline-flex items-center space-x-2 bg-white/10 dark:bg-blue-500/10 border border-white/20 dark:border-blue-500/30 px-4 py-1.5 rounded-full text-white dark:text-blue-300 text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm"
           >
-            <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-            <span>µLearn GECI Karma Arena</span>
+            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            <span>µLearn GECI Leaderboard & Arena</span>
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white mb-4"
+            className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4"
           >
-            The Vertical <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-300">Karma Rope</span>
+            The Vertical <span className="text-amber-300 dark:text-blue-400">Karma Rope</span>
           </motion.h1>
 
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-gray-400 mb-8">
-            Climb the rope by building consistency, committing code, and earning Karma. 
+          <p className="max-w-2xl mx-auto text-base sm:text-lg text-blue-100 dark:text-gray-300 mb-8 leading-relaxed">
+            Climb the rope by building consistency, submitting proof-of-work, and earning Karma. 
             The higher your Karma, the closer you ascend to the top!
           </p>
 
           {/* Key Metrics Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 shadow-lg backdrop-blur-md">
-              <div className="flex items-center space-x-3 text-amber-400 mb-1">
-                <Crown className="w-5 h-5" />
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Pioneer</span>
+            <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
+              <div className="flex items-center space-x-2 text-amber-300 dark:text-amber-400 mb-1">
+                <Crown className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Pioneer</span>
               </div>
               <p className="text-lg font-bold text-white truncate">{sortedMembers[0]?.full_name || 'N/A'}</p>
-              <p className="text-xs text-amber-400 font-semibold">{sortedMembers[0]?.karma.toLocaleString()} Karma</p>
+              <p className="text-xs text-amber-300 dark:text-amber-400 font-semibold">{sortedMembers[0]?.karma.toLocaleString()} Karma</p>
             </div>
 
-            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 shadow-lg backdrop-blur-md">
-              <div className="flex items-center space-x-3 text-blue-400 mb-1">
-                <Zap className="w-5 h-5" />
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Karma</span>
+            <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
+              <div className="flex items-center space-x-2 text-blue-200 dark:text-blue-400 mb-1">
+                <Zap className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Total Karma</span>
               </div>
               <p className="text-lg font-bold text-white">{totalKarma.toLocaleString()} XP</p>
-              <p className="text-xs text-gray-400">Across campus</p>
+              <p className="text-xs text-blue-100 dark:text-gray-400">Across campus</p>
             </div>
 
-            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 shadow-lg backdrop-blur-md">
-              <div className="flex items-center space-x-3 text-indigo-400 mb-1">
-                <Users className="w-5 h-5" />
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Climbers</span>
+            <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
+              <div className="flex items-center space-x-2 text-indigo-200 dark:text-indigo-400 mb-1">
+                <Users className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Climbers</span>
               </div>
               <p className="text-lg font-bold text-white">{sortedMembers.length} Members</p>
-              <p className="text-xs text-gray-400">Active learners</p>
+              <p className="text-xs text-blue-100 dark:text-gray-400">Active learners</p>
             </div>
 
-            <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 shadow-lg backdrop-blur-md">
-              <div className="flex items-center space-x-3 text-emerald-400 mb-1">
-                <Activity className="w-5 h-5" />
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Average XP</span>
+            <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
+              <div className="flex items-center space-x-2 text-emerald-300 dark:text-emerald-400 mb-1">
+                <Activity className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Average XP</span>
               </div>
               <p className="text-lg font-bold text-white">{avgKarma.toLocaleString()}</p>
-              <p className="text-xs text-gray-400">Points per student</p>
+              <p className="text-xs text-blue-100 dark:text-gray-400">Points per student</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ─── Search, Department Filters & View Switcher ─────────────────── */}
-      <section className="sticky top-16 z-30 bg-gray-950/90 backdrop-blur-md border-b border-gray-800/80 py-4 px-4 sm:px-6 lg:px-8">
+      <section className="sticky top-16 z-30 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Search Input */}
@@ -341,7 +339,7 @@ export function Leaderboard() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search climber by name or µID..."
-              className="w-full bg-gray-900 border border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             />
           </div>
 
@@ -351,10 +349,10 @@ export function Leaderboard() {
               <button
                 key={dept}
                 onClick={() => setSelectedDept(dept)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                   selectedDept === dept
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                    : 'bg-gray-900 text-gray-400 hover:text-white hover:bg-gray-800'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 {dept}
@@ -363,11 +361,11 @@ export function Leaderboard() {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-gray-900 border border-gray-800 rounded-xl p-1">
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
             <button
               onClick={() => setViewMode('rope')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                viewMode === 'rope' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'
+                viewMode === 'rope' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
               title="Karma Rope View"
             >
@@ -377,7 +375,7 @@ export function Leaderboard() {
             <button
               onClick={() => setViewMode('grid')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                viewMode === 'grid' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'
+                viewMode === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
               title="Cards Grid View"
             >
@@ -387,7 +385,7 @@ export function Leaderboard() {
             <button
               onClick={() => setViewMode('table')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                viewMode === 'table' ? 'bg-blue-600 text-white shadow' : 'text-gray-400 hover:text-white'
+                viewMode === 'table' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
               title="Classic Table View"
             >
@@ -402,10 +400,10 @@ export function Leaderboard() {
       {/* ─── Main Content Area ─────────────────────────────────────────── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {filteredMembers.length === 0 ? (
-          <div className="text-center py-20 bg-gray-900/50 border border-gray-800 rounded-2xl">
-            <Users className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white">No Climbers Found</h3>
-            <p className="text-sm text-gray-400 mt-1">Try adjusting your search query or department filter.</p>
+          <div className="text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
+            <Users className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">No Climbers Found</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Try adjusting your search query or department filter.</p>
           </div>
         ) : (
           <>
@@ -414,10 +412,10 @@ export function Leaderboard() {
               <div className="relative py-12 min-h-[900px] flex flex-col items-center">
                 
                 {/* Central Glowing Energy Rope */}
-                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1.5 bg-gradient-to-b from-amber-400 via-blue-500 to-indigo-700 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.8)] z-0" />
+                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1.5 bg-gradient-to-b from-amber-400 via-blue-500 to-indigo-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)] z-0" />
                 
                 {/* Top Rope Crown Anchor */}
-                <div className="relative z-10 bg-amber-500 text-gray-950 font-extrabold px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.8)] flex items-center space-x-2 mb-12 -mt-4">
+                <div className="relative z-10 bg-amber-500 text-gray-950 font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-2 mb-12 -mt-4">
                   <Crown className="w-4 h-4" />
                   <span className="text-xs uppercase tracking-widest">Summit Peak • 100% Karma</span>
                 </div>
@@ -426,31 +424,30 @@ export function Leaderboard() {
                 <div className="w-full max-w-4xl space-y-12 relative z-10">
                   {filteredMembers.map((member, index) => {
                     const isEven = index % 2 === 0;
-                    const relativeOffset = maxKarma > 0 ? (member.karma / maxKarma) : 0;
                     
                     return (
                       <motion.div
                         key={member.muid}
-                        initial={{ opacity: 0, x: isEven ? -40 : 40 }}
+                        initial={{ opacity: 0, x: isEven ? -30 : 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: index * 0.05 }}
+                        transition={{ duration: 0.4, delay: index * 0.04 }}
                         className={`flex items-center w-full ${isEven ? 'flex-row' : 'flex-row-reverse'}`}
                       >
                         {/* Member Card Box */}
                         <div className={`w-1/2 ${isEven ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
                           <div
                             onClick={() => setSelectedMember(member)}
-                            className="inline-block bg-gray-900/90 border border-gray-800 hover:border-blue-500/80 rounded-2xl p-4 shadow-xl hover:shadow-blue-500/10 cursor-pointer transition-all duration-300 group hover:-translate-y-1"
+                            className="inline-block bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/80 hover:border-blue-500/80 dark:hover:border-blue-500/80 rounded-2xl p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 group hover:-translate-y-1"
                           >
                             <div className={`flex items-center space-x-3 ${isEven ? 'flex-row-reverse space-x-reverse' : 'flex-row'}`}>
                               
                               {/* Avatar / Badge */}
                               <div className="relative flex-shrink-0">
-                                <div className={`w-12 h-12 rounded-full overflow-hidden border-2 flex items-center justify-center font-bold text-sm bg-gray-800 text-white ${
-                                  member.rank === 1 ? 'border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)]' :
-                                  member.rank === 2 ? 'border-slate-300 shadow-[0_0_10px_rgba(203,213,225,0.5)]' :
-                                  member.rank === 3 ? 'border-amber-700 shadow-[0_0_10px_rgba(180,83,9,0.5)]' :
+                                <div className={`w-12 h-12 rounded-full overflow-hidden border-2 flex items-center justify-center font-bold text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white ${
+                                  member.rank === 1 ? 'border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)]' :
+                                  member.rank === 2 ? 'border-slate-400 shadow-sm' :
+                                  member.rank === 3 ? 'border-amber-600 shadow-sm' :
                                   'border-blue-500/40'
                                 }`}>
                                   {member.avatar ? (
@@ -461,7 +458,7 @@ export function Leaderboard() {
                                 </div>
                                 
                                 {/* Rank Tag */}
-                                <span className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold ${
+                                <span className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold shadow-sm ${
                                   member.rank === 1 ? 'bg-amber-400 text-gray-950' :
                                   member.rank === 2 ? 'bg-slate-300 text-gray-950' :
                                   member.rank === 3 ? 'bg-amber-700 text-white' :
@@ -474,26 +471,26 @@ export function Leaderboard() {
                               {/* Info */}
                               <div>
                                 <div className="flex items-center space-x-2">
-                                  <h3 className="font-bold text-sm text-white group-hover:text-blue-400 transition-colors">
+                                  <h3 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                     {member.full_name}
                                   </h3>
                                   {member.is_alumni && (
-                                    <span className="bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] px-1.5 py-0.5 rounded">
+                                    <span className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 text-[10px] px-1.5 py-0.5 rounded font-semibold">
                                       Alumni
                                     </span>
                                   )}
                                 </div>
                                 
-                                <p className="text-xs text-gray-400 font-mono mt-0.5">{member.muid}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{member.muid}</p>
                                 
                                 <div className="flex items-center space-x-2 mt-2">
-                                  <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold px-2 py-0.5 rounded-full">
+                                  <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 text-xs font-bold px-2 py-0.5 rounded-full">
                                     {member.karma.toLocaleString()} XP
                                   </span>
-                                  <span className="bg-gray-800 text-gray-300 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-[11px] font-semibold px-2 py-0.5 rounded-full">
                                     Lvl {member.level}
                                   </span>
-                                  <span className="bg-gray-800 text-gray-400 text-[11px] px-2 py-0.5 rounded-full">
+                                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-0.5 rounded-full">
                                     {member.department}
                                   </span>
                                 </div>
@@ -505,11 +502,11 @@ export function Leaderboard() {
 
                         {/* Central Node Indicator on Rope */}
                         <div className="relative z-20 flex items-center justify-center">
-                          <div className={`w-8 h-8 rounded-full border-2 bg-gray-950 flex items-center justify-center shadow-lg transition-transform hover:scale-125 ${
-                            member.rank === 1 ? 'border-amber-400 text-amber-400 shadow-amber-400/40' :
-                            member.rank === 2 ? 'border-slate-300 text-slate-300' :
-                            member.rank === 3 ? 'border-amber-600 text-amber-600' :
-                            'border-blue-500 text-blue-400'
+                          <div className={`w-8 h-8 rounded-full border-2 bg-white dark:bg-gray-900 flex items-center justify-center shadow-md transition-transform hover:scale-125 ${
+                            member.rank === 1 ? 'border-amber-400 text-amber-500 shadow-amber-400/30' :
+                            member.rank === 2 ? 'border-slate-400 text-slate-500' :
+                            member.rank === 3 ? 'border-amber-700 text-amber-700' :
+                            'border-blue-500 text-blue-600 dark:text-blue-400'
                           }`}>
                             <Zap className="w-4 h-4" />
                           </div>
@@ -523,7 +520,7 @@ export function Leaderboard() {
                 </div>
 
                 {/* Rope Base Camp Anchor */}
-                <div className="relative z-10 bg-gray-800 text-gray-400 font-bold px-4 py-1.5 rounded-full border border-gray-700 text-xs uppercase tracking-widest mt-12">
+                <div className="relative z-10 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold px-4 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-xs uppercase tracking-widest mt-12 shadow-sm">
                   <span>Base Camp • Start of Journey</span>
                 </div>
 
@@ -539,44 +536,44 @@ export function Leaderboard() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => setSelectedMember(member)}
-                    className="bg-gray-900/90 border border-gray-800 hover:border-blue-500/80 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:-translate-y-1 group"
+                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500/80 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:-translate-y-1 group"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${
                         member.rank === 1 ? 'bg-amber-400 text-gray-950' :
                         member.rank === 2 ? 'bg-slate-300 text-gray-950' :
                         member.rank === 3 ? 'bg-amber-700 text-white' :
-                        'bg-blue-600/30 text-blue-300 border border-blue-500/30'
+                        'bg-blue-100 dark:bg-blue-600/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30'
                       }`}>
                         Rank #{member.rank}
                       </span>
-                      <span className="bg-gray-800 text-gray-400 text-xs px-2.5 py-1 rounded-full font-semibold">
+                      <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2.5 py-1 rounded-full font-semibold">
                         Lvl {member.level}
                       </span>
                     </div>
 
                     <div className="text-center mb-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500/40 mx-auto mb-3 flex items-center justify-center font-bold text-lg bg-gray-800 text-white">
+                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500/40 mx-auto mb-3 flex items-center justify-center font-bold text-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
                         {member.avatar ? (
                           <img src={member.avatar} alt={member.full_name} className="w-full h-full object-cover" />
                         ) : (
                           <span>{member.full_name.slice(0, 2).toUpperCase()}</span>
                         )}
                       </div>
-                      <h3 className="font-bold text-base text-white group-hover:text-blue-400 transition-colors">
+                      <h3 className="font-bold text-base text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {member.full_name}
                       </h3>
-                      <p className="text-xs text-gray-400 font-mono mt-0.5">{member.muid}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{member.muid}</p>
                     </div>
 
-                    <div className="bg-gray-950/60 rounded-xl p-3 flex items-center justify-between">
+                    <div className="bg-gray-50 dark:bg-gray-900/60 rounded-xl p-3 flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Karma XP</p>
-                        <p className="text-sm font-extrabold text-blue-400">{member.karma.toLocaleString()}</p>
+                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Karma XP</p>
+                        <p className="text-sm font-extrabold text-blue-600 dark:text-blue-400">{member.karma.toLocaleString()}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Dept</p>
-                        <p className="text-sm font-bold text-gray-300">{member.department}</p>
+                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Dept</p>
+                        <p className="text-sm font-bold text-gray-700 dark:text-gray-300">{member.department}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -586,10 +583,10 @@ export function Leaderboard() {
 
             {/* VIEW 3: CLASSIC TABLE */}
             {viewMode === 'table' && (
-              <div className="bg-gray-900/90 border border-gray-800 rounded-2xl overflow-hidden shadow-xl">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm text-gray-300">
-                    <thead className="bg-gray-950 text-gray-400 uppercase text-[11px] font-bold tracking-wider border-b border-gray-800">
+                  <table className="w-full text-left text-sm text-gray-700 dark:text-gray-300">
+                    <thead className="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 uppercase text-[11px] font-bold tracking-wider border-b border-gray-200 dark:border-gray-700">
                       <tr>
                         <th className="py-4 px-6">Rank</th>
                         <th className="py-4 px-6">Student</th>
@@ -599,26 +596,26 @@ export function Leaderboard() {
                         <th className="py-4 px-6">IGs & Circles</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-800/60">
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700/60">
                       {filteredMembers.map((member) => (
                         <tr
                           key={member.muid}
                           onClick={() => setSelectedMember(member)}
-                          className="hover:bg-gray-800/40 cursor-pointer transition-colors"
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer transition-colors"
                         >
-                          <td className="py-4 px-6 font-extrabold text-white">
+                          <td className="py-4 px-6 font-extrabold text-gray-900 dark:text-white">
                             <span className={`px-2.5 py-1 rounded-full text-xs ${
                               member.rank === 1 ? 'bg-amber-400 text-gray-950' :
                               member.rank === 2 ? 'bg-slate-300 text-gray-950' :
                               member.rank === 3 ? 'bg-amber-700 text-white' :
-                              'text-gray-400'
+                              'text-gray-500 dark:text-gray-400'
                             }`}>
                               #{member.rank}
                             </span>
                           </td>
                           <td className="py-4 px-6">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-xs text-gray-800 dark:text-white flex-shrink-0">
                                 {member.avatar ? (
                                   <img src={member.avatar} alt={member.full_name} className="w-full h-full object-cover" />
                                 ) : (
@@ -626,24 +623,24 @@ export function Leaderboard() {
                                 )}
                               </div>
                               <div>
-                                <p className="font-bold text-white hover:text-blue-400 transition-colors">{member.full_name}</p>
-                                <p className="text-xs text-gray-500 font-mono">{member.muid}</p>
+                                <p className="font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{member.full_name}</p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 font-mono">{member.muid}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6 font-extrabold text-blue-400">
+                          <td className="py-4 px-6 font-extrabold text-blue-600 dark:text-blue-400">
                             {member.karma.toLocaleString()} XP
                           </td>
                           <td className="py-4 px-6">
-                            <span className="bg-gray-800 text-gray-300 text-xs px-2.5 py-1 rounded-full font-semibold">
+                            <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2.5 py-1 rounded-full font-semibold">
                               Lvl {member.level}
                             </span>
                           </td>
-                          <td className="py-4 px-6 font-semibold text-gray-300">
+                          <td className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">
                             {member.department}
                           </td>
-                          <td className="py-4 px-6 text-xs text-gray-400">
-                            <span className="text-indigo-400 font-bold">{member.ig_count}</span> IGs • <span className="text-emerald-400 font-bold">{member.lc_count}</span> Circles
+                          <td className="py-4 px-6 text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">{member.ig_count}</span> IGs • <span className="text-emerald-600 dark:text-emerald-400 font-bold">{member.lc_count}</span> Circles
                           </td>
                         </tr>
                       ))}
@@ -659,24 +656,24 @@ export function Leaderboard() {
       {/* ─── Student RPG Character Card Modal ─────────────────────────── */}
       <AnimatePresence>
         {selectedMember && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/60 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-gray-900 border border-gray-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative overflow-hidden"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative overflow-hidden text-gray-900 dark:text-white"
             >
               {/* Close Button */}
               <button
                 onClick={() => setSelectedMember(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white bg-gray-800/60 p-2 rounded-full transition-colors"
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white bg-gray-100 dark:bg-gray-700/60 p-2 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Character Header */}
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 flex items-center justify-center font-bold text-xl bg-gray-800 text-white flex-shrink-0">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 flex items-center justify-center font-bold text-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white flex-shrink-0">
                   {selectedMember.avatar ? (
                     <img src={selectedMember.avatar} alt={selectedMember.full_name} className="w-full h-full object-cover" />
                   ) : (
@@ -684,13 +681,13 @@ export function Leaderboard() {
                   )}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">{selectedMember.full_name}</h3>
-                  <p className="text-xs text-blue-400 font-mono">{selectedMember.muid}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{selectedMember.full_name}</h3>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-mono">{selectedMember.muid}</p>
                   <div className="flex items-center space-x-2 mt-1.5">
-                    <span className="bg-blue-600/30 border border-blue-500/40 text-blue-300 text-xs px-2 py-0.5 rounded-md font-semibold">
+                    <span className="bg-blue-100 dark:bg-blue-600/30 border border-blue-200 dark:border-blue-500/40 text-blue-700 dark:text-blue-300 text-xs px-2 py-0.5 rounded-md font-semibold">
                       Rank #{selectedMember.rank}
                     </span>
-                    <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-md font-semibold">
+                    <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2 py-0.5 rounded-md font-semibold">
                       Level {selectedMember.level}
                     </span>
                   </div>
@@ -699,37 +696,37 @@ export function Leaderboard() {
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Karma Points</span>
-                  <span className="text-lg font-extrabold text-blue-400">{selectedMember.karma.toLocaleString()} XP</span>
+                <div className="bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 rounded-xl p-3.5">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Karma Points</span>
+                  <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400">{selectedMember.karma.toLocaleString()} XP</span>
                 </div>
-                <div className="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Recent Boost</span>
-                  <span className="text-lg font-extrabold text-emerald-400">+{selectedMember.last_karma_gained} XP</span>
+                <div className="bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 rounded-xl p-3.5">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Recent Boost</span>
+                  <span className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">+{selectedMember.last_karma_gained} XP</span>
                 </div>
-                <div className="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Interest Groups</span>
-                  <span className="text-lg font-extrabold text-indigo-400">{selectedMember.ig_count} Groups</span>
+                <div className="bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 rounded-xl p-3.5">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Interest Groups</span>
+                  <span className="text-lg font-extrabold text-indigo-600 dark:text-indigo-400">{selectedMember.ig_count} Groups</span>
                 </div>
-                <div className="bg-gray-950/80 border border-gray-800 rounded-xl p-3.5">
-                  <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Learning Circles</span>
-                  <span className="text-lg font-extrabold text-amber-400">{selectedMember.lc_count} Circles</span>
+                <div className="bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 rounded-xl p-3.5">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Learning Circles</span>
+                  <span className="text-lg font-extrabold text-amber-600 dark:text-amber-400">{selectedMember.lc_count} Circles</span>
                 </div>
               </div>
 
               {/* Details List */}
-              <div className="space-y-2 text-xs border-t border-gray-800 pt-4">
-                <div className="flex justify-between py-1 text-gray-400">
+              <div className="space-y-2 text-xs border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="flex justify-between py-1 text-gray-500 dark:text-gray-400">
                   <span>Department</span>
-                  <span className="text-white font-bold">{selectedMember.department}</span>
+                  <span className="text-gray-900 dark:text-white font-bold">{selectedMember.department}</span>
                 </div>
-                <div className="flex justify-between py-1 text-gray-400">
+                <div className="flex justify-between py-1 text-gray-500 dark:text-gray-400">
                   <span>Graduation Year</span>
-                  <span className="text-white font-bold">{selectedMember.graduation_year}</span>
+                  <span className="text-gray-900 dark:text-white font-bold">{selectedMember.graduation_year}</span>
                 </div>
-                <div className="flex justify-between py-1 text-gray-400">
+                <div className="flex justify-between py-1 text-gray-500 dark:text-gray-400">
                   <span>Status</span>
-                  <span className="text-white font-bold">{selectedMember.is_alumni ? 'Alumni' : 'Active Student'}</span>
+                  <span className="text-gray-900 dark:text-white font-bold">{selectedMember.is_alumni ? 'Alumni' : 'Active Student'}</span>
                 </div>
               </div>
 
