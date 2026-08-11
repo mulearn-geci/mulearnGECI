@@ -36,18 +36,23 @@ const formatKarma = (val: number | null | undefined): string => {
   return val.toLocaleString();
 };
 
-// Abbreviate long department names (e.g. Computer Science and Engineering -> CSE)
+// Abbreviate long department names cleanly or return '' if no department is specified
 const getDeptAbbreviation = (deptStr: string | null | undefined): string => {
-  if (!deptStr || typeof deptStr !== 'string') return 'CSE';
-  const str = deptStr.toUpperCase();
-  if (str.includes('COMPUTER') || str.includes('CSE')) return 'CSE';
-  if (str.includes('MECHANICAL') || str.includes('MECH') || str === 'ME') return 'ME';
-  if (str.includes('ELECTRONICS') || str.includes('COMMUNICATION') || str.includes('ECE')) return 'ECE';
-  if (str.includes('ELECTRICAL') || str.includes('EEE')) return 'EEE';
-  if (str.includes('MECHATRONICS') || str === 'MR') return 'MR';
-  if (str.includes('INFORMATION') || str.includes('IT')) return 'IT';
-  if (str === '-' || str === '' || str.includes('NONE')) return 'CSE';
-  return deptStr.slice(0, 4).toUpperCase();
+  if (!deptStr || typeof deptStr !== 'string') return '';
+  const str = deptStr.trim();
+  const upper = str.toUpperCase();
+  if (!str || str === '-' || upper === 'NONE' || upper === 'N/A' || upper === 'NULL' || upper === 'NO DEPARTMENT') {
+    return '';
+  }
+  if (upper.includes('ELECTRICAL AND ELECTRONICS') || upper.includes('ELECTRICAL & ELECTRONICS') || upper === 'EEE' || upper.includes('ELECTRICAL')) return 'EEE';
+  if (upper.includes('ELECTRONICS AND COMMUNICATION') || upper.includes('ELECTRONICS & COMMUNICATION') || upper === 'ECE' || upper.includes('ELECTRONICS')) return 'ECE';
+  if (upper.includes('INFORMATION TECHNOLOGY') || upper === 'IT' || upper.includes('INFORMATION')) return 'IT';
+  if (upper.includes('COMPUTER SCIENCE AND ENGINEERING') || upper.includes('COMPUTER SCIENCE & ENGINEERING') || upper.includes('COMPUTER SCIENCE') || upper === 'CSE' || upper.includes('COMPUTER')) return 'CSE';
+  if (upper.includes('MECHANICAL ENGINEERING') || upper.includes('MECHANICAL') || upper === 'ME') return 'ME';
+  if (upper.includes('MECHATRONICS') || upper === 'MR') return 'MR';
+  
+  if (['CSE', 'ECE', 'EEE', 'ME', 'MR', 'IT'].includes(upper)) return upper;
+  return upper.slice(0, 4);
 };
 
 // Compute dynamic level based on Karma XP
@@ -307,7 +312,7 @@ export function Leaderboard() {
     return sortedMembers.filter(m => {
       if (!m) return false;
       const dept = getDeptAbbreviation(m.department);
-      const matchesDept = selectedDept === 'All' || dept === selectedDept;
+      const matchesDept = selectedDept === 'All' || (dept !== '' && dept === selectedDept);
       const name = (m.full_name || '').toLowerCase();
       const muid = (m.muid || '').toLowerCase();
       const matchesSearch = name.includes(term) || muid.includes(term) || dept.toLowerCase().includes(term);
@@ -626,10 +631,12 @@ export function Leaderboard() {
                         <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Karma XP</p>
                         <p className="text-sm font-extrabold text-blue-600 dark:text-blue-400">{formatKarma(member.karma)}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Dept</p>
-                        <p className="text-sm font-bold text-gray-700 dark:text-gray-300">{member.department}</p>
-                      </div>
+                      {getDeptAbbreviation(member.department) ? (
+                        <div className="text-right">
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Dept</p>
+                          <p className="text-sm font-bold text-gray-700 dark:text-gray-300">{getDeptAbbreviation(member.department)}</p>
+                        </div>
+                      ) : null}
                     </div>
                   </motion.div>
                 ))}
@@ -763,10 +770,12 @@ export function Leaderboard() {
 
               {/* Details List */}
               <div className="space-y-2 text-xs border-t border-gray-200 dark:border-gray-700 pt-4">
-                <div className="flex justify-between py-1 text-gray-500 dark:text-gray-400">
-                  <span>Department</span>
-                  <span className="text-gray-900 dark:text-white font-bold">{selectedMember.department}</span>
-                </div>
+                {getDeptAbbreviation(selectedMember.department) ? (
+                  <div className="flex justify-between py-1 text-gray-500 dark:text-gray-400">
+                    <span>Department</span>
+                    <span className="text-gray-900 dark:text-white font-bold">{getDeptAbbreviation(selectedMember.department)}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between py-1 text-gray-500 dark:text-gray-400">
                   <span>Graduation Year</span>
                   <span className="text-gray-900 dark:text-white font-bold">{selectedMember.graduation_year}</span>

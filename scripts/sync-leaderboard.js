@@ -64,7 +64,7 @@ function parseCSV(csvText) {
     obj.full_name = obj.student || obj.full_name || obj.name || values[1] || 'Student';
     obj.karma = extractNum(obj.karma || values[2], 0);
     obj.level = extractNum(obj.level || values[3], 1);
-    obj.department = obj.department___cluster || obj.department || values[4] || 'CSE';
+    obj.department = obj.department___cluster || obj.department || values[4] || '';
     obj.is_alumni = String(obj.alumni_status || obj.is_alumni || values[5] || '').toLowerCase().includes('true') || String(values[5]) === '1';
     obj.muid = obj.muid || obj.full_name.toLowerCase().replace(/\s+/g, '') + '@mulearn';
 

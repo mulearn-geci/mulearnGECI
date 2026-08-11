@@ -13,18 +13,23 @@ function extractNumber(val, fallback = 0) {
   return fallback;
 }
 
-// Helper to abbreviate department names cleanly (e.g. Computer Science and Engineering -> CSE)
+// Helper to abbreviate department names cleanly or return '' if no department is specified
 function getDeptAbbreviation(deptStr) {
-  if (!deptStr || typeof deptStr !== 'string') return 'CSE';
-  const str = deptStr.toUpperCase().trim();
-  if (str.includes('COMPUTER') || str.includes('CSE')) return 'CSE';
-  if (str.includes('MECHANICAL') || str.includes('MECH') || str === 'ME') return 'ME';
-  if (str.includes('ELECTRONICS') || str.includes('COMMUNICATION') || str.includes('ECE')) return 'ECE';
-  if (str.includes('ELECTRICAL') || str.includes('EEE')) return 'EEE';
-  if (str.includes('MECHATRONICS') || str === 'MR') return 'MR';
-  if (str.includes('INFORMATION') || str.includes('IT')) return 'IT';
-  if (str === '-' || str === '' || str.includes('NONE')) return 'CSE';
-  return deptStr.slice(0, 4).toUpperCase();
+  if (!deptStr || typeof deptStr !== 'string') return '';
+  const str = deptStr.trim();
+  const upper = str.toUpperCase();
+  if (!str || str === '-' || upper === 'NONE' || upper === 'N/A' || upper === 'NULL' || upper === 'NO DEPARTMENT') {
+    return '';
+  }
+  if (upper.includes('ELECTRICAL AND ELECTRONICS') || upper.includes('ELECTRICAL & ELECTRONICS') || upper === 'EEE' || upper.includes('ELECTRICAL')) return 'EEE';
+  if (upper.includes('ELECTRONICS AND COMMUNICATION') || upper.includes('ELECTRONICS & COMMUNICATION') || upper === 'ECE' || upper.includes('ELECTRONICS')) return 'ECE';
+  if (upper.includes('INFORMATION TECHNOLOGY') || upper === 'IT' || upper.includes('INFORMATION')) return 'IT';
+  if (upper.includes('COMPUTER SCIENCE AND ENGINEERING') || upper.includes('COMPUTER SCIENCE & ENGINEERING') || upper.includes('COMPUTER SCIENCE') || upper === 'CSE' || upper.includes('COMPUTER')) return 'CSE';
+  if (upper.includes('MECHANICAL ENGINEERING') || upper.includes('MECHANICAL') || upper === 'ME') return 'ME';
+  if (upper.includes('MECHATRONICS') || upper === 'MR') return 'MR';
+  
+  if (['CSE', 'ECE', 'EEE', 'ME', 'MR', 'IT'].includes(upper)) return upper;
+  return upper.slice(0, 4);
 }
 
 // Helper to compute exact Level based on LVL string or Karma points
