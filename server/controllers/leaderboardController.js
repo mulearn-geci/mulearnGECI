@@ -129,7 +129,16 @@ const leaderboardController = {
         const lastKarmaVal = extractNumber(s.last_karma_gained || s.LastKarmaGained, 0);
         const igVal = extractNumber(s.ig_count || s.IgCount, 0);
         const lcVal = extractNumber(s.lc_count || s.LcCount, 0);
-        const isAlumniVal = Boolean(s.is_alumni === true || s.is_alumni === 'true' || s.IsAlumni === true || s.IsAlumni === 'true');
+        const gradYear = extractNumber(s.graduation_year || s.GraduationYear || s.grad_year, 0);
+        const deptRaw = (s.department || s.Department || s.Department___Cluster || '').toString().toUpperCase();
+        const isAlumniVal = Boolean(
+          s.is_alumni === true || 
+          s.is_alumni === 'true' || 
+          s.IsAlumni === true || 
+          s.IsAlumni === 'true' ||
+          deptRaw.includes('ALUMNI') ||
+          (gradYear > 1990 && gradYear <= 2025)
+        );
         const deptVal = getDeptAbbreviation(s.department || s.Department || s.Department___Cluster);
 
         return {

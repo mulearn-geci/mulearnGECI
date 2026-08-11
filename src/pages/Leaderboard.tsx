@@ -273,7 +273,7 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
   }
 ];
 
-const DEPARTMENTS = ['All', 'CSE', 'ECE', 'EEE', 'ME', 'RAI'];
+const DEPARTMENTS = ['All', 'CSE', 'ECE', 'EEE', 'ME', 'RAI', 'Alumni'];
 
 export function Leaderboard() {
   const [members, setMembers] = useState<LeaderboardMember[]>(INITIAL_LEADERBOARD_DATA);
@@ -311,23 +311,53 @@ export function Leaderboard() {
 
   const maxKarma = sortedMembers[0]?.karma || 1;
 
-  // Filtered members based on search and department with complete null safety
+  // Separate active campus members vs alumni members
+  const activeMembersList = useMemo(() => {
+    return selectedDept === 'Alumni' 
+      ? sortedMembers.filter(m => Boolean(m?.is_alumni))
+      : sortedMembers.filter(m => !m?.is_alumni);
+  }, [sortedMembers, selectedDept]);
+
+  // Filtered members based on search and department tab with contextual ranking
   const filteredMembers = useMemo(() => {
     const term = (searchTerm || '').toLowerCase();
-    return sortedMembers.filter(m => {
-      if (!m) return false;
-      const dept = getDeptAbbreviation(m.department);
-      const matchesDept = selectedDept === 'All' || (dept !== '' && dept === selectedDept);
-      const name = (m.full_name || '').toLowerCase();
-      const muid = (m.muid || '').toLowerCase();
-      const matchesSearch = name.includes(term) || muid.includes(term) || dept.toLowerCase().includes(term);
-      return matchesDept && matchesSearch;
-    });
+    
+    let baseList: LeaderboardMember[] = [];
+
+    if (selectedDept === 'Alumni') {
+      baseList = sortedMembers.filter(m => Boolean(m?.is_alumni));
+    } else {
+      // Exclude Alumni from default campus views (All, CSE, ECE, EEE, ME, RAI)
+      baseList = sortedMembers.filter(m => !m?.is_alumni);
+      if (selectedDept !== 'All') {
+        baseList = baseList.filter(m => {
+          if (!m) return false;
+          const dept = getDeptAbbreviation(m.department);
+          return dept !== '' && dept === selectedDept;
+        });
+      }
+    }
+
+    if (term) {
+      baseList = baseList.filter(m => {
+        if (!m) return false;
+        const dept = getDeptAbbreviation(m.department);
+        const name = (m.full_name || '').toLowerCase();
+        const muid = (m.muid || '').toLowerCase();
+        return name.includes(term) || muid.includes(term) || dept.toLowerCase().includes(term);
+      });
+    }
+
+    // Re-rank items starting from #1 for the active section (1, 2, 3...)
+    return baseList.map((member, index) => ({
+      ...member,
+      rank: index + 1
+    }));
   }, [sortedMembers, selectedDept, searchTerm]);
 
-  // Overall campus stats with complete null safety
-  const totalKarma = sortedMembers.reduce((acc, curr) => acc + (curr?.karma || 0), 0);
-  const avgKarma = sortedMembers.length > 0 ? Math.round(totalKarma / sortedMembers.length) : 0;
+  // Stats computed for current view
+  const totalKarma = activeMembersList.reduce((acc, curr) => acc + (curr?.karma || 0), 0);
+  const avgKarma = activeMembersList.length > 0 ? Math.round(totalKarma / activeMembersList.length) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
@@ -366,8 +396,8 @@ export function Leaderboard() {
                 <Crown className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Pioneer</span>
               </div>
-              <p className="text-lg font-bold text-white truncate">{sortedMembers[0]?.full_name || 'N/A'}</p>
-              <p className="text-xs text-amber-300 dark:text-amber-400 font-semibold">{formatKarma(sortedMembers[0]?.karma)} Karma</p>
+              <p className="text-lg font-bold text-white truncate">{activeMembersList[0]?.full_name || 'N/A'}</p>
+              <p className="text-xs text-amber-300 dark:text-amber-400 font-semibold">{formatKarma(activeMembersList[0]?.karma)} Karma</p>
             </div>
 
             <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
@@ -376,7 +406,7 @@ export function Leaderboard() {
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Total Karma</span>
               </div>
               <p className="text-lg font-bold text-white">{formatKarma(totalKarma)} XP</p>
-              <p className="text-xs text-blue-100 dark:text-gray-400">Across campus</p>
+              <p className="text-xs text-blue-100 dark:text-gray-400">{selectedDept === 'Alumni' ? 'Alumni total' : 'Across campus'}</p>
             </div>
 
             <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
@@ -384,8 +414,8 @@ export function Leaderboard() {
                 <Users className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Climbers</span>
               </div>
-              <p className="text-lg font-bold text-white">{sortedMembers.length} Members</p>
-              <p className="text-xs text-blue-100 dark:text-gray-400">Active learners</p>
+              <p className="text-lg font-bold text-white">{activeMembersList.length} Members</p>
+              <p className="text-xs text-blue-100 dark:text-gray-400">{selectedDept === 'Alumni' ? 'Graduated Alumni' : 'Active learners'}</p>
             </div>
 
             <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
