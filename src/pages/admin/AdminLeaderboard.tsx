@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, RefreshCw, Database, CheckCircle, AlertCircle, Users, Trophy } from 'lucide-react';
+import { Upload, RefreshCw, Database, CheckCircle, AlertCircle, Users, Trophy, Trash2 } from 'lucide-react';
 import { leaderboardAPI } from '../../services/api';
 import { AdminLayout } from '../../components/AdminLayout';
 
@@ -35,9 +35,12 @@ export function AdminLeaderboard() {
           totalStudents: res.data.length,
           lastUpdated: res.data[0]?.lastUpdated ? new Date(res.data[0].lastUpdated).toLocaleString() : 'Never'
         });
+      } else {
+        setStats({ totalStudents: 0, lastUpdated: 'Never' });
       }
     } catch (err) {
       console.error('Error fetching stats:', err);
+      setStats({ totalStudents: 0, lastUpdated: 'Never' });
     } finally {
       setLoading(false);
     }
@@ -46,6 +49,27 @@ export function AdminLeaderboard() {
   useEffect(() => {
     fetchStats();
   }, []);
+
+  const handleClearLeaderboard = async () => {
+    if (!window.confirm('Are you sure you want to clear all leaderboard records from the database? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      setSyncing(true);
+      setMessage(null);
+      const res = await leaderboardAPI.clear();
+      if (res.success) {
+        setMessage({ type: 'success', text: res.message || 'Leaderboard cleared successfully!' });
+        fetchStats();
+      } else {
+        setMessage({ type: 'error', text: res.message || 'Failed to clear leaderboard' });
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Error clearing leaderboard data' });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,14 +118,25 @@ export function AdminLeaderboard() {
             </p>
           </div>
 
-          <button
-            onClick={fetchStats}
-            disabled={loading || syncing}
-            className="inline-flex items-center justify-center space-x-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm disabled:opacity-50 flex-shrink-0"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh Stats</span>
-          </button>
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            <button
+              onClick={handleClearLeaderboard}
+              disabled={loading || syncing}
+              className="inline-flex items-center justify-center space-x-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Clear Data</span>
+            </button>
+
+            <button
+              onClick={fetchStats}
+              disabled={loading || syncing}
+              className="inline-flex items-center justify-center space-x-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <span>Refresh Stats</span>
+            </button>
+          </div>
         </div>
 
         {/* Message Alert */}

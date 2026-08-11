@@ -402,5 +402,17 @@ export const leaderboardAPI = {
       throw new Error(err.message || 'Failed to sync leaderboard data');
     }
     return response.json();
+  },
+
+  clear: async () => {
+    const response = await fetch(`${API_BASE_URL}/leaderboard/clear`, {
+      method: 'DELETE',
+      headers: createAuthHeaders(),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to clear leaderboard data');
+    }
+    return response.json();
   }
 };
