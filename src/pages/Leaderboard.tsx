@@ -24,10 +24,10 @@ export interface LeaderboardMember {
 
 // Helper to extract student initials (e.g. Roshan Alexander -> RA)
 const getInitials = (name: string): string => {
-  if (!name) return '??';
+  if (!name || typeof name !== 'string') return '??';
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
 };
 
 // High quality mock dataset based on exact CSV columns provided by user
@@ -257,28 +257,30 @@ export function Leaderboard() {
     fetchLeaderboard();
   }, []);
 
-  // Sorted list by karma descending
+  // Sorted list by karma descending with complete null safety
   const sortedMembers = useMemo(() => {
-    return [...members].sort((a, b) => b.karma - a.karma);
+    return [...members].sort((a, b) => (b?.karma || 0) - (a?.karma || 0));
   }, [members]);
 
   const maxKarma = sortedMembers[0]?.karma || 1;
 
-  // Filtered members based on search and department
+  // Filtered members based on search and department with complete null safety
   const filteredMembers = useMemo(() => {
+    const term = (searchTerm || '').toLowerCase();
     return sortedMembers.filter(m => {
-      const matchesDept = selectedDept === 'All' || m.department === selectedDept;
-      const matchesSearch = 
-        m.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.muid.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.department.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!m) return false;
+      const dept = (m.department || '').toUpperCase();
+      const matchesDept = selectedDept === 'All' || dept.includes(selectedDept.toUpperCase());
+      const name = (m.full_name || '').toLowerCase();
+      const muid = (m.muid || '').toLowerCase();
+      const matchesSearch = name.includes(term) || muid.includes(term) || dept.toLowerCase().includes(term);
       return matchesDept && matchesSearch;
     });
   }, [sortedMembers, selectedDept, searchTerm]);
 
-  // Overall campus stats
-  const totalKarma = sortedMembers.reduce((acc, curr) => acc + curr.karma, 0);
-  const avgKarma = Math.round(totalKarma / sortedMembers.length);
+  // Overall campus stats with complete null safety
+  const totalKarma = sortedMembers.reduce((acc, curr) => acc + (curr?.karma || 0), 0);
+  const avgKarma = sortedMembers.length > 0 ? Math.round(totalKarma / sortedMembers.length) : 0;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">

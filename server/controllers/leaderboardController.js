@@ -10,22 +10,22 @@ const leaderboardController = {
     try {
       let members = await Leaderboard.find().sort({ karma: -1 });
 
-      // Add dynamic rank positioning
+      // Add dynamic rank positioning & sanitize null fields
       const formattedMembers = members.map((m, index) => ({
         _id: m._id,
-        full_name: m.full_name,
-        muid: m.muid,
-        karma: m.karma,
+        full_name: m.full_name || 'Student',
+        muid: m.muid || 'student@mulearn',
+        karma: typeof m.karma === 'number' && !isNaN(m.karma) ? m.karma : 0,
         rank: index + 1,
-        level: m.level,
-        join_date: m.join_date,
-        last_karma_gained: m.last_karma_gained,
-        graduation_year: m.graduation_year,
+        level: typeof m.level === 'number' && !isNaN(m.level) ? m.level : 1,
+        join_date: m.join_date ? m.join_date : new Date(),
+        last_karma_gained: typeof m.last_karma_gained === 'number' ? m.last_karma_gained : 0,
+        graduation_year: m.graduation_year || '',
         department: m.department || 'CSE',
-        is_alumni: m.is_alumni,
-        ig_count: m.ig_count,
-        lc_count: m.lc_count,
-        lastUpdated: m.lastUpdated
+        is_alumni: Boolean(m.is_alumni),
+        ig_count: typeof m.ig_count === 'number' ? m.ig_count : 0,
+        lc_count: typeof m.lc_count === 'number' ? m.lc_count : 0,
+        lastUpdated: m.lastUpdated || new Date()
       }));
 
       return sendSuccess(res, 'Leaderboard data retrieved successfully', formattedMembers);
@@ -55,27 +55,36 @@ const leaderboardController = {
       }
 
       const bulkOps = students.map((s, index) => {
-        const karmaVal = parseInt(s.karma || s.Karma || 0, 10);
-        const levelVal = parseInt(s.level || s.Level || 1, 10);
-        const lastKarmaVal = parseInt(s.last_karma_gained || s.LastKarmaGained || 0, 10);
-        const igVal = parseInt(s.ig_count || s.IgCount || 0, 10);
-        const lcVal = parseInt(s.lc_count || s.LcCount || 0, 10);
+        const nameVal = (s.full_name || s.FullName || s.name || s.Student || 'Student').toString().trim();
+        const rawMuid = (s.muid || s.Muid || nameVal).toString().trim().toLowerCase();
+        
+        const parseNum = (val, fallback = 0) => {
+          const parsed = parseInt(val, 10);
+          return isNaN(parsed) ? fallback : parsed;
+        };
+
+        const karmaVal = parseNum(s.karma || s.Karma, 0);
+        const levelVal = parseNum(s.level || s.Level, 1);
+        const lastKarmaVal = parseNum(s.last_karma_gained || s.LastKarmaGained, 0);
+        const igVal = parseNum(s.ig_count || s.IgCount, 0);
+        const lcVal = parseNum(s.lc_count || s.LcCount, 0);
         const isAlumniVal = Boolean(s.is_alumni === true || s.is_alumni === 'true' || s.IsAlumni === true || s.IsAlumni === 'true');
+        const deptVal = (s.department || s.Department || s.Department___Cluster || 'CSE').toString().trim().toUpperCase();
 
         return {
           updateOne: {
-            filter: { muid: (s.muid || s.Muid || s.full_name).trim().toLowerCase() },
+            filter: { muid: rawMuid },
             update: {
               $set: {
-                full_name: (s.full_name || s.FullName || s.name || 'Student').trim(),
-                muid: (s.muid || s.Muid || s.full_name).trim().toLowerCase(),
+                full_name: nameVal,
+                muid: rawMuid,
                 karma: karmaVal,
-                rank: parseInt(s.rank || index + 1, 10),
+                rank: parseNum(s.rank || s.Rank, index + 1),
                 level: levelVal,
                 join_date: s.join_date ? new Date(s.join_date) : new Date(),
                 last_karma_gained: lastKarmaVal,
                 graduation_year: String(s.graduation_year || s.GraduationYear || ''),
-                department: (s.department || s.Department || 'CSE').trim().toUpperCase(),
+                department: deptVal,
                 is_alumni: isAlumniVal,
                 ig_count: igVal,
                 lc_count: lcVal,
