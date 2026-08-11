@@ -434,10 +434,10 @@ export function Leaderboard() {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-1 overflow-x-auto max-w-full scrollbar-none">
             <button
               onClick={() => setViewMode('rope')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                 viewMode === 'rope' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
               title="Karma Rope View"
@@ -447,7 +447,7 @@ export function Leaderboard() {
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                 viewMode === 'grid' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
               title="Cards Grid View"
@@ -457,7 +457,7 @@ export function Leaderboard() {
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                 viewMode === 'table' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
               title="Classic Table View"
@@ -471,7 +471,7 @@ export function Leaderboard() {
       </section>
 
       {/* ─── Main Content Area ─────────────────────────────────────────── */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {filteredMembers.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
             <Users className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
@@ -479,45 +479,64 @@ export function Leaderboard() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Try adjusting your search query or department filter.</p>
           </div>
         ) : (
-          <>
+          <AnimatePresence mode="wait">
             {/* VIEW 1: THE VERTICAL KARMA ROPE */}
             {viewMode === 'rope' && (
-              <div className="relative py-12 min-h-[900px] flex flex-col items-center">
+              <motion.div
+                key="rope-view"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="relative py-8 sm:py-12 min-h-[600px] flex flex-col items-center overflow-hidden"
+              >
                 
-                {/* Central Glowing Energy Rope */}
-                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1.5 bg-gradient-to-b from-amber-400 via-blue-500 to-indigo-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)] z-0" />
+                {/* Central / Left Glowing Energy Rope */}
+                <div className="absolute top-0 bottom-0 left-6 sm:left-1/2 -translate-x-1/2 w-1.5 bg-gradient-to-b from-amber-400 via-blue-500 to-indigo-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)] z-0" />
                 
                 {/* Top Rope Crown Anchor */}
-                <div className="relative z-10 bg-amber-500 text-gray-950 font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-2 mb-12 -mt-4">
-                  <Crown className="w-4 h-4" />
+                <div className="relative z-10 bg-amber-500 text-gray-950 font-extrabold px-4 py-1.5 rounded-full shadow-lg flex items-center space-x-2 mb-8 sm:mb-12 -mt-4 text-center">
+                  <Crown className="w-4 h-4 flex-shrink-0" />
                   <span className="text-xs uppercase tracking-widest">Summit Peak • 100% Karma</span>
                 </div>
 
                 {/* Rope Nodes Stack */}
-                <div className="w-full max-w-4xl space-y-12 relative z-10">
+                <div className="w-full max-w-4xl space-y-6 sm:space-y-12 relative z-10">
                   {filteredMembers.map((member, index) => {
                     const isEven = index % 2 === 0;
                     
                     return (
-                      <motion.div
+                      <div
                         key={member.muid}
-                        initial={{ opacity: 0, x: isEven ? -30 : 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.4, delay: index * 0.04 }}
-                        className={`flex items-center w-full ${isEven ? 'flex-row' : 'flex-row-reverse'}`}
+                        className="relative flex items-center w-full"
                       >
+                        {/* Rope Node Indicator */}
+                        <div className="absolute left-6 sm:left-1/2 -translate-x-1/2 z-20 flex items-center justify-center">
+                          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 bg-white dark:bg-gray-900 flex items-center justify-center shadow-md transition-transform hover:scale-125 ${
+                            member.rank === 1 ? 'border-amber-400 text-amber-500 shadow-amber-400/30' :
+                            member.rank === 2 ? 'border-slate-400 text-slate-500' :
+                            member.rank === 3 ? 'border-amber-700 text-amber-700' :
+                            'border-blue-500 text-blue-600 dark:text-blue-400'
+                          }`}>
+                            <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          </div>
+                        </div>
+
                         {/* Member Card Box */}
-                        <div className={`w-1/2 ${isEven ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
-                          <div
+                        <div className={`w-full pl-12 sm:pl-0 sm:w-1/2 ${isEven ? 'sm:pr-8 sm:text-right sm:ml-0' : 'sm:pl-8 sm:text-left sm:ml-auto'}`}>
+                          <motion.div
+                            initial={{ opacity: 0, y: 15 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: '-40px' }}
+                            transition={{ duration: 0.3 }}
                             onClick={() => setSelectedMember(member)}
-                            className="inline-block bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/80 hover:border-blue-500/80 dark:hover:border-blue-500/80 rounded-2xl p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 group hover:-translate-y-1"
+                            className="w-full bg-white dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700/80 hover:border-blue-500/80 dark:hover:border-blue-500/80 rounded-2xl p-3.5 sm:p-4 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 group hover:-translate-y-1"
                           >
-                            <div className={`flex items-center space-x-3 ${isEven ? 'flex-row-reverse space-x-reverse' : 'flex-row'}`}>
+                            <div className={`flex items-center space-x-3 ${isEven ? 'sm:flex-row-reverse sm:space-x-reverse' : 'flex-row'}`}>
                               
                               {/* Avatar Badge with Name Initials */}
                               <div className="relative flex-shrink-0">
-                                <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-extrabold text-sm bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md ${
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center font-extrabold text-xs sm:text-sm bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md ${
                                   member.rank === 1 ? 'border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)]' :
                                   member.rank === 2 ? 'border-slate-400' :
                                   member.rank === 3 ? 'border-amber-600' :
@@ -527,7 +546,7 @@ export function Leaderboard() {
                                 </div>
                                 
                                 {/* Rank Tag */}
-                                <span className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold shadow-sm ${
+                                <span className={`absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold shadow-sm ${
                                   member.rank === 1 ? 'bg-amber-400 text-gray-950' :
                                   member.rank === 2 ? 'bg-slate-300 text-gray-950' :
                                   member.rank === 3 ? 'bg-amber-700 text-white' :
@@ -538,52 +557,39 @@ export function Leaderboard() {
                               </div>
 
                               {/* Info */}
-                              <div>
-                                <div className="flex items-center space-x-2">
-                                  <h3 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                              <div className="flex-1 min-w-0">
+                                <div className={`flex items-center space-x-2 ${isEven ? 'sm:justify-end' : 'justify-start'}`}>
+                                  <h3 className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                                     {member.full_name}
                                   </h3>
                                   {member.is_alumni && (
-                                    <span className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 text-[10px] px-1.5 py-0.5 rounded font-semibold">
+                                    <span className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0">
                                       Alumni
                                     </span>
                                   )}
                                 </div>
                                 
-                                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{member.muid}</p>
+                                <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5 truncate">{member.muid}</p>
                                 
-                                <div className="flex items-center space-x-2 mt-2">
-                                  <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 text-xs font-bold px-2 py-0.5 rounded-full">
+                                <div className={`flex flex-wrap items-center gap-1.5 mt-2 ${isEven ? 'sm:justify-end' : 'justify-start'}`}>
+                                  <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-full">
                                     {formatKarma(member.karma)} XP
                                   </span>
-                                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full">
                                     Lvl {member.level}
                                   </span>
-                                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[11px] px-2 py-0.5 rounded-full">
-                                    {member.department}
-                                  </span>
+                                  {getDeptAbbreviation(member.department) ? (
+                                    <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full font-medium">
+                                      {getDeptAbbreviation(member.department)}
+                                    </span>
+                                  ) : null}
                                 </div>
                               </div>
 
                             </div>
-                          </div>
+                          </motion.div>
                         </div>
-
-                        {/* Central Node Indicator on Rope */}
-                        <div className="relative z-20 flex items-center justify-center">
-                          <div className={`w-8 h-8 rounded-full border-2 bg-white dark:bg-gray-900 flex items-center justify-center shadow-md transition-transform hover:scale-125 ${
-                            member.rank === 1 ? 'border-amber-400 text-amber-500 shadow-amber-400/30' :
-                            member.rank === 2 ? 'border-slate-400 text-slate-500' :
-                            member.rank === 3 ? 'border-amber-700 text-amber-700' :
-                            'border-blue-500 text-blue-600 dark:text-blue-400'
-                          }`}>
-                            <Zap className="w-4 h-4" />
-                          </div>
-                        </div>
-
-                        {/* Spacer for Alternate Side */}
-                        <div className="w-1/2" />
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
@@ -593,19 +599,24 @@ export function Leaderboard() {
                   <span>Base Camp • Start of Journey</span>
                 </div>
 
-              </div>
+              </motion.div>
             )}
 
             {/* VIEW 2: CARDS GRID */}
             {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <motion.div
+                key="grid-view"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+              >
                 {filteredMembers.map((member) => (
-                  <motion.div
+                  <div
                     key={member.muid}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
                     onClick={() => setSelectedMember(member)}
-                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500/80 rounded-2xl p-5 shadow-lg cursor-pointer transition-all hover:-translate-y-1 group"
+                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500/80 rounded-2xl p-4 sm:p-5 shadow-lg cursor-pointer transition-all hover:-translate-y-1 group"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${
@@ -622,13 +633,13 @@ export function Leaderboard() {
                     </div>
 
                     <div className="text-center mb-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500/40 mx-auto mb-3 flex items-center justify-center font-extrabold text-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-blue-500/40 mx-auto mb-3 flex items-center justify-center font-extrabold text-lg sm:text-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md">
                         <span>{getInitials(member.full_name)}</span>
                       </div>
-                      <h3 className="font-bold text-base text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {member.full_name}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{member.muid}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5 truncate">{member.muid}</p>
                     </div>
 
                     <div className="bg-gray-50 dark:bg-gray-900/60 rounded-xl p-3 flex items-center justify-between">
@@ -643,24 +654,31 @@ export function Leaderboard() {
                         </div>
                       ) : null}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </div>
+              </motion.div>
             )}
 
             {/* VIEW 3: CLASSIC TABLE */}
             {viewMode === 'table' && (
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg">
+              <motion.div
+                key="table-view"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-lg"
+              >
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm text-gray-700 dark:text-gray-300">
                     <thead className="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 uppercase text-[11px] font-bold tracking-wider border-b border-gray-200 dark:border-gray-700">
                       <tr>
-                        <th className="py-4 px-6">Rank</th>
-                        <th className="py-4 px-6">Student</th>
-                        <th className="py-4 px-6">Karma XP</th>
-                        <th className="py-4 px-6">Level</th>
-                        <th className="py-4 px-6">Dept</th>
-                        <th className="py-4 px-6">IGs & Circles</th>
+                        <th className="py-3.5 px-4 sm:px-6">Rank</th>
+                        <th className="py-3.5 px-4 sm:px-6">Student</th>
+                        <th className="py-3.5 px-4 sm:px-6">Karma XP</th>
+                        <th className="py-3.5 px-4 sm:px-6">Level</th>
+                        <th className="py-3.5 px-4 sm:px-6">Dept</th>
+                        <th className="py-3.5 px-4 sm:px-6">IGs & Circles</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700/60">
@@ -670,7 +688,7 @@ export function Leaderboard() {
                           onClick={() => setSelectedMember(member)}
                           className="hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer transition-colors"
                         >
-                          <td className="py-4 px-6 font-extrabold text-gray-900 dark:text-white">
+                          <td className="py-3.5 px-4 sm:px-6 font-extrabold text-gray-900 dark:text-white">
                             <span className={`px-2.5 py-1 rounded-full text-xs ${
                               member.rank === 1 ? 'bg-amber-400 text-gray-950' :
                               member.rank === 2 ? 'bg-slate-300 text-gray-950' :
@@ -680,29 +698,29 @@ export function Leaderboard() {
                               #{member.rank}
                             </span>
                           </td>
-                          <td className="py-4 px-6">
+                          <td className="py-3.5 px-4 sm:px-6">
                             <div className="flex items-center space-x-3">
                               <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-extrabold text-xs text-white flex-shrink-0 shadow-sm">
                                 <span>{getInitials(member.full_name)}</span>
                               </div>
-                              <div>
-                                <p className="font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{member.full_name}</p>
-                                <p className="text-xs text-gray-400 dark:text-gray-500 font-mono">{member.muid}</p>
+                              <div className="min-w-0">
+                                <p className="font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate">{member.full_name}</p>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 font-mono truncate">{member.muid}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6 font-extrabold text-blue-600 dark:text-blue-400">
+                          <td className="py-3.5 px-4 sm:px-6 font-extrabold text-blue-600 dark:text-blue-400 whitespace-nowrap">
                             {formatKarma(member.karma)} XP
                           </td>
-                          <td className="py-4 px-6">
+                          <td className="py-3.5 px-4 sm:px-6 whitespace-nowrap">
                             <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2.5 py-1 rounded-full font-semibold">
                               Lvl {member.level}
                             </span>
                           </td>
-                          <td className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">
-                            {member.department}
+                          <td className="py-3.5 px-4 sm:px-6 font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {getDeptAbbreviation(member.department) || '—'}
                           </td>
-                          <td className="py-4 px-6 text-xs text-gray-500 dark:text-gray-400">
+                          <td className="py-3.5 px-4 sm:px-6 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                             <span className="text-indigo-600 dark:text-indigo-400 font-bold">{member.ig_count}</span> IGs • <span className="text-emerald-600 dark:text-emerald-400 font-bold">{member.lc_count}</span> Circles
                           </td>
                         </tr>
@@ -710,9 +728,9 @@ export function Leaderboard() {
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </motion.div>
             )}
-          </>
+          </AnimatePresence>
         )}
       </main>
 
