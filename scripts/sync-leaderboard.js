@@ -172,6 +172,15 @@ async function runSyncBot() {
     await page.goto('https://app.mulearn.org/dashboard/campus/manage', { waitUntil: 'networkidle', timeout: 35000 }).catch(() => {});
     await page.waitForTimeout(3000);
 
+    // Dismiss any announcement dialog popups if open
+    try {
+      await page.keyboard.press('Escape');
+      const dialogCloseBtn = page.locator('button:has-text("Close"), button[aria-label="Close"], [role="dialog"] button');
+      if (await dialogCloseBtn.count() > 0) {
+        await dialogCloseBtn.first().click().catch(() => {});
+      }
+    } catch (err) {}
+
     // 4. Click "Export CSV" button
     console.log('📥 Searching for Export CSV button...');
     const exportBtn = page.locator('button:has-text("Export CSV"), button:has-text("Export"), a:has-text("Export CSV")');
@@ -179,7 +188,7 @@ async function runSyncBot() {
     if (await exportBtn.count() > 0 && !csvContent) {
       console.log('✅ Found Export CSV button! Triggering click event...');
       const downloadPromise = page.waitForEvent('download', { timeout: 20000 }).catch(() => null);
-      await exportBtn.first().click();
+      await exportBtn.first().click({ force: true });
 
       const download = await downloadPromise;
       if (download) {
