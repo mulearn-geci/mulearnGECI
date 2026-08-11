@@ -30,6 +30,12 @@ const getInitials = (name: string): string => {
   return (parts[0][0] + (parts[parts.length - 1][0] || '')).toUpperCase();
 };
 
+// Safe Karma Formatter to prevent unhandled TypeError crashes
+const formatKarma = (val: number | null | undefined): string => {
+  if (val === null || val === undefined || isNaN(val)) return '0';
+  return val.toLocaleString();
+};
+
 // High quality mock dataset based on exact CSV columns provided by user
 const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
   {
@@ -320,7 +326,7 @@ export function Leaderboard() {
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Pioneer</span>
               </div>
               <p className="text-lg font-bold text-white truncate">{sortedMembers[0]?.full_name || 'N/A'}</p>
-              <p className="text-xs text-amber-300 dark:text-amber-400 font-semibold">{sortedMembers[0]?.karma.toLocaleString()} Karma</p>
+              <p className="text-xs text-amber-300 dark:text-amber-400 font-semibold">{formatKarma(sortedMembers[0]?.karma)} Karma</p>
             </div>
 
             <div className="bg-white/10 dark:bg-gray-800/80 border border-white/20 dark:border-gray-700/80 rounded-xl p-4 shadow-lg backdrop-blur-md">
@@ -328,7 +334,7 @@ export function Leaderboard() {
                 <Zap className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Total Karma</span>
               </div>
-              <p className="text-lg font-bold text-white">{totalKarma.toLocaleString()} XP</p>
+              <p className="text-lg font-bold text-white">{formatKarma(totalKarma)} XP</p>
               <p className="text-xs text-blue-100 dark:text-gray-400">Across campus</p>
             </div>
 
@@ -346,7 +352,7 @@ export function Leaderboard() {
                 <Activity className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-100 dark:text-gray-400">Average XP</span>
               </div>
-              <p className="text-lg font-bold text-white">{avgKarma.toLocaleString()}</p>
+              <p className="text-lg font-bold text-white">{formatKarma(avgKarma)}</p>
               <p className="text-xs text-blue-100 dark:text-gray-400">Points per student</p>
             </div>
           </div>
@@ -507,7 +513,7 @@ export function Leaderboard() {
                                 
                                 <div className="flex items-center space-x-2 mt-2">
                                   <span className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 text-xs font-bold px-2 py-0.5 rounded-full">
-                                    {member.karma.toLocaleString()} XP
+                                    {formatKarma(member.karma)} XP
                                   </span>
                                   <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-[11px] font-semibold px-2 py-0.5 rounded-full">
                                     Lvl {member.level}
@@ -587,7 +593,7 @@ export function Leaderboard() {
                     <div className="bg-gray-50 dark:bg-gray-900/60 rounded-xl p-3 flex items-center justify-between">
                       <div>
                         <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Karma XP</p>
-                        <p className="text-sm font-extrabold text-blue-600 dark:text-blue-400">{member.karma.toLocaleString()}</p>
+                        <p className="text-sm font-extrabold text-blue-600 dark:text-blue-400">{formatKarma(member.karma)}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Dept</p>
@@ -643,7 +649,7 @@ export function Leaderboard() {
                             </div>
                           </td>
                           <td className="py-4 px-6 font-extrabold text-blue-600 dark:text-blue-400">
-                            {member.karma.toLocaleString()} XP
+                            {formatKarma(member.karma)} XP
                           </td>
                           <td className="py-4 px-6">
                             <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2.5 py-1 rounded-full font-semibold">
@@ -708,7 +714,7 @@ export function Leaderboard() {
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 rounded-xl p-3.5">
                   <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Karma Points</span>
-                  <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400">{selectedMember.karma.toLocaleString()} XP</span>
+                  <span className="text-lg font-extrabold text-blue-600 dark:text-blue-400">{formatKarma(selectedMember.karma)} XP</span>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 rounded-xl p-3.5">
                   <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-1">Recent Boost</span>

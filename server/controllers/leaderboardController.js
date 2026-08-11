@@ -10,6 +10,18 @@ const leaderboardController = {
     try {
       let members = await Leaderboard.find().sort({ karma: -1 });
 
+      if (members.length === 0) {
+        const initialMock = [
+          { full_name: 'Albert George', muid: 'albertgeorge@mulearn', karma: 14850, rank: 1, level: 5, department: 'CSE', is_alumni: false, ig_count: 8, lc_count: 5 },
+          { full_name: 'Rahul K', muid: 'rahulk@mulearn', karma: 12400, rank: 2, level: 5, department: 'CSE', is_alumni: true, ig_count: 6, lc_count: 4 },
+          { full_name: 'Ananya S', muid: 'ananyas@mulearn', karma: 10950, rank: 3, level: 4, department: 'ECE', is_alumni: false, ig_count: 5, lc_count: 3 },
+          { full_name: 'Vaisakh M', muid: 'vaisakhm@mulearn', karma: 9600, rank: 4, level: 4, department: 'EEE', is_alumni: false, ig_count: 7, lc_count: 2 },
+          { full_name: 'Devika Nair', muid: 'devikanair@mulearn', karma: 8450, rank: 5, level: 4, department: 'CSE', is_alumni: false, ig_count: 4, lc_count: 3 }
+        ];
+        await Leaderboard.insertMany(initialMock).catch(() => {});
+        members = await Leaderboard.find().sort({ karma: -1 });
+      }
+
       // Add dynamic rank positioning & sanitize null fields
       const formattedMembers = members.map((m, index) => ({
         _id: m._id,
