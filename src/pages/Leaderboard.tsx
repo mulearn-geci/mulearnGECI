@@ -36,6 +36,33 @@ const formatKarma = (val: number | null | undefined): string => {
   return val.toLocaleString();
 };
 
+// Abbreviate long department names (e.g. Computer Science and Engineering -> CSE)
+const getDeptAbbreviation = (deptStr: string | null | undefined): string => {
+  if (!deptStr || typeof deptStr !== 'string') return 'CSE';
+  const str = deptStr.toUpperCase();
+  if (str.includes('COMPUTER') || str.includes('CSE')) return 'CSE';
+  if (str.includes('MECHANICAL') || str.includes('MECH') || str === 'ME') return 'ME';
+  if (str.includes('ELECTRONICS') || str.includes('COMMUNICATION') || str.includes('ECE')) return 'ECE';
+  if (str.includes('ELECTRICAL') || str.includes('EEE')) return 'EEE';
+  if (str.includes('MECHATRONICS') || str === 'MR') return 'MR';
+  if (str.includes('INFORMATION') || str.includes('IT')) return 'IT';
+  if (str === '-' || str === '' || str.includes('NONE')) return 'CSE';
+  return deptStr.slice(0, 4).toUpperCase();
+};
+
+// Compute dynamic level based on Karma XP
+const computeLevel = (karma: number | null | undefined, rawLevel?: number): number => {
+  const k = typeof karma === 'number' && !isNaN(karma) ? karma : 0;
+  if (k >= 25000) return 7;
+  if (k >= 15000) return 6;
+  if (k >= 10000) return 5;
+  if (k >= 5000) return 4;
+  if (k >= 2500) return 3;
+  if (k >= 1000) return 2;
+  if (typeof rawLevel === 'number' && rawLevel > 0) return rawLevel;
+  return 1;
+};
+
 // High quality mock dataset based on exact CSV columns provided by user
 const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
   {
@@ -252,7 +279,11 @@ export function Leaderboard() {
         setLoading(true);
         const res = await leaderboardAPI.getAll();
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          setMembers(res.data);
+          setMembers(res.data.map((m: LeaderboardMember) => ({
+            ...m,
+            department: getDeptAbbreviation(m.department),
+            level: computeLevel(m.karma, m.level)
+          })));
         }
       } catch (err) {
         console.error('Error fetching live leaderboard:', err);
@@ -275,8 +306,8 @@ export function Leaderboard() {
     const term = (searchTerm || '').toLowerCase();
     return sortedMembers.filter(m => {
       if (!m) return false;
-      const dept = (m.department || '').toUpperCase();
-      const matchesDept = selectedDept === 'All' || dept.includes(selectedDept.toUpperCase());
+      const dept = getDeptAbbreviation(m.department);
+      const matchesDept = selectedDept === 'All' || dept === selectedDept;
       const name = (m.full_name || '').toLowerCase();
       const muid = (m.muid || '').toLowerCase();
       const matchesSearch = name.includes(term) || muid.includes(term) || dept.toLowerCase().includes(term);

@@ -53,9 +53,17 @@ function parseCSV(csvText) {
       obj[header] = values[index] || '';
     });
 
+    function extractNum(val, fallback = 0) {
+      if (typeof val === 'number') return isNaN(val) ? fallback : val;
+      if (!val) return fallback;
+      const matches = String(val).match(/\d+/);
+      if (matches) return parseInt(matches[0], 10);
+      return fallback;
+    }
+
     obj.full_name = obj.student || obj.full_name || obj.name || values[1] || 'Student';
-    obj.karma = parseInt(obj.karma || values[2] || '0', 10);
-    obj.level = parseInt(obj.level || values[3] || '1', 10);
+    obj.karma = extractNum(obj.karma || values[2], 0);
+    obj.level = extractNum(obj.level || values[3], 1);
     obj.department = obj.department___cluster || obj.department || values[4] || 'CSE';
     obj.is_alumni = String(obj.alumni_status || obj.is_alumni || values[5] || '').toLowerCase().includes('true') || String(values[5]) === '1';
     obj.muid = obj.muid || obj.full_name.toLowerCase().replace(/\s+/g, '') + '@mulearn';

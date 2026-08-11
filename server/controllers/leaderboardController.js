@@ -4,6 +4,44 @@ const logger = require('../utils/logger');
 
 const SYNC_SECRET = process.env.LEADERBOARD_SYNC_SECRET || 'mulearn-geci-sync-secret-2026';
 
+// Helper to extract numbers from string values (e.g. "LVL5" -> 5, "Level 4" -> 4)
+function extractNumber(val, fallback = 0) {
+  if (typeof val === 'number') return isNaN(val) ? fallback : val;
+  if (!val) return fallback;
+  const matches = String(val).match(/\d+/);
+  if (matches) return parseInt(matches[0], 10);
+  return fallback;
+}
+
+// Helper to abbreviate department names cleanly (e.g. Computer Science and Engineering -> CSE)
+function getDeptAbbreviation(deptStr) {
+  if (!deptStr || typeof deptStr !== 'string') return 'CSE';
+  const str = deptStr.toUpperCase().trim();
+  if (str.includes('COMPUTER') || str.includes('CSE')) return 'CSE';
+  if (str.includes('MECHANICAL') || str.includes('MECH') || str === 'ME') return 'ME';
+  if (str.includes('ELECTRONICS') || str.includes('COMMUNICATION') || str.includes('ECE')) return 'ECE';
+  if (str.includes('ELECTRICAL') || str.includes('EEE')) return 'EEE';
+  if (str.includes('MECHATRONICS') || str === 'MR') return 'MR';
+  if (str.includes('INFORMATION') || str.includes('IT')) return 'IT';
+  if (str === '-' || str === '' || str.includes('NONE')) return 'CSE';
+  return deptStr.slice(0, 4).toUpperCase();
+}
+
+// Helper to compute exact Level based on LVL string or Karma points
+function computeLevel(karma, rawLevel) {
+  const parsedLevel = extractNumber(rawLevel, 0);
+  if (parsedLevel > 0) return parsedLevel;
+
+  const k = extractNumber(karma, 0);
+  if (k >= 25000) return 7;
+  if (k >= 15000) return 6;
+  if (k >= 10000) return 5;
+  if (k >= 5000) return 4;
+  if (k >= 2500) return 3;
+  if (k >= 1000) return 2;
+  return 1;
+}
+
 const leaderboardController = {
   // Get all Leaderboard records sorted by karma
   getAllLeaderboard: async (req, res) => {
@@ -22,23 +60,29 @@ const leaderboardController = {
         members = await Leaderboard.find().sort({ karma: -1 });
       }
 
-      // Add dynamic rank positioning & sanitize null fields
-      const formattedMembers = members.map((m, index) => ({
-        _id: m._id,
-        full_name: m.full_name || 'Student',
-        muid: m.muid || 'student@mulearn',
-        karma: typeof m.karma === 'number' && !isNaN(m.karma) ? m.karma : 0,
-        rank: index + 1,
-        level: typeof m.level === 'number' && !isNaN(m.level) ? m.level : 1,
-        join_date: m.join_date ? m.join_date : new Date(),
-        last_karma_gained: typeof m.last_karma_gained === 'number' ? m.last_karma_gained : 0,
-        graduation_year: m.graduation_year || '',
-        department: m.department || 'CSE',
-        is_alumni: Boolean(m.is_alumni),
-        ig_count: typeof m.ig_count === 'number' ? m.ig_count : 0,
-        lc_count: typeof m.lc_count === 'number' ? m.lc_count : 0,
-        lastUpdated: m.lastUpdated || new Date()
-      }));
+      // Add dynamic rank positioning & sanitize department & level
+      const formattedMembers = members.map((m, index) => {
+        const karmaVal = extractNumber(m.karma, 0);
+        const levelVal = computeLevel(karmaVal, m.level);
+        const deptVal = getDeptAbbreviation(m.department);
+
+        return {
+          _id: m._id,
+          full_name: m.full_name || 'Student',
+          muid: m.muid || 'student@mulearn',
+          karma: karmaVal,
+          rank: index + 1,
+          level: levelVal,
+          join_date: m.join_date ? m.join_date : new Date(),
+          last_karma_gained: extractNumber(m.last_karma_gained, 0),
+          graduation_year: m.graduation_year || '',
+          department: deptVal,
+          is_alumni: Boolean(m.is_alumni),
+          ig_count: extractNumber(m.ig_count, 0),
+          lc_count: extractNumber(m.lc_count, 0),
+          lastUpdated: m.lastUpdated || new Date()
+        };
+      });
 
       return sendSuccess(res, 'Leaderboard data retrieved successfully', formattedMembers);
     } catch (error) {
@@ -70,18 +114,13 @@ const leaderboardController = {
         const nameVal = (s.full_name || s.FullName || s.name || s.Student || 'Student').toString().trim();
         const rawMuid = (s.muid || s.Muid || nameVal).toString().trim().toLowerCase();
         
-        const parseNum = (val, fallback = 0) => {
-          const parsed = parseInt(val, 10);
-          return isNaN(parsed) ? fallback : parsed;
-        };
-
-        const karmaVal = parseNum(s.karma || s.Karma, 0);
-        const levelVal = parseNum(s.level || s.Level, 1);
-        const lastKarmaVal = parseNum(s.last_karma_gained || s.LastKarmaGained, 0);
-        const igVal = parseNum(s.ig_count || s.IgCount, 0);
-        const lcVal = parseNum(s.lc_count || s.LcCount, 0);
+        const karmaVal = extractNumber(s.karma || s.Karma, 0);
+        const levelVal = computeLevel(karmaVal, s.level || s.Level);
+        const lastKarmaVal = extractNumber(s.last_karma_gained || s.LastKarmaGained, 0);
+        const igVal = extractNumber(s.ig_count || s.IgCount, 0);
+        const lcVal = extractNumber(s.lc_count || s.LcCount, 0);
         const isAlumniVal = Boolean(s.is_alumni === true || s.is_alumni === 'true' || s.IsAlumni === true || s.IsAlumni === 'true');
-        const deptVal = (s.department || s.Department || s.Department___Cluster || 'CSE').toString().trim().toUpperCase();
+        const deptVal = getDeptAbbreviation(s.department || s.Department || s.Department___Cluster);
 
         return {
           updateOne: {
@@ -91,7 +130,7 @@ const leaderboardController = {
                 full_name: nameVal,
                 muid: rawMuid,
                 karma: karmaVal,
-                rank: parseNum(s.rank || s.Rank, index + 1),
+                rank: extractNumber(s.rank || s.Rank, index + 1),
                 level: levelVal,
                 join_date: s.join_date ? new Date(s.join_date) : new Date(),
                 last_karma_gained: lastKarmaVal,
@@ -114,6 +153,8 @@ const leaderboardController = {
       const allMembers = await Leaderboard.find().sort({ karma: -1 });
       for (let i = 0; i < allMembers.length; i++) {
         allMembers[i].rank = i + 1;
+        allMembers[i].level = computeLevel(allMembers[i].karma, allMembers[i].level);
+        allMembers[i].department = getDeptAbbreviation(allMembers[i].department);
         await allMembers[i].save();
       }
 
