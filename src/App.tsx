@@ -18,6 +18,7 @@ import { AdminPosts } from './pages/admin/AdminPosts';
 import { AdminEvents } from './pages/admin/AdminEvents';
 import { AdminExecom } from './pages/admin/AdminExecom';
 import { AdminAlumni } from './pages/admin/AdminAlumni';
+import { AdminLeaderboard } from './pages/admin/AdminLeaderboard';
 import { CreatePost } from './pages/admin/CreatePost';
 import { CreateEvent } from './pages/admin/CreateEvent';
 import { EditPost } from './pages/admin/EditPost';
@@ -82,6 +83,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AdminAlumni />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/leaderboard" 
+                element={
+                  <ProtectedRoute>
+                    <AdminLeaderboard />
                   </ProtectedRoute>
                 } 
               />

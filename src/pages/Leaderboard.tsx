@@ -5,6 +5,7 @@ import {
   Crown, GraduationCap, Users, BookOpen, ChevronRight, 
   ArrowUpRight, Star, ShieldCheck, LayoutGrid, List, Activity, X
 } from 'lucide-react';
+import { leaderboardAPI } from '../services/api';
 
 export interface LeaderboardMember {
   full_name: string;
@@ -232,15 +233,34 @@ const INITIAL_LEADERBOARD_DATA: LeaderboardMember[] = [
 const DEPARTMENTS = ['All', 'CSE', 'ECE', 'EEE', 'ME', 'MR'];
 
 export function Leaderboard() {
+  const [members, setMembers] = useState<LeaderboardMember[]>(INITIAL_LEADERBOARD_DATA);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('All');
   const [viewMode, setViewMode] = useState<'rope' | 'grid' | 'table'>('rope');
   const [selectedMember, setSelectedMember] = useState<LeaderboardMember | null>(null);
 
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const res = await leaderboardAPI.getAll();
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setMembers(res.data);
+        }
+      } catch (err) {
+        console.error('Error fetching live leaderboard:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeaderboard();
+  }, []);
+
   // Sorted list by karma descending
   const sortedMembers = useMemo(() => {
-    return [...INITIAL_LEADERBOARD_DATA].sort((a, b) => b.karma - a.karma);
-  }, []);
+    return [...members].sort((a, b) => b.karma - a.karma);
+  }, [members]);
 
   const maxKarma = sortedMembers[0]?.karma || 1;
 

@@ -379,4 +379,28 @@ export const alumniAPI = {
     }
     return response.json();
   }
+};
+
+// Leaderboard API
+export const leaderboardAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_BASE_URL}/leaderboard`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch leaderboard data');
+    }
+    return response.json();
+  },
+
+  sync: async (students: any[]) => {
+    const response = await fetch(`${API_BASE_URL}/leaderboard/sync`, {
+      method: 'POST',
+      headers: createAuthHeaders(),
+      body: JSON.stringify({ students }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to sync leaderboard data');
+    }
+    return response.json();
+  }
 };

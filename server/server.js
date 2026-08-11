@@ -19,6 +19,7 @@ const execomRoutes = require('./routes/execom');
 const execomController = require('./controllers/execomController');
 const alumniRoutes = require('./routes/alumni');
 const alumniController = require('./controllers/alumniController');
+const leaderboardRoutes = require('./routes/leaderboard');
 
 // Import middleware
 const logger = require('./utils/logger');
@@ -115,6 +116,7 @@ app.use(['/api/contact', '/contact'], contactRoutes);
 app.use(['/api/dashboard', '/dashboard'], dashboardRoutes);
 app.use(['/api/execom', '/execom'], execomRoutes);
 app.use(['/api/alumni', '/alumni'], alumniRoutes);
+app.use(['/api/leaderboard', '/leaderboard'], leaderboardRoutes);
 
 // Health check endpoint
 app.get(['/api/health', '/health'], (req, res) => {
