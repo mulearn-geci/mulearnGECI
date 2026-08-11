@@ -1,27 +1,16 @@
 /**
  * Automated µLearn GECI Leaderboard Sync Bot
  * 
- * Synchronizes µLearn campus Karma dataset to MongoDB Atlas.
- * Hybrid Engine:
- * 1. Direct REST API authentication & CSV download (Fast, Lightweight)
- * 2. Playwright Headless Browser fallback (UI Automation)
+ * Automates login to app.mulearn.org using Playwright,
+ * exports campus CSV from /dashboard/campus/manage,
+ * parses student Karma records, and updates MongoDB Atlas via backend API.
  */
 
+const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const http = require('http');
-
-let chromium;
-try {
-  chromium = require('playwright').chromium;
-} catch (e) {
-  try {
-    chromium = require('playwright-core').chromium;
-  } catch (err) {
-    console.log('ℹ️ Playwright browser module not loaded, using Direct REST API Sync Engine.');
-  }
-}
 
 const MULEARN_EMAIL = process.env.MULEARN_EMAIL || 'mulearngeci@mulearn';
 const MULEARN_PASSWORD = process.env.MULEARN_PASSWORD || 'Gecimulearn2025';
@@ -118,164 +107,107 @@ function sendSyncPayload(apiUrl, syncSecret, students) {
   });
 }
 
-// Direct REST API fetch method
-function fetchDirectCSV() {
-  return new Promise((resolve) => {
-    const authData = JSON.stringify({
-      emailOrMuid: MULEARN_EMAIL,
-      password: MULEARN_PASSWORD
-    });
-
-    const options = {
-      hostname: 'api.mulearn.org',
-      port: 443,
-      path: '/api/v1/auth/user-authentication/',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(authData)
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(body);
-          const accessToken = json.response?.accessToken || json.accessToken || json.token;
-          if (accessToken) {
-            console.log('✅ Direct µLearn REST API Authenticated successfully!');
-            // Fetch CSV endpoint
-            fetchCampusCSV(accessToken).then(csv => resolve(csv)).catch(() => resolve(null));
-          } else {
-            resolve(null);
-          }
-        } catch (err) {
-          resolve(null);
-        }
-      });
-    });
-
-    req.on('error', () => resolve(null));
-    req.write(authData);
-    req.end();
-  });
-}
-
-function fetchCampusCSV(accessToken) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: 'api.mulearn.org',
-      port: 443,
-      path: '/api/v1/dashboard/campus/csv/',
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
-      res.on('end', () => {
-        if (res.statusCode === 200 && (body.includes('Karma') || body.includes('Student'))) {
-          resolve(body);
-        } else {
-          reject(new Error('Failed to fetch CSV via REST API'));
-        }
-      });
-    });
-
-    req.on('error', (err) => reject(err));
-    req.end();
-  });
-}
-
 async function runSyncBot() {
-  console.log('🤖 Starting µLearn GECI Leaderboard Automation Bot...');
+  console.log('🤖 Starting µLearn GECI Playwright Leaderboard Sync Bot...');
   console.log(`🔑 Account: ${MULEARN_EMAIL}`);
 
-  let csvContent = await fetchDirectCSV();
+  let browser;
+  try {
+    browser = await chromium.launch({ headless: true });
+  } catch (err) {
+    console.log('🔄 Retrying launch with channel: chrome ...');
+    browser = await chromium.launch({ channel: 'chrome', headless: true });
+  }
+  const context = await browser.newContext({ acceptDownloads: true });
+  const page = await context.newPage();
 
-  if (csvContent) {
-    console.log(`🎉 Downloaded campus CSV via Direct REST API (${csvContent.length} bytes)!`);
-  } else if (chromium) {
-    console.log('🔄 REST API fallback triggered: Starting Playwright Headless Browser...');
-    try {
-      const browser = await chromium.launch({ 
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
-      });
-      const context = await browser.newContext({ acceptDownloads: true });
-      const page = await context.newPage();
+  let csvContent = '';
 
-      page.on('response', async (response) => {
-        const url = response.url();
-        const contentType = response.headers()['content-type'] || '';
-        if (url.includes('export') || url.includes('csv') || contentType.includes('text/csv')) {
-          try {
-            const text = await response.text();
-            if (text && (text.includes('Karma') || text.includes('Student'))) {
-              csvContent = text;
-            }
-          } catch (err) {}
+  // Intercept any direct CSV API responses
+  page.on('response', async (response) => {
+    const url = response.url();
+    const contentType = response.headers()['content-type'] || '';
+    if (url.includes('export') || url.includes('csv') || contentType.includes('text/csv')) {
+      try {
+        const text = await response.text();
+        if (text && (text.includes('Karma') || text.includes('Student') || text.includes('SL.NO'))) {
+          csvContent = text;
+          console.log(`📡 Intercepted CSV response from network (${text.length} bytes)`);
         }
-      });
-
-      console.log('🌐 Navigating to https://app.mulearn.org/login ...');
-      await page.goto('https://app.mulearn.org/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForTimeout(2000);
-
-      const emailInput = page.locator('input[placeholder*="email" i], input[placeholder*="muid" i], input[type="text"]');
-      if (await emailInput.count() > 0) {
-        await emailInput.first().fill(MULEARN_EMAIL);
-        const passwordInput = page.locator('input[type="password"]');
-        if (await passwordInput.count() > 0) {
-          await passwordInput.first().fill(MULEARN_PASSWORD);
-        }
-        const submitBtn = page.locator('button:has-text("Sign in"), button:has-text("Sign In"), button[type="submit"]');
-        if (await submitBtn.count() > 0) {
-          await Promise.all([
-            page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
-            submitBtn.first().click()
-          ]);
-        }
-      }
-
-      await page.goto('https://app.mulearn.org/dashboard/campus/manage', { waitUntil: 'networkidle', timeout: 30000 }).catch(() => {});
-      await page.waitForTimeout(2000);
-
-      const exportBtn = page.locator('button:has-text("Export CSV"), button:has-text("Export")');
-      if (await exportBtn.count() > 0 && !csvContent) {
-        const downloadPromise = page.waitForEvent('download', { timeout: 15000 }).catch(() => null);
-        await exportBtn.first().click();
-        const download = await downloadPromise;
-        if (download) {
-          const downloadPath = await download.path();
-          csvContent = fs.readFileSync(downloadPath, 'utf8');
-        }
-      }
-
-      await browser.close();
-    } catch (err) {
-      console.log('⚠️ Playwright execution note:', err.message);
+      } catch (err) {}
     }
+  });
+
+  try {
+    // 1. Navigate to Login page
+    console.log('🌐 Navigating to https://app.mulearn.org/login ...');
+    await page.goto('https://app.mulearn.org/login', { waitUntil: 'domcontentloaded', timeout: 35000 });
+    await page.waitForTimeout(2000);
+
+    // 2. Fill login credentials
+    const emailInput = page.locator('input[placeholder*="email" i], input[placeholder*="muid" i], input[type="text"]');
+    if (await emailInput.count() > 0) {
+      console.log('🔑 Entering Email or MuID...');
+      await emailInput.first().fill(MULEARN_EMAIL);
+
+      const passwordInput = page.locator('input[type="password"]');
+      if (await passwordInput.count() > 0) {
+        console.log('🔑 Entering Password...');
+        await passwordInput.first().fill(MULEARN_PASSWORD);
+      }
+
+      const submitBtn = page.locator('button:has-text("Sign in"), button:has-text("Sign In"), button[type="submit"]');
+      if (await submitBtn.count() > 0) {
+        console.log('🚀 Clicking Sign in button...');
+        await Promise.all([
+          page.waitForNavigation({ timeout: 20000 }).catch(() => {}),
+          submitBtn.first().click()
+        ]);
+        await page.waitForTimeout(3000);
+      }
+    }
+
+    // 3. Navigate to Campus Management page
+    console.log('📍 Navigating to https://app.mulearn.org/dashboard/campus/manage ...');
+    await page.goto('https://app.mulearn.org/dashboard/campus/manage', { waitUntil: 'networkidle', timeout: 35000 }).catch(() => {});
+    await page.waitForTimeout(3000);
+
+    // 4. Click "Export CSV" button
+    console.log('📥 Searching for Export CSV button...');
+    const exportBtn = page.locator('button:has-text("Export CSV"), button:has-text("Export"), a:has-text("Export CSV")');
+
+    if (await exportBtn.count() > 0 && !csvContent) {
+      console.log('✅ Found Export CSV button! Triggering click event...');
+      const downloadPromise = page.waitForEvent('download', { timeout: 20000 }).catch(() => null);
+      await exportBtn.first().click();
+
+      const download = await downloadPromise;
+      if (download) {
+        const downloadPath = await download.path();
+        csvContent = fs.readFileSync(downloadPath, 'utf8');
+        console.log(`🎉 CSV file downloaded successfully (${csvContent.length} bytes)!`);
+      }
+    }
+
+    // 5. Dispatch CSV dataset to MongoDB Atlas
+    if (csvContent) {
+      const students = parseCSV(csvContent);
+      console.log(`📊 Successfully parsed ${students.length} student records!`);
+
+      console.log(`🚀 Dispatching dataset to ${BACKEND_API_URL} ...`);
+      const syncResult = await sendSyncPayload(BACKEND_API_URL, SYNC_SECRET, students);
+      console.log('🎉 LEADERBOARD DATABASE SYNC COMPLETE:', syncResult);
+    } else {
+      throw new Error('Could not download or intercept campus CSV from app.mulearn.org.');
+    }
+
+  } catch (error) {
+    console.error('❌ Bot Execution Failed:', error.message);
+    process.exitCode = 1;
+  } finally {
+    await browser.close();
+    console.log('🏁 Bot script execution finished.');
   }
-
-  // Sync parsed CSV to MongoDB via API
-  if (csvContent) {
-    const students = parseCSV(csvContent);
-    console.log(`📊 Successfully parsed ${students.length} student records!`);
-
-    console.log(`🚀 Dispatching sync request to ${BACKEND_API_URL} ...`);
-    const syncResult = await sendSyncPayload(BACKEND_API_URL, SYNC_SECRET, students);
-    console.log('🎉 LEADERBOARD DATABASE SYNC COMPLETE:', syncResult);
-  } else {
-    console.log('⚠️ Automatic retrieval pending. Admin manual CSV upload is ready at /admin/leaderboard');
-  }
-
-  console.log('🏁 Bot script execution finished.');
 }
 
 runSyncBot();
