@@ -47,7 +47,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex transition-colors duration-300">
+    <div className="h-screen w-screen overflow-hidden bg-gray-50 dark:bg-gray-900 flex transition-colors duration-300">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -58,12 +58,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       )}
 
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform ${
+      {/* Fixed Sidebar */}
+      <aside className={`fixed lg:sticky top-0 inset-y-0 left-0 z-50 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col justify-between`}>
-        <div>
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+      } transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col justify-between flex-shrink-0`}>
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto scrollbar-none">
+          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">µ</span>
@@ -78,7 +78,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </button>
           </div>
 
-          <nav className="mt-6 px-4">
+          <nav className="mt-6 px-4 flex-1">
             <ul className="space-y-1.5">
               {navigation.map((item) => (
                 <li key={item.name}>
@@ -100,10 +100,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
         </div>
 
-        {/* User info and logout */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        {/* User info & Sign Out permanently pinned at bottom-left */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
               <span>{user?.name?.charAt(0) || 'A'}</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -117,18 +117,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </div>
           <button
             onClick={logout}
-            className="flex items-center justify-center w-full px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 rounded-xl transition-colors"
+            className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/60 rounded-xl transition-colors shadow-sm"
           >
             <LogOut className="h-4 w-4 mr-2" />
             <span>Sign Out</span>
           </button>
         </div>
-      </div>
+      </aside>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Admin Top Header & Quick Switch Tabs */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm flex-shrink-0">
           <div className="flex items-center space-x-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(true)}
