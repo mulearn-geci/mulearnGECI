@@ -155,9 +155,37 @@ const FAQS = [
 export function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [execomMembers, setExecomMembers] = useState(DEFAULT_EXECOM_SLOTS);
+  const [interestGroups, setInterestGroups] = useState(INTEREST_GROUPS);
 
-  // Dynamically fetch Execom members if database entries exist
+  // Dynamically fetch Execom members & load custom admin config
   useEffect(() => {
+    const loadCustomConfig = () => {
+      try {
+        const saved = localStorage.getItem('mulearn_homepage_custom_config');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.igs && parsed.igs.length > 0) {
+            const formattedIgs = parsed.igs.map((ig: any, i: number) => ({
+              title: ig.title,
+              domain: ig.domain || 'Domain',
+              description: ig.description,
+              icon: INTEREST_GROUPS[i % INTEREST_GROUPS.length]?.icon || Code2,
+              link: ig.link || '/events',
+              badge: ig.badge || 'Active'
+            }));
+            setInterestGroups(formattedIgs);
+          }
+          if (parsed.execoms && parsed.execoms.length > 0) {
+            setExecomMembers(parsed.execoms);
+          }
+        }
+      } catch (e) {
+        console.warn('Error loading custom config:', e);
+      }
+    };
+
+    loadCustomConfig();
+
     execomAPI.getAll()
       .then((res) => {
         if (res.success && res.data && res.data.length > 0) {
@@ -173,6 +201,9 @@ export function Home() {
       .catch((err) => {
         console.warn('Execom fetch note:', err);
       });
+
+    window.addEventListener('mulearn_config_updated', loadCustomConfig);
+    return () => window.removeEventListener('mulearn_config_updated', loadCustomConfig);
   }, []);
 
   // Element Refs
@@ -527,9 +558,9 @@ export function Home() {
               </p>
             </div>
 
-            {/* 10 Real Interest Groups Grid (All link to /events) */}
+            {/* Active Interest Groups Grid (All link to /events) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-32">
-              {INTEREST_GROUPS.map((ig, index) => {
+              {interestGroups.map((ig, index) => {
                 const IconComp = ig.icon;
                 return (
                   <motion.div

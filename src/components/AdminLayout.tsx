@@ -7,6 +7,7 @@ import {
   Users,
   GraduationCap,
   Trophy,
+  Sparkles,
   LogOut,
   Menu,
   X,
@@ -26,6 +27,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Homepage Customizer', href: '/admin/homepage', icon: Sparkles },
     { name: 'Posts', href: '/admin/posts', icon: FileText },
     { name: 'Events', href: '/admin/events', icon: Calendar },
     { name: 'Execom Team', href: '/admin/execom', icon: Users },

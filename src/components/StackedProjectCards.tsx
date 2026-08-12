@@ -65,6 +65,36 @@ const PROJECTS: ProjectCard[] = [
 export const StackedProjectCards: React.FC = () => {
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
 
+  useEffect(() => {
+    const loadCustomConfig = () => {
+      try {
+        const saved = localStorage.getItem('mulearn_homepage_custom_config');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.cards && parsed.cards.length > 0) {
+            const formatted = parsed.cards.map((c: any, i: number) => ({
+              id: c.id || String(i + 1),
+              number: String(i + 1).padStart(2, '0'),
+              meta: c.meta || 'SHOWCASE',
+              title: c.title,
+              description: c.description,
+              image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
+              link: c.link || '/events',
+              ctaText: c.ctaText || 'Learn More'
+            }));
+            setCards(formatted);
+          }
+        }
+      } catch (e) {
+        console.warn('Error reading custom cards:', e);
+      }
+    };
+
+    loadCustomConfig();
+    window.addEventListener('mulearn_config_updated', loadCustomConfig);
+    return () => window.removeEventListener('mulearn_config_updated', loadCustomConfig);
+  }, []);
+
   const handleNext = () => {
     setCards((prev) => {
       const copy = [...prev];
