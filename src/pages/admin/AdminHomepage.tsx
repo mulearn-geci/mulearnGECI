@@ -695,24 +695,31 @@ export function AdminHomepage() {
                       type="text"
                       placeholder="Paste Image URL or Upload"
                       value={about.photo1}
-                      onChange={(e) => setAbout({ ...about, photo1: e.target.value })}
+                      onChange={(e) => setAbout((prev) => ({ ...prev, photo1: e.target.value }))}
                       className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
                     />
-                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0">
+                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handleFileUpload(e, (dataUrl) => setAbout({ ...about, photo1: dataUrl }))}
+                        onChange={(e) => handleFileUpload(e, (dataUrl) => setAbout((prev) => ({ ...prev, photo1: dataUrl })))}
                       />
                     </label>
                   </div>
 
                   {about.photo1 && (
-                    <div className="h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="mt-2 relative h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 group">
                       <img src={about.photo1} alt="About Photo 1 Preview" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => setAbout((prev) => ({ ...prev, photo1: '' }))}
+                        className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove Photo"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -728,24 +735,31 @@ export function AdminHomepage() {
                       type="text"
                       placeholder="Paste Image URL or Upload"
                       value={about.photo2}
-                      onChange={(e) => setAbout({ ...about, photo2: e.target.value })}
+                      onChange={(e) => setAbout((prev) => ({ ...prev, photo2: e.target.value }))}
                       className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
                     />
-                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0">
+                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handleFileUpload(e, (dataUrl) => setAbout({ ...about, photo2: dataUrl }))}
+                        onChange={(e) => handleFileUpload(e, (dataUrl) => setAbout((prev) => ({ ...prev, photo2: dataUrl })))}
                       />
                     </label>
                   </div>
 
                   {about.photo2 && (
-                    <div className="h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="mt-2 relative h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 group">
                       <img src={about.photo2} alt="About Photo 2 Preview" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => setAbout((prev) => ({ ...prev, photo2: '' }))}
+                        className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove Photo"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   )}
                 </div>
@@ -761,24 +775,31 @@ export function AdminHomepage() {
                       type="text"
                       placeholder="Paste Image URL or Upload"
                       value={about.photo3}
-                      onChange={(e) => setAbout({ ...about, photo3: e.target.value })}
+                      onChange={(e) => setAbout((prev) => ({ ...prev, photo3: e.target.value }))}
                       className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
                     />
-                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0">
+                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handleFileUpload(e, (dataUrl) => setAbout({ ...about, photo3: dataUrl }))}
+                        onChange={(e) => handleFileUpload(e, (dataUrl) => setAbout((prev) => ({ ...prev, photo3: dataUrl })))}
                       />
                     </label>
                   </div>
 
                   {about.photo3 && (
-                    <div className="h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="mt-2 relative h-40 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 group">
                       <img src={about.photo3} alt="About Photo 3 Preview" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => setAbout((prev) => ({ ...prev, photo3: '' }))}
+                        className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove Photo"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   )}
                 </div>
