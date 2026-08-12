@@ -67,49 +67,59 @@ export const StackedProjectCards: React.FC = () => {
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
 
   useEffect(() => {
-    const loadCustomConfig = async () => {
-      try {
-        const res = await homepageAPI.getConfig();
-        if (res.success && res.data && res.data.cards && res.data.cards.length > 0) {
-          const formatted = res.data.cards.map((c: any, i: number) => ({
-            id: c.id || String(i + 1),
-            number: String(i + 1).padStart(2, '0'),
-            meta: c.meta || 'SHOWCASE',
-            title: c.title,
-            description: c.description,
-            image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
-            link: c.link || '/events',
-            ctaText: c.ctaText || 'Learn More'
-          }));
-          setCards(formatted);
-          return;
-        }
-      } catch (err) {}
+    const applyCardsFromObj = (cardsArr: any[]) => {
+      if (cardsArr && cardsArr.length > 0) {
+        const formatted = cardsArr.map((c: any, i: number) => ({
+          id: c.id || String(i + 1),
+          number: String(i + 1).padStart(2, '0'),
+          meta: c.meta || 'SHOWCASE',
+          title: c.title,
+          description: c.description,
+          image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
+          link: c.link || '/events',
+          ctaText: c.ctaText || 'Learn More'
+        }));
+        setCards(formatted);
+        return true;
+      }
+      return false;
+    };
 
+    const loadCustomConfig = async () => {
+      // 1. Check local storage cache first for instant update
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed.cards && parsed.cards.length > 0) {
-            const formatted = parsed.cards.map((c: any, i: number) => ({
-              id: c.id || String(i + 1),
-              number: String(i + 1).padStart(2, '0'),
-              meta: c.meta || 'SHOWCASE',
-              title: c.title,
-              description: c.description,
-              image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
-              link: c.link || '/events',
-              ctaText: c.ctaText || 'Learn More'
-            }));
-            setCards(formatted);
-          }
+          if (applyCardsFromObj(parsed.cards)) return;
         }
       } catch (e) {}
+
+      // 2. Fetch from backend API
+      try {
+        const res = await homepageAPI.getConfig();
+        if (res.success && res.data && res.data.cards) {
+          applyCardsFromObj(res.data.cards);
+        }
+      } catch (err) {}
     };
 
     loadCustomConfig();
+
     window.addEventListener('mulearn_config_updated', loadCustomConfig);
-    return () => window.removeEventListener('mulearn_config_updated', loadCustomConfig);
+    window.addEventListener('storage', loadCustomConfig);
+
+    let bc: any = null;
+    if (typeof BroadcastChannel !== 'undefined') {
+      bc = new BroadcastChannel('mulearn_config_channel');
+      bc.onmessage = () => loadCustomConfig();
+    }
+
+    return () => {
+      window.removeEventListener('mulearn_config_updated', loadCustomConfig);
+      window.removeEventListener('storage', loadCustomConfig);
+      if (bc) bc.close();
+    };
   }, []);
 
   const handleNext = () => {

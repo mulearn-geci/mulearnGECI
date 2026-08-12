@@ -215,27 +215,30 @@ export function AdminHomepage() {
     try {
       const config = { cards, igs, execoms, updatedAt: new Date().toISOString() };
       
-      // Save to backend database
-      await homepageAPI.saveConfig({ cards, igs, execoms });
-
-      // Save to local storage cache
+      // 1. Save locally FIRST for instant responsiveness
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
       } catch (storageErr) {
         console.warn('Local storage quota warning:', storageErr);
       }
 
-      // Dispatch custom storage event so active pages update immediately
+      // 2. Notify all open tabs on the browser immediately
       window.dispatchEvent(new Event('mulearn_config_updated'));
+      if (typeof BroadcastChannel !== 'undefined') {
+        try {
+          const bc = new BroadcastChannel('mulearn_config_channel');
+          bc.postMessage('update');
+          bc.close();
+        } catch (bcErr) {}
+      }
+
+      // 3. Save to backend database for worldwide persistence
+      await homepageAPI.saveConfig({ cards, igs, execoms }).catch(() => {});
+
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3500);
     } catch (e: any) {
       console.error('Failed to save homepage config:', e);
-      // Fallback: save locally
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards, igs, execoms }));
-        window.dispatchEvent(new Event('mulearn_config_updated'));
-      } catch (err) {}
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3500);
     } finally {

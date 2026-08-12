@@ -159,70 +159,78 @@ export function Home() {
 
   // Dynamically fetch Execom members & load custom admin config
   useEffect(() => {
-    const loadCustomConfig = async () => {
-      try {
-        const apiRes = await homepageAPI.getConfig();
-        if (apiRes.success && apiRes.data) {
-          if (apiRes.data.igs && apiRes.data.igs.length > 0) {
-            const formattedIgs = apiRes.data.igs.map((ig: any, i: number) => ({
-              title: ig.title,
-              domain: ig.domain || 'Domain',
-              description: ig.description,
-              icon: INTEREST_GROUPS[i % INTEREST_GROUPS.length]?.icon || Code2,
-              link: ig.link || '/events',
-              badge: ig.badge || 'Active'
-            }));
-            setInterestGroups(formattedIgs);
-          }
-          if (apiRes.data.execoms && apiRes.data.execoms.length > 0) {
-            setExecomMembers(apiRes.data.execoms);
-          }
-          return;
-        }
-      } catch (e) {}
+    let hasCustomExecom = false;
 
+    const applyConfigFromObj = (data: any) => {
+      if (data.igs && data.igs.length > 0) {
+        const formattedIgs = data.igs.map((ig: any, i: number) => ({
+          title: ig.title,
+          domain: ig.domain || 'Domain',
+          description: ig.description,
+          icon: INTEREST_GROUPS[i % INTEREST_GROUPS.length]?.icon || Code2,
+          link: ig.link || '/events',
+          badge: ig.badge || 'Active'
+        }));
+        setInterestGroups(formattedIgs);
+      }
+      if (data.execoms && data.execoms.length > 0) {
+        setExecomMembers(data.execoms);
+        hasCustomExecom = true;
+      }
+    };
+
+    const loadCustomConfig = async () => {
+      // 1. Local cache first for instant update
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed.igs && parsed.igs.length > 0) {
-            const formattedIgs = parsed.igs.map((ig: any, i: number) => ({
-              title: ig.title,
-              domain: ig.domain || 'Domain',
-              description: ig.description,
-              icon: INTEREST_GROUPS[i % INTEREST_GROUPS.length]?.icon || Code2,
-              link: ig.link || '/events',
-              badge: ig.badge || 'Active'
-            }));
-            setInterestGroups(formattedIgs);
-          }
-          if (parsed.execoms && parsed.execoms.length > 0) {
-            setExecomMembers(parsed.execoms);
-          }
+          applyConfigFromObj(parsed);
         }
       } catch (e) {}
+
+      // 2. API fetch
+      try {
+        const apiRes = await homepageAPI.getConfig();
+        if (apiRes.success && apiRes.data) {
+          applyConfigFromObj(apiRes.data);
+        }
+      } catch (e) {}
+
+      // 3. Fallback to Execom API only if no custom execom exists
+      if (!hasCustomExecom) {
+        execomAPI.getAll()
+          .then((res) => {
+            if (res.success && res.data && res.data.length > 0 && !hasCustomExecom) {
+              const formatted = res.data.slice(0, 3).map((item: any) => ({
+                name: item.name || 'Execom Member',
+                role: item.role || 'Domain Lead',
+                department: item.department || 'Engineering',
+                image: item.image ? getImageUrl(item.image) : ''
+              }));
+              setExecomMembers(formatted);
+            }
+          })
+          .catch(() => {});
+      }
     };
 
     loadCustomConfig();
 
-    execomAPI.getAll()
-      .then((res) => {
-        if (res.success && res.data && res.data.length > 0) {
-          const formatted = res.data.slice(0, 3).map((item: any) => ({
-            name: item.name || 'Execom Member',
-            role: item.role || 'Domain Lead',
-            department: item.department || 'Engineering',
-            image: item.image ? getImageUrl(item.image) : ''
-          }));
-          setExecomMembers(formatted);
-        }
-      })
-      .catch((err) => {
-        console.warn('Execom fetch note:', err);
-      });
-
     window.addEventListener('mulearn_config_updated', loadCustomConfig);
-    return () => window.removeEventListener('mulearn_config_updated', loadCustomConfig);
+    window.addEventListener('storage', loadCustomConfig);
+
+    let bc: any = null;
+    if (typeof BroadcastChannel !== 'undefined') {
+      bc = new BroadcastChannel('mulearn_config_channel');
+      bc.onmessage = () => loadCustomConfig();
+    }
+
+    return () => {
+      window.removeEventListener('mulearn_config_updated', loadCustomConfig);
+      window.removeEventListener('storage', loadCustomConfig);
+      if (bc) bc.close();
+    };
   }, []);
 
   // Element Refs
