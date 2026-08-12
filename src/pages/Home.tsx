@@ -464,7 +464,7 @@ export function Home() {
                   className="sm:col-span-1 h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                 >
                   <img
-                    src={aboutContent.photo1}
+                    src={getImageUrl(aboutContent.photo1) || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop'}
                     alt="About Showcase 1"
                     className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-700"
                   />
@@ -480,7 +480,7 @@ export function Home() {
                     className="h-[220px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
-                      src={aboutContent.photo2}
+                      src={getImageUrl(aboutContent.photo2) || 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop'}
                       alt="About Showcase 2"
                       className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-700"
                     />
@@ -494,7 +494,7 @@ export function Home() {
                     className="h-[260px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
-                      src={aboutContent.photo3}
+                      src={getImageUrl(aboutContent.photo3) || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop'}
                       alt="About Showcase 3"
                       className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-700"
                     />

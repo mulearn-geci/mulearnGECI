@@ -209,9 +209,22 @@ export function AdminHomepage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing config on mount (First from API, fallback to localStorage)
+  // Load existing config on mount (First from localStorage, then API overlay)
   useEffect(() => {
     const fetchConfig = async () => {
+      // 1. Read local storage cache first
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.cards && parsed.cards.length > 0) setCards(parsed.cards);
+          if (parsed.igs && parsed.igs.length > 0) setIgs(parsed.igs);
+          if (parsed.execoms && parsed.execoms.length > 0) setExecoms(parsed.execoms);
+          if (parsed.about && Object.keys(parsed.about).length > 0) setAbout((prev) => ({ ...prev, ...parsed.about }));
+        }
+      } catch (err) {}
+
+      // 2. Fetch from backend API
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
@@ -220,21 +233,7 @@ export function AdminHomepage() {
           if (res.data.execoms && res.data.execoms.length > 0) setExecoms(res.data.execoms);
           if (res.data.about && Object.keys(res.data.about).length > 0) setAbout((prev) => ({ ...prev, ...res.data.about }));
         }
-      } catch (e) {
-        console.warn('API config fetch failed, loading from local cache:', e);
-        try {
-          const saved = localStorage.getItem(STORAGE_KEY);
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed.cards) setCards(parsed.cards);
-            if (parsed.igs) setIgs(parsed.igs);
-            if (parsed.execoms) setExecoms(parsed.execoms);
-            if (parsed.about) setAbout((prev) => ({ ...prev, ...parsed.about }));
-          }
-        } catch (err) {
-          console.warn('Local storage parse error:', err);
-        }
-      }
+      } catch (e) {}
     };
     fetchConfig();
   }, []);
