@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Sparkles, Plus, Trash2, Edit3, Save, RefreshCw, CheckCircle, 
-  Image as ImageIcon, Layers, Users, Layout, ArrowRight, ExternalLink 
+  Image as ImageIcon, Layers, Users, Layout, ArrowRight, ExternalLink,
+  Upload, X
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 
@@ -276,6 +277,24 @@ export function AdminHomepage() {
     setExecoms(execoms.filter((_, i) => i !== index));
   };
 
+  // File Upload Helper
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, onRead: (dataUrl: string) => void) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size is larger than 5MB. Please choose a smaller image.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          onRead(ev.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">
@@ -288,10 +307,10 @@ export function AdminHomepage() {
               <span>Homepage & Customizer Studio</span>
             </div>
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-              Customize Homepage Cards & Content
+              Customize Homepage Cards, Photos & Content
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Add new cards, replace text, upload photos, and manage active Interest Groups live across the website.
+              Upload local image files or paste image URLs to replace photos across cards, Execom team slots, and active Interest Groups.
             </p>
           </div>
 
@@ -368,7 +387,7 @@ export function AdminHomepage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Manage Stacked Highlight Cards
+                Manage Stacked Highlight Cards & Photos
               </h2>
               <button
                 onClick={addCard}
@@ -398,7 +417,7 @@ export function AdminHomepage() {
                     </button>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-1">Card Title</label>
                       <input
@@ -429,23 +448,59 @@ export function AdminHomepage() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-500 mb-1">Photo / Image URL</label>
+                    {/* Image Upload & URL Input */}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1">Card Photo / Image</label>
+                      <div className="flex items-center space-x-2">
                         <input
                           type="text"
-                          placeholder="Paste image URL or Leave blank for local photo"
+                          placeholder="Paste Image URL or Upload File"
                           value={card.image}
                           onChange={(e) => updateCard(idx, 'image', e.target.value)}
-                          className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-900 dark:text-white font-medium"
+                          className="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
                         />
+                        <label className="cursor-pointer inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors shadow-sm flex-shrink-0">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload File</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(e, (dataUrl) => updateCard(idx, 'image', dataUrl))}
+                          />
+                        </label>
                       </div>
+
+                      {card.image && (
+                        <div className="mt-3 relative w-24 h-16 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 group">
+                          <img src={card.image} alt="Card Preview" className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => updateCard(idx, 'image', '')}
+                            className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove Photo"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-1">Target Link</label>
                         <input
                           type="text"
                           value={card.link}
                           onChange={(e) => updateCard(idx, 'link', e.target.value)}
+                          className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-900 dark:text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">CTA Button Text</label>
+                        <input
+                          type="text"
+                          value={card.ctaText}
+                          onChange={(e) => updateCard(idx, 'ctaText', e.target.value)}
                           className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-900 dark:text-white font-medium"
                         />
                       </div>
@@ -606,15 +661,41 @@ export function AdminHomepage() {
                       />
                     </div>
 
+                    {/* Member Photo Upload & URL Input */}
                     <div>
-                      <label className="block text-xs font-semibold text-gray-500 mb-1">Photo Image URL</label>
-                      <input
-                        type="text"
-                        placeholder="Paste image URL (Leave blank to keep placeholder)"
-                        value={member.image}
-                        onChange={(e) => updateExecom(idx, 'image', e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-900 dark:text-white font-medium"
-                      />
+                      <label className="block text-xs font-semibold text-gray-500 mb-1">Member Photo Image</label>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          placeholder="Paste URL or Upload File"
+                          value={member.image}
+                          onChange={(e) => updateExecom(idx, 'image', e.target.value)}
+                          className="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
+                        />
+                        <label className="cursor-pointer inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors shadow-sm flex-shrink-0">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload File</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(e, (dataUrl) => updateExecom(idx, 'image', dataUrl))}
+                          />
+                        </label>
+                      </div>
+
+                      {member.image && (
+                        <div className="mt-3 relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500 group">
+                          <img src={member.image} alt="Member Preview" className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => updateExecom(idx, 'image', '')}
+                            className="absolute inset-0 bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove Photo"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
