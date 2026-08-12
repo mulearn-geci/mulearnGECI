@@ -11,7 +11,7 @@ const vertexShaderSource = `
 `;
 
 const fragmentShaderSource = `
-  precision highp float;
+  precision mediump float;
   uniform vec2 u_resolution;
   uniform float u_time;
   varying vec2 v_uv;
@@ -218,9 +218,11 @@ export const HeroShaderCanvas: React.FC = () => {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
-    />
+    <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#0a0a0f] via-[#1a233a] to-[#0d0d0d] pointer-events-none z-0">
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full object-cover pointer-events-none opacity-90"
+      />
+    </div>
   );
 };
