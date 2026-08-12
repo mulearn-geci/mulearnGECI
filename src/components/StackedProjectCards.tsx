@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, Award, Users, BookOpen, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { homepageAPI } from '../services/api';
+import { getImageUrl } from '../utils/imageUtils';
 
 import MulearnGroupImg from '../img/mulearnGroup.jpg';
 import AlbertImg from '../img/albert.jpeg';
@@ -203,7 +204,7 @@ export const StackedProjectCards: React.FC = () => {
 
               return (
                 <motion.div
-                  key={card.id}
+                  key={`${card.id}-${card.title.slice(0, 15)}-${index}`}
                   layout
                   initial={{ scale: 0.9, y: 50, opacity: 0 }}
                   animate={{
@@ -266,7 +267,7 @@ export const StackedProjectCards: React.FC = () => {
                     {/* Right Half (Real µLearn Group Image & Glass Overlay) */}
                     <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group">
                       <img
-                        src={card.image}
+                        src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
                         alt={card.title}
                         className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
                       />
