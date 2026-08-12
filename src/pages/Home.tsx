@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpRight, Trophy, Calendar, Users, GraduationCap, ChevronDown, 
-  ArrowUp, Sparkles, Star, CheckCircle, Code, BookOpen, Award, Rocket
+  ArrowUp, Sparkles, Star, Code, ShieldCheck, Cpu, Laptop
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';
@@ -62,34 +62,39 @@ const TEAM_MEMBERS = [
   }
 ];
 
-// Section 4.6 µLearn Core Goal & Proof of Work Journey
-const GOALS_JOURNEY = [
+// Section 4.6 Active Interest Groups (IGs)
+const INTEREST_GROUPS = [
   {
-    step: '01',
-    title: '1. Learn & Upskill',
-    tagline: 'Peer-to-Peer Skill Acquisition',
-    description: 'Join interest groups across Web Dev, AI/ML, Cyber Security, Cloud, and Robotics. Learn directly from senior student mentors.',
-    icon: BookOpen,
-    highlighted: false,
-    link: '/events'
-  },
-  {
-    step: '02',
-    title: '2. Build & Ship Daily',
-    tagline: 'Public Proof-of-Work Engine',
-    description: 'Build real-world software and hardware projects. Push daily commits on GitHub and document your progress publicly on LinkedIn.',
+    title: 'Web & Full-Stack Development',
+    domain: 'Web & Cloud',
+    description: 'Master React, TypeScript, Node.js, and cloud deployment. Build scalable web applications and production REST APIs.',
     icon: Code,
-    highlighted: true,
-    link: '/leaderboard'
+    link: '/events',
+    badge: 'Popular'
   },
   {
-    step: '03',
-    title: '3. Rank & Get Recruited',
-    tagline: 'Karma Ladder & Alumni Referrals',
-    description: 'Earn Karma XP points for every verified commit. Climb the campus leaderboard and unlock placement referrals from alumni leaders.',
-    icon: Award,
-    highlighted: false,
-    link: '/alumni'
+    title: 'Artificial Intelligence & ML',
+    domain: 'AI / Machine Learning',
+    description: 'Deep dive into Python, PyTorch, LLM integrations, and computer vision models for real-world automation.',
+    icon: Sparkles,
+    link: '/events',
+    badge: 'Trending'
+  },
+  {
+    title: 'Cyber Security & DevOps',
+    domain: 'Security & Systems',
+    description: 'Hands-on CTF challenges, Linux system administration, vulnerability auditing, and automated CI/CD pipelines.',
+    icon: ShieldCheck,
+    link: '/events',
+    badge: 'Core'
+  },
+  {
+    title: 'Robotics & Hardware Systems',
+    domain: 'IoT & Embedded',
+    description: 'Prototype physical hardware using Arduino, Raspberry Pi, ROS, and sensor networks in campus hardware labs.',
+    icon: Cpu,
+    link: '/events',
+    badge: 'Hardware'
   }
 ];
 
@@ -169,7 +174,7 @@ export function Home() {
                 solutio
                 <span className="relative">
                   n
-                  {/* Micro-interaction: Extending line from 'n' scaling X 0 to 1 over 1.5s */}
+                  {/* Micro-interaction line */}
                   <motion.span
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
@@ -214,10 +219,9 @@ export function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Circular Rotating Badge (Bottom Right) */}
+          {/* Circular Rotating Badge */}
           <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto">
             <div className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center">
-              {/* Infinitely Rotating SVG Text (360deg over 10s) */}
               <motion.svg
                 animate={{ rotate: 360 }}
                 transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
@@ -236,7 +240,6 @@ export function Home() {
                 </text>
               </motion.svg>
 
-              {/* Central Star Icon */}
               <div className="absolute inset-0 m-auto w-10 h-10 md:w-12 md:h-12 bg-white/10 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-amber-400 shadow-xl">
                 <Star className="w-5 h-5 fill-amber-400" />
               </div>
@@ -248,7 +251,6 @@ export function Home() {
         <section className="py-24 md:py-32 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
-            {/* Header */}
             <div className="mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
                 Explore The Platform
@@ -258,7 +260,6 @@ export function Home() {
               </h2>
             </div>
 
-            {/* 4-Column Grid for Website Pages */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {WEBSITE_PAGES.map((page, index) => {
                 const IconComp = page.icon;
@@ -336,7 +337,7 @@ export function Home() {
                 </div>
               </div>
 
-              {/* Right Column: Masonry Grid with whileInView motion */}
+              {/* Right Column: Masonry Grid */}
               <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                 
                 {/* Image 1: Large Left Column */}
@@ -354,7 +355,7 @@ export function Home() {
                   />
                 </motion.div>
 
-                {/* Right Column (Top & Bottom Images) */}
+                {/* Right Column */}
                 <div className="sm:col-span-1 space-y-6">
                   
                   {/* Image 2: Top Right */}
@@ -399,7 +400,6 @@ export function Home() {
         {/* ─── 4.5 Team Banner & Grid ───────────────────────────────────────── */}
         <section className="py-24 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
           
-          {/* Marquee Banner with Text Stroke Effect */}
           <div className="mb-20 overflow-hidden border-y border-gray-200 dark:border-gray-800 py-6 bg-gray-50 dark:bg-gray-950">
             <motion.div
               animate={{ x: ['0%', '-50%'] }}
@@ -415,7 +415,6 @@ export function Home() {
             </motion.div>
           </div>
 
-          {/* 3-Column Team Grid with Real Images */}
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {TEAM_MEMBERS.map((member, index) => (
@@ -427,17 +426,12 @@ export function Home() {
                   transition={{ duration: 0.6, delay: index * 0.2 }}
                   className="group relative h-[420px] rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl cursor-pointer"
                 >
-                  {/* Image with Grayscale -> Color Hover Transition */}
                   <img
                     src={member.image}
                     alt={member.name}
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                   />
-
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-
-                  {/* Text Overlay (Slides Up on Hover) */}
                   <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                     <span className="text-xs uppercase tracking-wider font-semibold text-blue-400 block mb-1">
                       {member.department}
@@ -465,72 +459,63 @@ export function Home() {
           </div>
         </section>
 
-        {/* ─── 4.6 µLearn Goals & Proof of Work Journey ────────────────────── */}
+        {/* ─── 4.6 Active Interest Groups (IGs) ────────────────────────────── */}
         <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
             {/* Header */}
             <div className="text-center max-w-3xl mx-auto mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
-                Our Core Mission
+                Campus Technical Domains
               </span>
               <h2 className="font-display text-4xl md:text-6xl font-bold mb-4 leading-tight">
-                The µLearn Proof-of-Work Engine
+                Active Interest Groups (IGs)
               </h2>
               <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
-                From writing your first line of code to getting hired by top engineering firms in 3 simple steps.
+                Specialized tech domains driven by peer mentorship, hands-on workshops, and real-world project builds at GECI.
               </p>
             </div>
 
-            {/* 3 Step Goal Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mb-32">
-              {GOALS_JOURNEY.map((goal) => {
-                const IconComp = goal.icon;
-                const isHighlight = goal.highlighted;
+            {/* 4 Interest Group Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
+              {INTEREST_GROUPS.map((ig, index) => {
+                const IconComp = ig.icon;
                 return (
-                  <div
-                    key={goal.title}
-                    className={`rounded-3xl p-8 transition-all duration-300 shadow-xl border flex flex-col justify-between ${
-                      isHighlight
-                        ? 'bg-black text-white dark:bg-gray-900 border-blue-500 md:-translate-y-4 shadow-blue-500/10'
-                        : 'bg-white text-gray-900 dark:bg-gray-800 dark:text-white border-gray-200 dark:border-gray-700'
-                    }`}
+                  <motion.div
+                    key={ig.title}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.15 }}
+                    className="p-8 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-6">
-                        <div className={`w-12 h-12 rounded-full font-display font-bold text-sm flex items-center justify-center ${
-                          isHighlight ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
-                        }`}>
-                          {goal.step}
+                        <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
+                          <IconComp className="w-6 h-6" />
                         </div>
-                        <span className={`text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full ${
-                          isHighlight ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-slate-100 text-slate-700 dark:bg-gray-700 dark:text-gray-300'
-                        }`}>
-                          {goal.tagline}
+                        <span className="text-xs uppercase tracking-wider font-bold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full">
+                          {ig.badge}
                         </span>
                       </div>
 
-                      <h3 className="font-display text-2xl font-bold mb-3">
-                        {goal.title}
+                      <h3 className="font-display text-xl font-bold mb-3 text-slate-900 dark:text-white">
+                        {ig.title}
                       </h3>
 
-                      <p className={`text-sm leading-relaxed mb-6 ${isHighlight ? 'text-gray-300' : 'text-gray-600 dark:text-gray-400'}`}>
-                        {goal.description}
+                      <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium">
+                        {ig.description}
                       </p>
                     </div>
 
                     <Link
-                      to={goal.link}
-                      className={`w-full py-3.5 rounded-full font-bold text-sm inline-flex items-center justify-center space-x-2 transition-all ${
-                        isHighlight
-                          ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'
-                          : 'bg-gray-900 hover:bg-blue-600 text-white dark:bg-white dark:hover:bg-blue-500 dark:text-gray-900 dark:hover:text-white'
-                      }`}
+                      to={ig.link}
+                      className="w-full py-3 rounded-full font-bold text-xs inline-flex items-center justify-center space-x-2 bg-slate-900 hover:bg-blue-600 text-white dark:bg-white dark:hover:bg-blue-500 dark:text-slate-900 dark:hover:text-white transition-all shadow-md"
                     >
-                      <span>Get Started</span>
-                      <ArrowUpRight className="w-4 h-4" />
+                      <span>Explore {ig.domain}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
                     </Link>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
