@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { homepageAPI } from '../../services/api';
+import { compressImageToDataUrl } from '../../utils/imageUtils';
 
 export interface CustomCard {
   id: string;
@@ -317,20 +318,13 @@ export function AdminHomepage() {
   };
 
   // File Upload Helper
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, onRead: (dataUrl: string) => void) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, onRead: (dataUrl: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size is larger than 5MB. Please choose a smaller image.');
-        return;
+      const compressedDataUrl = await compressImageToDataUrl(file, 1200, 1200, 0.75);
+      if (compressedDataUrl) {
+        onRead(compressedDataUrl);
       }
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        if (ev.target?.result) {
-          onRead(ev.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
     }
   };
 
