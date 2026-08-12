@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowUpRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowUpRight, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface ProjectCard {
