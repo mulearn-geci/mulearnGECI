@@ -61,17 +61,19 @@ const PROJECTS: ProjectCard[] = [
 
 export const StackedProjectCards: React.FC = () => {
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
   const [viewMode, setViewMode] = useState<'stacked' | 'grid'>('stacked');
 
   useEffect(() => {
     const applyCardsFromObj = (cardsArr: any[]) => {
-      if (cardsArr && cardsArr.length > 0) {
+      if (cardsArr && Array.isArray(cardsArr) && cardsArr.length > 0) {
         const formatted = cardsArr.map((c: any, i: number) => ({
           id: c.id || String(i + 1),
-          number: String(i + 1).padStart(2, '0'),
-          meta: c.meta || 'SHOWCASE',
-          title: c.title,
-          description: c.description,
+          number: c.number || String(i + 1).padStart(2, '0'),
+          meta: c.meta || 'CAMPUS SHOWCASE',
+          title: c.title || `Showcase Card #${i + 1}`,
+          description: c.description || 'Discover campus initiatives, community achievements, and student projects at µLearn GECI.',
           image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
           link: c.link || '/events',
           ctaText: c.ctaText || 'Learn More'
@@ -129,75 +131,78 @@ export const StackedProjectCards: React.FC = () => {
   }, []);
 
   const handleNext = () => {
-    setCards((prev) => {
-      const copy = [...prev];
-      const first = copy.shift();
-      if (first) copy.push(first);
-      return copy;
-    });
+    setDirection(1);
+    setActiveIndex((prev) => (prev + 1) % cards.length);
   };
 
   const handlePrev = () => {
-    setCards((prev) => {
-      const copy = [...prev];
-      const last = copy.pop();
-      if (last) copy.unshift(last);
-      return copy;
-    });
+    setDirection(-1);
+    setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length);
   };
 
-  const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
-    if (info.offset.x < -80) {
-      handleNext();
-    } else if (info.offset.x > 80) {
-      handlePrev();
-    }
+  const goToCard = (index: number) => {
+    setDirection(index > activeIndex ? 1 : -1);
+    setActiveIndex(index);
   };
 
-  const bringToFront = (index: number) => {
-    if (index === 0) return;
-    setCards((prev) => {
-      const copy = [...prev];
-      const selected = copy.splice(index, 1)[0];
-      return [selected, ...copy];
-    });
+  const currentCard = cards[activeIndex] || cards[0] || PROJECTS[0];
+
+  const variants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? 120 : -120,
+      opacity: 0,
+      scale: 0.95
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1
+    },
+    exit: (dir: number) => ({
+      x: dir < 0 ? 120 : -120,
+      opacity: 0,
+      scale: 0.95
+    })
   };
 
   return (
-    <section className="py-24 md:py-32 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
+    <section className="py-20 md:py-28 bg-slate-900 text-white transition-colors duration-300 overflow-hidden relative">
+      {/* Background Subtle Gradient Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 relative z-10">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Campus Highlights • {cards.length} Total Cards</span>
+            <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-400 mb-3 bg-blue-950/60 px-3 py-1 rounded-full border border-blue-800/40">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Campus Highlights • {cards.length} Active Cards</span>
             </div>
-            <h2 className="font-display text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
               Community Highlights & Stories
             </h2>
           </div>
 
           {/* Controls: View Mode Toggle & Next/Prev */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center space-x-1">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="bg-slate-800/80 p-1 rounded-2xl border border-slate-700 flex items-center space-x-1 shadow-lg">
               <button
                 onClick={() => setViewMode('stacked')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   viewMode === 'stacked'
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Stacked 3D View
+                Carousel View
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   viewMode === 'grid'
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 All Cards Grid ({cards.length})
@@ -205,27 +210,32 @@ export const StackedProjectCards: React.FC = () => {
             </div>
 
             {viewMode === 'stacked' && (
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={handlePrev}
-                  aria-label="Previous Highlight"
-                  className="w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleNext}
-                  aria-label="Next Highlight"
-                  className="w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+              <div className="flex items-center space-x-3">
+                <span className="text-xs font-bold text-slate-400 bg-slate-800 px-3 py-2 rounded-xl border border-slate-700">
+                  Card {activeIndex + 1} of {cards.length}
+                </span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handlePrev}
+                    aria-label="Previous Highlight"
+                    className="w-11 h-11 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    aria-label="Next Highlight"
+                    className="w-11 h-11 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* View Mode 1: Grid View (Renders ALL cards simultaneously) */}
+        {/* MODE 1: ALL CARDS GRID VIEW */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {cards.map((card, index) => (
@@ -234,26 +244,26 @@ export const StackedProjectCards: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="bg-slate-50 dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-xl flex flex-col justify-between group"
+                className="bg-slate-800/90 rounded-3xl p-6 border border-slate-700 shadow-2xl flex flex-col justify-between group hover:border-blue-500/50 transition-all"
               >
                 <div className="space-y-4">
-                  <div className="h-48 rounded-2xl overflow-hidden relative border border-gray-200 dark:border-gray-700">
+                  <div className="h-52 rounded-2xl overflow-hidden relative border border-slate-700">
                     <img
                       src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
                       alt={card.title}
                       className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 bg-blue-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow-md">
+                    <div className="absolute top-3 left-3 bg-blue-600 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-md">
                       #{card.number || String(index + 1).padStart(2, '0')}
                     </div>
                   </div>
-                  <span className="text-xs uppercase tracking-wider font-bold text-blue-600 dark:text-blue-400 block">
+                  <span className="text-xs uppercase tracking-wider font-bold text-blue-400 block">
                     {card.meta}
                   </span>
-                  <h3 className="font-display text-xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                  <h3 className="font-display text-xl font-extrabold text-white leading-tight">
                     {card.title}
                   </h3>
-                  <p className="text-slate-600 dark:text-slate-300 text-xs font-medium leading-relaxed line-clamp-3">
+                  <p className="text-slate-300 text-xs font-medium leading-relaxed line-clamp-3">
                     {card.description}
                   </p>
                 </div>
@@ -261,7 +271,7 @@ export const StackedProjectCards: React.FC = () => {
                 <div className="pt-6">
                   <Link
                     to={card.link}
-                    className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-bold text-xs transition-colors shadow-md group/btn"
+                    className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-full font-bold text-xs transition-colors shadow-md group/btn"
                   >
                     <span>{card.ctaText || 'Learn More'}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
@@ -271,121 +281,92 @@ export const StackedProjectCards: React.FC = () => {
             ))}
           </div>
         ) : (
-          /* View Mode 2: Stacked 3D View */
+          /* MODE 2: SMOOTH CAROUSEL SHOWCASE VIEW */
           <div>
-            <div className="relative h-[650px] md:h-[540px] w-full flex items-center justify-center">
-              <AnimatePresence mode="popLayout">
-                {cards.slice(0, Math.min(cards.length, 5)).map((card, index) => {
-                  const isFront = index === 0;
-                  const yOffset = -index * 24;
-                  const scale = 1 - index * 0.04;
-                  const zIndex = 50 - index * 10;
-
-                  return (
-                    <motion.div
-                      key={`${card.id}-${card.title.slice(0, 15)}-${index}`}
-                      layout
-                      initial={{ scale: 0.9, y: 50, opacity: 0 }}
-                      animate={{
-                        scale,
-                        y: yOffset,
-                        opacity: Math.max(0.3, 1 - index * 0.15),
-                        zIndex
-                      }}
-                      exit={{ scale: 0.8, y: -100, opacity: 0 }}
-                      transition={{
-                        duration: 0.5,
-                        ease: [0.16, 1, 0.3, 1]
-                      }}
-                      onClick={() => bringToFront(index)}
-                      drag={isFront ? "x" : false}
-                      dragConstraints={{ left: 0, right: 0 }}
-                      onDragEnd={isFront ? handleDragEnd : undefined}
-                      className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[500px] rounded-3xl p-6 md:p-10 border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden cursor-pointer bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white transition-colors duration-300 ${
-                        isFront ? 'cursor-grab active:cursor-grabbing' : ''
-                      }`}
-                    >
-                      <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-8 items-center">
-                        
-                        {/* Left Half */}
-                        <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
-                          <div>
-                            <div className="flex items-center space-x-4 mb-6">
-                              <div className="w-12 h-12 rounded-full border border-blue-600/30 text-white font-display font-bold text-sm flex items-center justify-center bg-blue-600 shadow-md">
-                                {card.number}
-                              </div>
-                              <span className="text-xs uppercase tracking-wider font-bold text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-3 py-1 rounded-full">
-                                {card.meta}
-                              </span>
-                            </div>
-
-                            <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 leading-tight">
-                              {card.title}
-                            </h3>
-
-                            <p className="text-slate-700 dark:text-slate-200 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
-                              {card.description}
-                            </p>
+            <div className="relative min-h-[500px] w-full flex items-center justify-center">
+              <AnimatePresence custom={direction} mode="wait">
+                <motion.div
+                  key={currentCard.id || activeIndex}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
+                  className="w-full max-w-[1250px] bg-slate-800/90 border border-slate-700/80 rounded-3xl p-6 md:p-10 shadow-2xl overflow-hidden backdrop-blur-xl"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    {/* Left Details */}
+                    <div className="lg:col-span-6 flex flex-col justify-between h-full space-y-6">
+                      <div>
+                        <div className="flex items-center space-x-4 mb-5">
+                          <div className="w-12 h-12 rounded-2xl border border-blue-500/40 text-white font-display font-extrabold text-base flex items-center justify-center bg-blue-600 shadow-lg shadow-blue-600/30">
+                            {currentCard.number || String(activeIndex + 1).padStart(2, '0')}
                           </div>
-
-                          <div className="pt-6 flex items-center space-x-4">
-                            <Link
-                              to={card.link}
-                              className="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/20 group"
-                            >
-                              <span>{card.ctaText}</span>
-                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleNext();
-                              }}
-                              className="inline-flex items-center space-x-2 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors"
-                            >
-                              <span>Next Card</span>
-                              <ChevronRight className="w-4 h-4" />
-                            </button>
-                          </div>
+                          <span className="text-xs uppercase tracking-wider font-extrabold text-blue-400 bg-blue-950/80 px-3.5 py-1.5 rounded-full border border-blue-800/50">
+                            {currentCard.meta}
+                          </span>
                         </div>
 
-                        {/* Right Half */}
-                        <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group">
-                          <img
-                            src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
-                            alt={card.title}
-                            className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
-                          />
+                        <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-extrabold text-white mb-4 leading-tight">
+                          {currentCard.title}
+                        </h3>
 
-                          <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/50 shadow-lg pointer-events-none transform -rotate-6 flex items-center justify-center text-blue-600">
-                            <Sparkles className="w-6 h-6" />
-                          </div>
-                          <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none transform rotate-12 flex items-center justify-center text-amber-400">
-                            <Award className="w-8 h-8" />
-                          </div>
-                        </div>
-
+                        <p className="text-slate-300 text-sm md:text-base font-medium leading-relaxed">
+                          {currentCard.description}
+                        </p>
                       </div>
-                    </motion.div>
-                  );
-                })}
+
+                      <div className="pt-4 flex flex-wrap items-center gap-4">
+                        <Link
+                          to={currentCard.link}
+                          className="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-500 text-white px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/30 group"
+                        >
+                          <span>{currentCard.ctaText || 'Explore Feature'}</span>
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+
+                        <div className="flex items-center space-x-2 text-xs font-bold text-slate-400">
+                          <span>Card {activeIndex + 1} of {cards.length}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Image */}
+                    <div className="lg:col-span-6 relative h-[280px] md:h-[380px] rounded-2xl overflow-hidden border border-slate-700/80 group">
+                      <img
+                        src={getImageUrl(currentCard.image) || PROJECTS[activeIndex % PROJECTS.length]?.image}
+                        alt={currentCard.title}
+                        className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
+                      />
+
+                      <div className="absolute top-4 left-4 w-14 h-14 rounded-2xl backdrop-blur-md bg-slate-900/60 border border-slate-700 shadow-lg pointer-events-none flex items-center justify-center text-blue-400">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div className="absolute bottom-4 right-4 w-16 h-16 rounded-full backdrop-blur-md bg-slate-900/60 border border-slate-700 shadow-lg pointer-events-none flex items-center justify-center text-amber-400">
+                        <Award className="w-7 h-7" />
+                      </div>
+                    </div>
+
+                  </div>
+                </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Quick Card Switcher Pills */}
+            {/* Quick Interactive Card Switcher Pills */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
               {cards.map((card, idx) => (
                 <button
                   key={card.id || idx}
-                  onClick={() => bringToFront(idx)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-                    idx === 0
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-md scale-105'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  onClick={() => goToCard(idx)}
+                  className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                    idx === activeIndex
+                      ? 'bg-blue-600 text-white border-blue-500 shadow-lg scale-105'
+                      : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
                   }`}
                 >
-                  #{card.number || String(idx + 1).padStart(2, '0')} {card.title.slice(0, 18)}...
+                  #{card.number || String(idx + 1).padStart(2, '0')} {card.title.slice(0, 20)}...
                 </button>
               ))}
             </div>
