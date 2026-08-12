@@ -1,16 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpRight, Trophy, Calendar, Users, GraduationCap, ChevronDown, 
-  ArrowUp, Sparkles, Star, Code, ShieldCheck, Cpu, Laptop
+  ArrowUp, Sparkles, Star, Code, ShieldCheck, Cpu, User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';
 import { StackedProjectCards } from '../components/StackedProjectCards';
-
-import AlbertImg from '../img/albert.jpeg';
-import AvaniImg from '../img/avani.jpg';
-import JeevanImg from '../img/JEEVANPRAKASH.jpeg';
+import { execomAPI } from '../services/api';
+import { getImageUrl } from '../utils/imageUtils';
 
 // Section 4.2 Website Feature Navigation Boxes
 const WEBSITE_PAGES = [
@@ -40,25 +38,25 @@ const WEBSITE_PAGES = [
   }
 ];
 
-// Section 4.5 Execom Team Members with Real Images
-const TEAM_MEMBERS = [
+// Section 4.5 Placeholder Slots for Execom Team (Names & Photos space reserved)
+const DEFAULT_EXECOM_SLOTS = [
   {
     name: 'Albert George',
     role: 'Campus Lead & Lead Architect',
-    image: AlbertImg,
-    department: 'Computer Science & Eng.'
+    department: 'Computer Science & Eng.',
+    image: ''
   },
   {
     name: 'Avani M U',
     role: 'Technical Lead & Developer',
-    image: AvaniImg,
-    department: 'Electronics & Comm.'
+    department: 'Electronics & Comm.',
+    image: ''
   },
   {
     name: 'Jeevan Prakash',
     role: 'Events & Operations Lead',
-    image: JeevanImg,
-    department: 'Robotics & AI'
+    department: 'Robotics & AI',
+    image: ''
   }
 ];
 
@@ -120,6 +118,26 @@ const FAQS = [
 
 export function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [execomMembers, setExecomMembers] = useState(DEFAULT_EXECOM_SLOTS);
+
+  // Dynamically fetch Execom members if database entries exist
+  useEffect(() => {
+    execomAPI.getAll()
+      .then((res) => {
+        if (res.success && res.data && res.data.length > 0) {
+          const formatted = res.data.slice(0, 3).map((item: any) => ({
+            name: item.name || 'Execom Member',
+            role: item.role || 'Domain Lead',
+            department: item.department || 'Engineering',
+            image: item.image ? getImageUrl(item.image) : ''
+          }));
+          setExecomMembers(formatted);
+        }
+      })
+      .catch((err) => {
+        console.warn('Execom fetch note:', err);
+      });
+  }, []);
 
   // Element Refs
   const heroRef = useRef<HTMLDivElement>(null);
@@ -139,18 +157,14 @@ export function Home() {
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
         <section ref={heroRef} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
-          {/* Full Screen WebGL Shader Canvas */}
           <HeroShaderCanvas />
 
-          {/* Dark Overlay gradient for contrast */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0d0d0d] z-10 pointer-events-none" />
 
-          {/* Hero Content */}
           <motion.div
             style={{ y: heroY }}
             className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 w-full flex flex-col items-start justify-center pt-16"
           >
-            {/* Tagline Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -161,7 +175,6 @@ export function Home() {
               <span>µLearn GECI • Student Innovation Hub</span>
             </motion.div>
 
-            {/* Massive Hero Display Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -174,7 +187,6 @@ export function Home() {
                 solutio
                 <span className="relative">
                   n
-                  {/* Micro-interaction line */}
                   <motion.span
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
@@ -185,7 +197,6 @@ export function Home() {
               </span>
             </motion.h1>
 
-            {/* Subtitle Paragraph */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -195,7 +206,6 @@ export function Home() {
               Empowering Government Engineering College Idukki students through peer-to-peer coding sprints, real-world proof of work, and live karma leaderboards.
             </motion.p>
 
-            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -219,7 +229,6 @@ export function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Circular Rotating Badge */}
           <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto">
             <div className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center">
               <motion.svg
@@ -310,7 +319,6 @@ export function Home() {
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
               
-              {/* Left Column: Sticky Narrative Text */}
               <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6">
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 block">
                   About µLearn GECI
@@ -337,10 +345,8 @@ export function Home() {
                 </div>
               </div>
 
-              {/* Right Column: Masonry Grid */}
               <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                 
-                {/* Image 1: Large Left Column */}
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -355,10 +361,8 @@ export function Home() {
                   />
                 </motion.div>
 
-                {/* Right Column */}
                 <div className="sm:col-span-1 space-y-6">
                   
-                  {/* Image 2: Top Right */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -373,7 +377,6 @@ export function Home() {
                     />
                   </motion.div>
 
-                  {/* Image 3: Bottom Right */}
                   <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -397,7 +400,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* ─── 4.5 Team Banner & Grid ───────────────────────────────────────── */}
+        {/* ─── 4.5 Team Banner & Reserved Execom Member Slots ─────────────── */}
         <section className="py-24 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
           
           <div className="mb-20 overflow-hidden border-y border-gray-200 dark:border-gray-800 py-6 bg-gray-50 dark:bg-gray-950">
@@ -416,30 +419,47 @@ export function Home() {
           </div>
 
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
+            {/* 3-Column Reserved Member Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {TEAM_MEMBERS.map((member, index) => (
+              {execomMembers.map((member, index) => (
                 <motion.div
-                  key={member.name}
+                  key={member.name + index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.2 }}
-                  className="group relative h-[420px] rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl cursor-pointer"
+                  className="group relative h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-8 hover:border-blue-500 transition-all duration-300"
                 >
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 right-0 p-8 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                    <span className="text-xs uppercase tracking-wider font-semibold text-blue-400 block mb-1">
+                  {/* Photo / Avatar Placeholder Area */}
+                  {member.image ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 z-0"
+                    />
+                  ) : (
+                    <div className="relative z-10 flex flex-col items-center justify-center h-48 rounded-2xl bg-slate-200/60 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 text-slate-400 dark:text-gray-400 group-hover:scale-105 transition-transform duration-500">
+                      <User className="w-16 h-16 text-blue-600/70 dark:text-blue-400/70 mb-2" />
+                      <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-300">
+                        Profile & Photo Reserved
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Gradient Overlay for image mode */}
+                  {member.image && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity z-10" />
+                  )}
+
+                  {/* Member Details */}
+                  <div className={`relative z-20 mt-auto pt-6 ${member.image ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+                    <span className="text-xs uppercase tracking-wider font-extrabold text-blue-600 dark:text-blue-400 block mb-1">
                       {member.department}
                     </span>
-                    <h3 className="font-display text-2xl font-bold text-white mb-1">
+                    <h3 className="font-display text-2xl font-extrabold mb-1">
                       {member.name}
                     </h3>
-                    <p className="text-gray-300 text-sm font-medium">
+                    <p className={`text-sm font-medium ${member.image ? 'text-gray-300' : 'text-slate-600 dark:text-gray-300'}`}>
                       {member.role}
                     </p>
                   </div>
@@ -463,7 +483,6 @@ export function Home() {
         <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
-            {/* Header */}
             <div className="text-center max-w-3xl mx-auto mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
                 Campus Technical Domains
@@ -476,7 +495,6 @@ export function Home() {
               </p>
             </div>
 
-            {/* 4 Interest Group Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
               {INTEREST_GROUPS.map((ig, index) => {
                 const IconComp = ig.icon;
@@ -520,7 +538,6 @@ export function Home() {
               })}
             </div>
 
-            {/* FAQ Accordion Section */}
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-12">
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-2 block">
@@ -580,7 +597,6 @@ export function Home() {
           >
             <div className="flex flex-col md:flex-row md:items-end justify-between pb-16 border-b border-gray-800 gap-8">
               
-              {/* Massive CTA */}
               <div>
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-500 mb-4 block">
                   Start Building Today
@@ -591,7 +607,6 @@ export function Home() {
                 </h2>
               </div>
 
-              {/* Action Buttons & Scroll to Top */}
               <div className="flex items-center space-x-4">
                 <Link
                   to="/contact"
@@ -611,7 +626,6 @@ export function Home() {
 
             </div>
 
-            {/* Bottom Meta & Copyright */}
             <div className="pt-12 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
               <p>© 2026 µLearn GECI Chapter. Built with React, Three.js & Tailwind CSS.</p>
               <div className="flex space-x-6 text-gray-400 font-medium">
