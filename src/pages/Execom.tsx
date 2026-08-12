@@ -4,30 +4,18 @@ import { Users, Award, Target, Linkedin, Mail, Github, Instagram, Phone, Code2, 
 import { execomAPI } from '../services/api';
 import { getImageUrl, extractGoogleDriveFileId } from '../utils/imageUtils';
 
-import Anandhu from '../img/anandhu.jpg';
-import Navya from '../img/NavyaMariamJohn.jpg';
-import Nidhin from '../img/Nidhin.jpg';
-import Shimna from '../img/shimna.jpg';
-import Ihsaan from '../img/ihsaan.jpg';
-import Adithyan from '../img/steam.jpg';
-import Avani from '../img/avani.jpg';
-import Jeevan from '../img/JEEVANPRAKASH.jpeg';
-import Albert from '../img/albert.jpeg';
-import Rejin from '../img/Rejin.jpg';
-import Nicholas from '../img/nicho.jpg';
-
 const defaultImageMap: Record<string, string> = {
-  'Prof. Rejin R': Rejin,
-  'Albert George': Albert,
-  'Anandhu S Uthaman': Anandhu,
-  'Navya Mariam John': Navya,
-  'Nicholas Roy': Nicholas,
-  'Nidhin Gireesh': Nidhin,
-  'Shimna B': Shimna,
-  'K S Mohammed Ihsaan': Ihsaan,
-  'Adithyan VS': Adithyan,
-  'Avani M U': Avani,
-  'Jeevan Prakash': Jeevan,
+  'Prof. Rejin R': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop',
+  'Albert George': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop',
+  'Anandhu S Uthaman': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000&auto=format&fit=crop',
+  'Navya Mariam John': 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop',
+  'Nicholas Roy': 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=1000&auto=format&fit=crop',
+  'Nidhin Gireesh': 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1000&auto=format&fit=crop',
+  'Shimna B': 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1000&auto=format&fit=crop',
+  'K S Mohammed Ihsaan': 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop',
+  'Adithyan VS': 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1000&auto=format&fit=crop',
+  'Avani M U': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1000&auto=format&fit=crop',
+  'Jeevan Prakash': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1000&auto=format&fit=crop',
 };
 
 interface ExecomMember {

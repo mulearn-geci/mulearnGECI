@@ -11,56 +11,25 @@ import { StackedProjectCards } from '../components/StackedProjectCards';
 import { execomAPI, homepageAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 
-import RejinImg from '../img/Rejin.jpg';
-import NidhinImg from '../img/Nidhin.jpg';
-
-// Section 4.2 Website Feature Navigation Boxes
-const WEBSITE_PAGES = [
-  {
-    icon: Trophy,
-    title: 'Karma XP Leaderboard',
-    description: 'Track live Karma points, daily commit streaks, and department rankings across CSE, IT, ECE, EEE, ME, and RAI.',
-    link: '/leaderboard'
-  },
-  {
-    icon: Calendar,
-    title: 'Events & Workshops',
-    description: 'Discover upcoming campus hackathons, 24-hour coding sprints, technical workshops, and hands-on bootcamps.',
-    link: '/events'
-  },
-  {
-    icon: Users,
-    title: 'Execom Board',
-    description: 'Meet our dedicated student office bearers, domain leads, and mentors leading µLearn GECI initiatives.',
-    link: '/execom'
-  },
-  {
-    icon: GraduationCap,
-    title: 'Alumni Network',
-    description: 'Connect with graduated seniors working at top global tech companies for career guidance, mock interviews, and referrals.',
-    link: '/alumni'
-  }
-];
-
 // Section 4.5 Official Execom Leadership Team
 const DEFAULT_EXECOM_SLOTS = [
   {
     name: 'Prof. Rejin R',
     role: 'Campus Enabler',
     department: 'Engineering',
-    image: RejinImg
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop'
   },
   {
     name: 'Nidhin Gireesh',
     role: 'Campus Lead',
     department: 'Engineering',
-    image: NidhinImg
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop'
   },
   {
     name: 'Aparna Anilkumar',
     role: 'Co - Lead',
     department: 'Engineering',
-    image: ''
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop'
   }
 ];
 

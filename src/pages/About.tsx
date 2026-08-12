@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, Eye, Heart, Users, Award, Rocket } from 'lucide-react';
-import Group from '../img/mulearnGroup.jpg';
+const Group = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop';
 
 export function About() {
   const values = [

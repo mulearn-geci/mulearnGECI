@@ -5,11 +5,6 @@ import { Link } from 'react-router-dom';
 import { homepageAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 
-import MulearnGroupImg from '../img/mulearnGroup.jpg';
-import AlbertImg from '../img/albert.jpeg';
-import NavyaImg from '../img/NavyaMariamJohn.jpg';
-import JeevanImg from '../img/JEEVANPRAKASH.jpeg';
-
 export interface ProjectCard {
   id: string;
   number: string;
@@ -28,7 +23,7 @@ const PROJECTS: ProjectCard[] = [
     meta: 'µLEARN GECI • CAMPUS LEADERBOARD',
     title: 'Live Campus Karma XP & Streak Ranking System',
     description: 'Track daily GitHub commits, LinkedIn proof-of-work posts, and karma points earned across all GECI engineering departments in real time.',
-    image: MulearnGroupImg,
+    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
     link: '/leaderboard',
     ctaText: 'View Leaderboard'
   },
@@ -38,7 +33,7 @@ const PROJECTS: ProjectCard[] = [
     meta: 'LEADERSHIP & ARCHITECTURE • EXECOM',
     title: 'Meet the Executive Board & Domain Leads',
     description: 'Our student office bearers and domain mentors coordinate technical interest groups, coding bootcamps, and hackathons year-round.',
-    image: AlbertImg,
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop',
     link: '/execom',
     ctaText: 'Meet Execom Board'
   },
@@ -48,7 +43,7 @@ const PROJECTS: ProjectCard[] = [
     meta: 'EVENTS & HACKATHONS • WORKSHOPS',
     title: 'Hands-On Bootcamps & 24-Hour Hackathons',
     description: 'Join campus workshops on Full-Stack Web Dev, AI/ML, Cloud DevOps, and Robotics engineered to turn theory into working code.',
-    image: JeevanImg,
+    image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop',
     link: '/events',
     ctaText: 'Explore Events'
   },
@@ -58,7 +53,7 @@ const PROJECTS: ProjectCard[] = [
     meta: 'ALUMNI & CAREERS • PLACEMENT NETWORK',
     title: 'Global Alumni Mentorship & Job Referral Hub',
     description: 'Connect directly with graduated seniors working at top global tech firms for mock technical interviews, project guidance, and referrals.',
-    image: NavyaImg,
+    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2070&auto=format&fit=crop',
     link: '/alumni',
     ctaText: 'Connect with Alumni'
   }
