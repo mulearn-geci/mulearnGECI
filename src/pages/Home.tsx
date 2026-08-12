@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpRight, Trophy, Calendar, Users, GraduationCap, ChevronDown, 
-  ArrowUp, Sparkles, Star, Code, ShieldCheck, Cpu, User
+  ArrowUp, Sparkles, Star, Code2, ShieldCheck, Smartphone, Palette,
+  Gamepad2, Rocket, Video, BookOpen, User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';
@@ -60,39 +61,87 @@ const DEFAULT_EXECOM_SLOTS = [
   }
 ];
 
-// Section 4.6 Active Interest Groups (IGs)
+// Section 4.6 Official Active Interest Groups (IGs) & Teams at µLearn GECI
 const INTEREST_GROUPS = [
   {
-    title: 'Web & Full-Stack Development',
-    domain: 'Web & Cloud',
-    description: 'Master React, TypeScript, Node.js, and cloud deployment. Build scalable web applications and production REST APIs.',
-    icon: Code,
+    title: 'DSA IG',
+    domain: 'Algorithms & Coding',
+    description: 'Master Data Structures, Algorithms, Problem Solving, and LeetCode challenges for technical interviews.',
+    icon: Code2,
     link: '/events',
-    badge: 'Popular'
+    badge: 'Competitive'
   },
   {
-    title: 'Artificial Intelligence & ML',
-    domain: 'AI / Machine Learning',
-    description: 'Deep dive into Python, PyTorch, LLM integrations, and computer vision models for real-world automation.',
+    title: 'AI IG',
+    domain: 'Artificial Intelligence',
+    description: 'Explore Machine Learning, Neural Networks, PyTorch models, and LLM application development.',
     icon: Sparkles,
     link: '/events',
     badge: 'Trending'
   },
   {
-    title: 'Cyber Security & DevOps',
-    domain: 'Security & Systems',
-    description: 'Hands-on CTF challenges, Linux system administration, vulnerability auditing, and automated CI/CD pipelines.',
-    icon: ShieldCheck,
+    title: 'App Development IG',
+    domain: 'Mobile Dev',
+    description: 'Build native Android and cross-platform mobile apps using Flutter, React Native, and Kotlin.',
+    icon: Smartphone,
     link: '/events',
-    badge: 'Core'
+    badge: 'Mobile'
   },
   {
-    title: 'Robotics & Hardware Systems',
-    domain: 'IoT & Embedded',
-    description: 'Prototype physical hardware using Arduino, Raspberry Pi, ROS, and sensor networks in campus hardware labs.',
-    icon: Cpu,
+    title: 'UI/UX IG',
+    domain: 'Design & Experience',
+    description: 'Design modern user interfaces, Figma prototypes, design systems, and seamless user experiences.',
+    icon: Palette,
     link: '/events',
-    badge: 'Hardware'
+    badge: 'Design'
+  },
+  {
+    title: 'Cybersecurity IG',
+    domain: 'Security & Hacking',
+    description: 'Participate in Capture The Flag (CTF) events, network auditing, penetration testing, and ethical hacking.',
+    icon: ShieldCheck,
+    link: '/events',
+    badge: 'Security'
+  },
+  {
+    title: 'Game IG',
+    domain: 'Game Development',
+    description: 'Develop 2D/3D games, physics engines, shader programming, and interactive graphics using Unity & Unreal.',
+    icon: Gamepad2,
+    link: '/events',
+    badge: 'Gaming'
+  },
+  {
+    title: 'Entrepreneurship IG',
+    domain: 'Startups & Ventures',
+    description: 'Turn technical ideas into viable startup products, pitch decks, business models, and founder networks.',
+    icon: Rocket,
+    link: '/events',
+    badge: 'Startups'
+  },
+  {
+    title: 'Media Team',
+    domain: 'Creative Media',
+    description: 'Spearhead campus branding, photography, video production, event coverage, and digital marketing.',
+    icon: Video,
+    link: '/events',
+    badge: 'Creative'
+  },
+  {
+    title: 'Mucomics',
+    domain: 'Visual Storytelling',
+    description: 'Creative tech comics, digital illustrations, visual stories, and artistic expressions celebrating learning.',
+    icon: BookOpen,
+    link: '/events',
+    badge: 'Comics'
+  },
+  {
+    title: 'Alumni Connect Team',
+    domain: 'Alumni Network',
+    description: 'Bridge current GECI students with graduated seniors working at top global tech firms for mentorship.',
+    icon: GraduationCap,
+    link: '/events',
+    badge: 'Mentorship'
   }
 ];
 
@@ -419,7 +468,6 @@ export function Home() {
           </div>
 
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
-            {/* 3-Column Reserved Member Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {execomMembers.map((member, index) => (
                 <motion.div
@@ -430,7 +478,6 @@ export function Home() {
                   transition={{ duration: 0.6, delay: index * 0.2 }}
                   className="group relative h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-8 hover:border-blue-500 transition-all duration-300"
                 >
-                  {/* Photo / Avatar Placeholder Area */}
                   {member.image ? (
                     <img
                       src={member.image}
@@ -446,12 +493,10 @@ export function Home() {
                     </div>
                   )}
 
-                  {/* Gradient Overlay for image mode */}
                   {member.image && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity z-10" />
                   )}
 
-                  {/* Member Details */}
                   <div className={`relative z-20 mt-auto pt-6 ${member.image ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                     <span className="text-xs uppercase tracking-wider font-extrabold text-blue-600 dark:text-blue-400 block mb-1">
                       {member.department}
@@ -479,23 +524,24 @@ export function Home() {
           </div>
         </section>
 
-        {/* ─── 4.6 Active Interest Groups (IGs) ────────────────────────────── */}
+        {/* ─── 4.6 Official Active Interest Groups (IGs) & Teams ───────────── */}
         <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
             <div className="text-center max-w-3xl mx-auto mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
-                Campus Technical Domains
+                Campus Interest Groups & Teams
               </span>
               <h2 className="font-display text-4xl md:text-6xl font-bold mb-4 leading-tight">
                 Active Interest Groups (IGs)
               </h2>
               <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
-                Specialized tech domains driven by peer mentorship, hands-on workshops, and real-world project builds at GECI.
+                Explore our official technical interest groups and creative teams leading peer huddles, workshops, and challenges at GECI.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
+            {/* 10 Real Interest Groups Grid (All link to /events) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-32">
               {INTEREST_GROUPS.map((ig, index) => {
                 const IconComp = ig.icon;
                 return (
@@ -504,33 +550,33 @@ export function Home() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.15 }}
-                    className="p-8 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                    transition={{ duration: 0.5, delay: index * 0.08 }}
+                    className="p-7 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center justify-between mb-5">
                         <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-sm">
                           <IconComp className="w-6 h-6" />
                         </div>
-                        <span className="text-xs uppercase tracking-wider font-bold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full">
+                        <span className="text-[11px] uppercase tracking-wider font-bold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full">
                           {ig.badge}
                         </span>
                       </div>
 
-                      <h3 className="font-display text-xl font-bold mb-3 text-slate-900 dark:text-white">
+                      <h3 className="font-display text-xl font-bold mb-2 text-slate-900 dark:text-white">
                         {ig.title}
                       </h3>
 
-                      <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium">
+                      <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium line-clamp-3">
                         {ig.description}
                       </p>
                     </div>
 
                     <Link
                       to={ig.link}
-                      className="w-full py-3 rounded-full font-bold text-xs inline-flex items-center justify-center space-x-2 bg-slate-900 hover:bg-blue-600 text-white dark:bg-white dark:hover:bg-blue-500 dark:text-slate-900 dark:hover:text-white transition-all shadow-md"
+                      className="w-full py-3 rounded-full font-bold text-xs inline-flex items-center justify-center space-x-2 bg-slate-900 hover:bg-blue-600 text-white dark:bg-white dark:hover:bg-blue-500 dark:text-slate-900 dark:hover:text-white transition-all shadow-md group-hover:shadow-blue-500/20"
                     >
-                      <span>Explore {ig.domain}</span>
+                      <span>Explore Events</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </Link>
                   </motion.div>
@@ -538,6 +584,7 @@ export function Home() {
               })}
             </div>
 
+            {/* FAQ Accordion Section */}
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-12">
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-2 block">
