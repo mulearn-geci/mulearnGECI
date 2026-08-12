@@ -209,7 +209,7 @@ export function AdminHomepage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing config on mount (First from localStorage, then API merge if server is newer)
+  // Load existing config on mount (First from localStorage, then API merge if server is newer & count safe)
   useEffect(() => {
     const fetchConfig = async () => {
       let localData: any = null;
@@ -226,7 +226,7 @@ export function AdminHomepage() {
         }
       } catch (err) {}
 
-      // 2. Fetch from backend API
+      // 2. Fetch from backend API & apply only if safe
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
@@ -235,8 +235,13 @@ export function AdminHomepage() {
           const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
           const serverTime = apiData?.updatedAt ? new Date(apiData.updatedAt).getTime() : 0;
 
-          // Only overwrite from server if server timestamp is NEWER than local storage OR local storage was empty
-          if (!localData || serverTime > localTime) {
+          const localCardsCount = localData?.cards?.length || 0;
+          const serverCardsCount = apiData?.cards?.length || 0;
+
+          // SAFEGUARD: Only overwrite local cards if:
+          // a) Local storage was empty OR
+          // b) Server time is newer AND server card count is >= local card count!
+          if (!localData || (serverTime > localTime && serverCardsCount >= localCardsCount)) {
             if (apiData.cards && apiData.cards.length > 0) setCards(apiData.cards);
             if (apiData.igs && apiData.igs.length > 0) setIgs(apiData.igs);
             if (apiData.execoms && apiData.execoms.length > 0) setExecoms(apiData.execoms);
@@ -256,7 +261,8 @@ export function AdminHomepage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const configPayload = { cards, igs, execoms, about, updatedAt: new Date().toISOString() };
+      const nowIso = new Date().toISOString();
+      const configPayload = { cards, igs, execoms, about, updatedAt: nowIso };
       
       // 1. Save locally FIRST for zero-delay responsiveness
       try {
@@ -265,7 +271,17 @@ export function AdminHomepage() {
         console.warn('Local storage quota warning:', storageErr);
       }
 
-      // 2. Dispatch local events so all browser tabs update immediately
+      // 2. Save to backend database for worldwide persistence across all devices
+      try {
+        const apiRes = await homepageAPI.saveConfig({ cards, igs, execoms, about });
+        if (apiRes && apiRes.data) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(apiRes.data));
+        }
+      } catch (apiErr) {
+        console.warn('Backend API save warning (retained in local cache):', apiErr);
+      }
+
+      // 3. Dispatch local events so all browser tabs update immediately
       window.dispatchEvent(new Event('mulearn_config_updated'));
       if (typeof BroadcastChannel !== 'undefined') {
         try {
@@ -273,13 +289,6 @@ export function AdminHomepage() {
           bc.postMessage('update');
           bc.close();
         } catch (bcErr) {}
-      }
-
-      // 3. Save to backend database for worldwide persistence across all devices
-      try {
-        await homepageAPI.saveConfig({ cards, igs, execoms, about });
-      } catch (apiErr) {
-        console.warn('Backend API save warning (retained in local cache):', apiErr);
       }
 
       setSavedSuccess(true);

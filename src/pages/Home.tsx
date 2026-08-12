@@ -210,7 +210,10 @@ export function Home() {
           const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
           const serverTime = apiRes.data?.updatedAt ? new Date(apiRes.data.updatedAt).getTime() : 0;
 
-          if (!localData || serverTime > localTime) {
+          const localCount = localData?.cards?.length || 0;
+          const serverCount = apiRes.data?.cards?.length || 0;
+
+          if (!localData || (serverTime > localTime && serverCount >= localCount)) {
             applyConfigFromObj(apiRes.data);
           }
         }

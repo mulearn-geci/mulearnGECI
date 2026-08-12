@@ -100,7 +100,10 @@ export const StackedProjectCards: React.FC = () => {
           const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
           const serverTime = res.data?.updatedAt ? new Date(res.data.updatedAt).getTime() : 0;
 
-          if (!localData || serverTime > localTime) {
+          const localCount = localData?.cards?.length || 0;
+          const serverCount = res.data?.cards?.length || 0;
+
+          if (!localData || (serverTime > localTime && serverCount >= localCount)) {
             applyCardsFromObj(res.data.cards);
           }
         }
