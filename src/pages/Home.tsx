@@ -11,6 +11,34 @@ import { StackedProjectCards } from '../components/StackedProjectCards';
 import { execomAPI, homepageAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 
+// Section 4.2 Website Feature Navigation Boxes
+const WEBSITE_PAGES = [
+  {
+    icon: Trophy,
+    title: 'Karma XP Leaderboard',
+    description: 'Track live Karma points, daily commit streaks, and department rankings across CSE, IT, ECE, EEE, ME, and RAI.',
+    link: '/leaderboard'
+  },
+  {
+    icon: Calendar,
+    title: 'Events & Workshops',
+    description: 'Discover upcoming campus hackathons, 24-hour coding sprints, technical workshops, and hands-on bootcamps.',
+    link: '/events'
+  },
+  {
+    icon: Users,
+    title: 'Execom Board',
+    description: 'Meet our dedicated student office bearers, domain leads, and mentors leading µLearn GECI initiatives.',
+    link: '/execom'
+  },
+  {
+    icon: GraduationCap,
+    title: 'Alumni Network',
+    description: 'Connect with graduated seniors working at top global tech companies for career guidance, mock interviews, and referrals.',
+    link: '/alumni'
+  }
+];
+
 // Section 4.5 Official Execom Leadership Team
 const DEFAULT_EXECOM_SLOTS = [
   {
