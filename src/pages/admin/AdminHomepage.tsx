@@ -209,32 +209,55 @@ export function AdminHomepage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing config on mount (First from localStorage, then API overlay)
+  // Load existing config on mount (First from localStorage, then API merge)
   useEffect(() => {
     const fetchConfig = async () => {
-      // 1. Fetch from backend API
+      let localParsed: any = null;
+
+      // 1. Read local storage FIRST so draft / added cards are NEVER lost on refresh!
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          localParsed = JSON.parse(saved);
+          if (localParsed.cards && localParsed.cards.length > 0) setCards(localParsed.cards);
+          if (localParsed.igs && localParsed.igs.length > 0) setIgs(localParsed.igs);
+          if (localParsed.execoms && localParsed.execoms.length > 0) setExecoms(localParsed.execoms);
+          if (localParsed.about && Object.keys(localParsed.about).length > 0) setAbout((prev) => ({ ...prev, ...localParsed.about }));
+        }
+      } catch (err) {}
+
+      // 2. Fetch from backend API & merge safely
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
-          if (res.data.cards && res.data.cards.length > 0) setCards(res.data.cards);
-          if (res.data.igs && res.data.igs.length > 0) setIgs(res.data.igs);
-          if (res.data.execoms && res.data.execoms.length > 0) setExecoms(res.data.execoms);
-          if (res.data.about && Object.keys(res.data.about).length > 0) setAbout((prev) => ({ ...prev, ...res.data.about }));
-          
-          // Cache in local storage
+          const apiCards = res.data.cards || [];
+          const apiIgs = res.data.igs || [];
+          const apiExecoms = res.data.execoms || [];
+          const apiAbout = res.data.about || {};
+
+          // Only overwrite local cards if server has equal or MORE cards than local cache
+          if (apiCards.length >= (localParsed?.cards?.length || 0) && apiCards.length > 0) {
+            setCards(apiCards);
+          }
+          if (apiIgs.length >= (localParsed?.igs?.length || 0) && apiIgs.length > 0) {
+            setIgs(apiIgs);
+          }
+          if (apiExecoms.length >= (localParsed?.execoms?.length || 0) && apiExecoms.length > 0) {
+            setExecoms(apiExecoms);
+          }
+          if (Object.keys(apiAbout).length > 0) {
+            setAbout((prev) => ({ ...prev, ...apiAbout }));
+          }
+
+          // Keep local storage in sync with authoritative server data
           try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(res.data));
-          } catch {}
-        } else {
-            // Fallback: Read local storage cache
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                if (parsed.cards && parsed.cards.length > 0) setCards(parsed.cards);
-                if (parsed.igs && parsed.igs.length > 0) setIgs(parsed.igs);
-                if (parsed.execoms && parsed.execoms.length > 0) setExecoms(parsed.execoms);
-                if (parsed.about && Object.keys(parsed.about).length > 0) setAbout((prev) => ({ ...prev, ...parsed.about }));
-            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+              cards: apiCards.length >= (localParsed?.cards?.length || 0) ? apiCards : (localParsed?.cards || apiCards),
+              igs: apiIgs.length >= (localParsed?.igs?.length || 0) ? apiIgs : (localParsed?.igs || apiIgs),
+              execoms: apiExecoms.length >= (localParsed?.execoms?.length || 0) ? apiExecoms : (localParsed?.execoms || apiExecoms),
+              about: Object.keys(apiAbout).length > 0 ? apiAbout : (localParsed?.about || apiAbout)
+            }));
+          } catch (e) {}
         }
       } catch (e) {}
     };
@@ -247,18 +270,14 @@ export function AdminHomepage() {
     try {
       const configPayload = { cards, igs, execoms, about, updatedAt: new Date().toISOString() };
       
-      // 1. Save to backend database FIRST for worldwide persistence
-      const apiRes = await homepageAPI.saveConfig({ cards, igs, execoms, about });
-
-      // 2. Save to local storage cache
+      // 1. Save locally FIRST for zero-delay responsiveness
       try {
-        const dataToSave = (apiRes && apiRes.data) ? apiRes.data : configPayload;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(configPayload));
       } catch (storageErr) {
         console.warn('Local storage quota warning:', storageErr);
       }
 
-      // 3. Notify all open tabs on the browser immediately
+      // 2. Dispatch local events so all browser tabs update immediately
       window.dispatchEvent(new Event('mulearn_config_updated'));
       if (typeof BroadcastChannel !== 'undefined') {
         try {
@@ -268,15 +287,17 @@ export function AdminHomepage() {
         } catch (bcErr) {}
       }
 
+      // 3. Save to backend database for worldwide persistence across all devices
+      try {
+        await homepageAPI.saveConfig({ cards, igs, execoms, about });
+      } catch (apiErr) {
+        console.warn('Backend API save warning (retained in local cache):', apiErr);
+      }
+
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3500);
     } catch (e: any) {
-      console.error('Failed to save homepage config to database:', e);
-      // Fallback: save locally
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards, igs, execoms, about }));
-        window.dispatchEvent(new Event('mulearn_config_updated'));
-      } catch (err) {}
+      console.error('Failed to save homepage config:', e);
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3500);
     } finally {

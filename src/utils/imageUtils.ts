@@ -113,7 +113,7 @@ export const getEventImageUrl = (imagePath: string): string => {
   return getImageUrl(imagePath);
 };
 
-export const compressImageToDataUrl = async (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.75): Promise<string> => {
+export const compressImageToDataUrl = async (file: File, maxWidth = 800, maxHeight = 800, quality = 0.65): Promise<string> => {
   return new Promise((resolve) => {
     if (!file || !file.type.startsWith('image/')) {
       resolve('');
