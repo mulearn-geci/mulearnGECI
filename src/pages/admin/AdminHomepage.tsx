@@ -240,8 +240,8 @@ export function AdminHomepage() {
 
           // SAFEGUARD: Only overwrite local cards if:
           // a) Local storage was empty OR
-          // b) Server time is newer AND server card count is >= local card count!
-          if (!localData || (serverTime > localTime && serverCardsCount >= localCardsCount)) {
+          // b) Server has MORE cards than local cache!
+          if (!localData || serverCardsCount > localCardsCount) {
             if (apiData.cards && apiData.cards.length > 0) setCards(apiData.cards);
             if (apiData.igs && apiData.igs.length > 0) setIgs(apiData.igs);
             if (apiData.execoms && apiData.execoms.length > 0) setExecoms(apiData.execoms);
@@ -274,7 +274,7 @@ export function AdminHomepage() {
       // 2. Save to backend database for worldwide persistence across all devices
       try {
         const apiRes = await homepageAPI.saveConfig({ cards, igs, execoms, about });
-        if (apiRes && apiRes.data) {
+        if (apiRes && apiRes.success && apiRes.data && apiRes.data.cards && apiRes.data.cards.length >= cards.length) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(apiRes.data));
         }
       } catch (apiErr) {

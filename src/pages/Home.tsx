@@ -213,7 +213,7 @@ export function Home() {
           const localCount = localData?.cards?.length || 0;
           const serverCount = apiRes.data?.cards?.length || 0;
 
-          if (!localData || (serverTime > localTime && serverCount >= localCount)) {
+          if (!localData || serverCount > localCount) {
             applyConfigFromObj(apiRes.data);
           }
         }

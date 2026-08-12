@@ -28,17 +28,30 @@ router.post('/', async (req, res) => {
   try {
     const { cards, igs, execoms, about } = req.body;
     
-    const updateData = { updatedAt: new Date() };
-    if (cards !== undefined) updateData.cards = cards;
-    if (igs !== undefined) updateData.igs = igs;
-    if (execoms !== undefined) updateData.execoms = execoms;
-    if (about !== undefined) updateData.about = about;
+    let config = await HomepageConfig.findOne({ key: 'main_config' });
+    if (!config) {
+      config = new HomepageConfig({ key: 'main_config' });
+    }
 
-    const config = await HomepageConfig.findOneAndUpdate(
-      { key: 'main_config' },
-      { $set: updateData },
-      { upsert: true, new: true, runValidators: true }
-    );
+    if (Array.isArray(cards)) {
+      config.cards = cards;
+      config.markModified('cards');
+    }
+    if (Array.isArray(igs)) {
+      config.igs = igs;
+      config.markModified('igs');
+    }
+    if (Array.isArray(execoms)) {
+      config.execoms = execoms;
+      config.markModified('execoms');
+    }
+    if (about && typeof about === 'object') {
+      config.about = about;
+      config.markModified('about');
+    }
+    config.updatedAt = new Date();
+
+    await config.save();
 
     return res.json({ 
       success: true, 
