@@ -103,6 +103,11 @@ const TRACKS = [
 export function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  // Element Refs
+  const heroRef = useRef<HTMLDivElement>(null);
+  const masonryRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+
   // Parallax transform for Hero Section
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 1000], [0, 250]);
@@ -115,7 +120,7 @@ export function Home() {
     <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white">
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
-        <section className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
+        <section ref={heroRef} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
           {/* Full Screen WebGL Shader Canvas */}
           <HeroShaderCanvas />
 
@@ -281,7 +286,7 @@ export function Home() {
         <StackedProjectCards />
 
         {/* ─── 4.4 About Section (Masonry Parallax) ────────────────────────── */}
-        <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
+        <section ref={masonryRef} className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -561,7 +566,7 @@ export function Home() {
         </section>
 
         {/* ─── 4.7 Footer Parallax Reveal Section ─────────────────────────── */}
-        <footer className="relative bg-black text-white py-24 md:py-32 overflow-hidden border-t border-gray-900 z-10">
+        <footer ref={footerRef} className="relative bg-black text-white py-24 md:py-32 overflow-hidden border-t border-gray-900 z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
