@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 // POST / UPDATE homepage customizer config
 router.post('/', async (req, res) => {
   try {
-    const { cards, igs, execoms } = req.body;
+    const { cards, igs, execoms, about } = req.body;
     let config = await HomepageConfig.findOne({ key: 'main_config' });
     
     if (!config) {
@@ -34,12 +34,14 @@ router.post('/', async (req, res) => {
         key: 'main_config', 
         cards: cards || [], 
         igs: igs || [], 
-        execoms: execoms || [] 
+        execoms: execoms || [],
+        about: about || {}
       });
     } else {
       if (cards !== undefined) config.cards = cards;
       if (igs !== undefined) config.igs = igs;
       if (execoms !== undefined) config.execoms = execoms;
+      if (about !== undefined) config.about = about;
       config.updatedAt = new Date();
     }
     

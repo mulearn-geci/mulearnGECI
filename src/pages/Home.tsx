@@ -156,6 +156,18 @@ export function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [execomMembers, setExecomMembers] = useState(DEFAULT_EXECOM_SLOTS);
   const [interestGroups, setInterestGroups] = useState(INTEREST_GROUPS);
+  const [aboutContent, setAboutContent] = useState({
+    tagline: 'About µLearn GECI',
+    headline: 'We believe in the power of student-led innovation.',
+    description: 'µLearn GECI is designed to bridge the gap between academic curriculum and high-impact engineering careers. We help students build consistent proof-of-work, gain real-world project experience, and connect directly with industry hiring partners.',
+    stat1Number: '1,040+',
+    stat1Label: 'Active Climbers',
+    stat2Number: '50+',
+    stat2Label: 'Events Hosted',
+    photo1: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
+    photo2: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop',
+    photo3: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop'
+  });
 
   // Dynamically fetch Execom members & load custom admin config
   useEffect(() => {
@@ -176,6 +188,9 @@ export function Home() {
       if (data.execoms && data.execoms.length > 0) {
         setExecomMembers(data.execoms);
         hasCustomExecom = true;
+      }
+      if (data.about && Object.keys(data.about).length > 0) {
+        setAboutContent((prev) => ({ ...prev, ...data.about }));
       }
     };
 
@@ -415,26 +430,26 @@ export function Home() {
               
               <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6">
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 block">
-                  About µLearn GECI
+                  {aboutContent.tagline}
                 </span>
 
                 <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                  We believe in the power of student-led innovation.
+                  {aboutContent.headline}
                 </h2>
 
                 <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg leading-relaxed">
-                  µLearn GECI is designed to bridge the gap between academic curriculum and high-impact engineering careers. We help students build consistent proof-of-work, gain real-world project experience, and connect directly with industry hiring partners.
+                  {aboutContent.description}
                 </p>
 
                 <div className="pt-4 flex items-center space-x-6">
                   <div>
-                    <p className="font-display text-3xl md:text-4xl font-extrabold text-blue-600 dark:text-blue-400">1,040+</p>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Active Climbers</p>
+                    <p className="font-display text-3xl md:text-4xl font-extrabold text-blue-600 dark:text-blue-400">{aboutContent.stat1Number}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{aboutContent.stat1Label}</p>
                   </div>
                   <div className="h-10 w-px bg-gray-300 dark:bg-gray-700" />
                   <div>
-                    <p className="font-display text-3xl md:text-4xl font-extrabold text-blue-600 dark:text-blue-400">50+</p>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Events Hosted</p>
+                    <p className="font-display text-3xl md:text-4xl font-extrabold text-blue-600 dark:text-blue-400">{aboutContent.stat2Number}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">{aboutContent.stat2Label}</p>
                   </div>
                 </div>
               </div>
@@ -449,8 +464,8 @@ export function Home() {
                   className="sm:col-span-1 h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
-                    alt="Students collaborating"
+                    src={aboutContent.photo1}
+                    alt="About Showcase 1"
                     className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-700"
                   />
                 </motion.div>
@@ -465,8 +480,8 @@ export function Home() {
                     className="h-[220px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
-                      src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop"
-                      alt="Coding hackathon"
+                      src={aboutContent.photo2}
+                      alt="About Showcase 2"
                       className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-700"
                     />
                   </motion.div>
@@ -479,8 +494,8 @@ export function Home() {
                     className="h-[260px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
-                      src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop"
-                      alt="Workshop Presentation"
+                      src={aboutContent.photo3}
+                      alt="About Showcase 3"
                       className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-700"
                     />
                   </motion.div>

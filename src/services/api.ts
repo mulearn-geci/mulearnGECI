@@ -427,7 +427,7 @@ export const homepageAPI = {
     return response.json();
   },
 
-  saveConfig: async (config: { cards?: any[]; igs?: any[]; execoms?: any[] }) => {
+  saveConfig: async (config: { cards?: any[]; igs?: any[]; execoms?: any[]; about?: any }) => {
     const response = await fetch(`${API_BASE_URL}/homepage-config`, {
       method: 'POST',
       headers: createAuthHeaders(),

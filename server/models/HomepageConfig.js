@@ -18,6 +18,10 @@ const HomepageConfigSchema = new mongoose.Schema({
     type: Array, 
     default: [] 
   },
+  about: {
+    type: Object,
+    default: {}
+  },
   updatedAt: { 
     type: Date, 
     default: Date.now 
