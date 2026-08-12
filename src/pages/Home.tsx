@@ -103,29 +103,9 @@ const TRACKS = [
 export function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  // Parallax ref for Hero Section (4.1)
-  const heroRef = useRef<HTMLDivElement>(null);
+  // Parallax transform for Hero Section
   const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 1000], [0, 400]);
-
-  // Parallax refs for About Masonry Section (4.4)
-  const masonryRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: masonryScroll } = useScroll({
-    target: masonryRef,
-    offset: ['start end', 'end start']
-  });
-
-  const masonryY1 = useTransform(masonryScroll, [0, 1], ['0%', '15%']);
-  const masonryY2 = useTransform(masonryScroll, [0, 1], ['0%', '-10%']);
-  const masonryY3 = useTransform(masonryScroll, [0, 1], ['0%', '20%']);
-
-  // Parallax ref for Footer Reveal Section (4.7)
-  const footerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: footerScroll } = useScroll({
-    target: footerRef,
-    offset: ['start end', 'end end']
-  });
-  const footerY = useTransform(footerScroll, [0, 1], ['-30%', '0%']);
+  const heroY = useTransform(scrollY, [0, 1000], [0, 250]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -301,7 +281,7 @@ export function Home() {
         <StackedProjectCards />
 
         {/* ─── 4.4 About Section (Masonry Parallax) ────────────────────────── */}
-        <section ref={masonryRef} className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
+        <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -333,12 +313,15 @@ export function Home() {
                 </div>
               </div>
 
-              {/* Right Column: Masonry Grid with Framer Parallax Y Transforms */}
+              {/* Right Column: Masonry Grid with whileInView motion */}
               <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                 
                 {/* Image 1: Large Left Column */}
                 <motion.div
-                  style={{ y: masonryY1 }}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
                   className="sm:col-span-1 h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                 >
                   <img
@@ -353,7 +336,10 @@ export function Home() {
                   
                   {/* Image 2: Top Right */}
                   <motion.div
-                    style={{ y: masonryY2 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
                     className="h-[220px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
@@ -365,7 +351,10 @@ export function Home() {
 
                   {/* Image 3: Bottom Right */}
                   <motion.div
-                    style={{ y: masonryY3 }}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
                     className="h-[260px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
@@ -572,9 +561,12 @@ export function Home() {
         </section>
 
         {/* ─── 4.7 Footer Parallax Reveal Section ─────────────────────────── */}
-        <footer ref={footerRef} className="relative bg-black text-white py-24 md:py-32 overflow-hidden border-t border-gray-900 z-10">
+        <footer className="relative bg-black text-white py-24 md:py-32 overflow-hidden border-t border-gray-900 z-10">
           <motion.div
-            style={{ y: footerY }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
             className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24"
           >
             <div className="flex flex-col md:flex-row md:items-end justify-between pb-16 border-b border-gray-800 gap-8">
