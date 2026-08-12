@@ -226,26 +226,31 @@ export function AdminHomepage() {
         }
       } catch (err) {}
 
-      // 2. Fetch from backend API & apply only if safe
+      // 2. Fetch from backend API & apply only if server has equal or more cards
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
           const apiData = res.data;
           
-          const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
-          const serverTime = apiData?.updatedAt ? new Date(apiData.updatedAt).getTime() : 0;
-
           const localCardsCount = localData?.cards?.length || 0;
           const serverCardsCount = apiData?.cards?.length || 0;
 
           // SAFEGUARD: Only overwrite local cards if:
-          // a) Local storage was empty OR
-          // b) Server has MORE cards than local cache!
-          if (!localData || serverCardsCount > localCardsCount) {
-            if (apiData.cards && apiData.cards.length > 0) setCards(apiData.cards);
-            if (apiData.igs && apiData.igs.length > 0) setIgs(apiData.igs);
-            if (apiData.execoms && apiData.execoms.length > 0) setExecoms(apiData.execoms);
-            if (apiData.about && Object.keys(apiData.about).length > 0) setAbout((prev) => ({ ...prev, ...apiData.about }));
+          // a) Local storage had no cards OR
+          // b) Server has EQUAL OR MORE cards than local cache!
+          if (!localData || serverCardsCount >= localCardsCount) {
+            if (apiData.cards && Array.isArray(apiData.cards) && apiData.cards.length > 0) {
+              setCards(apiData.cards);
+            }
+            if (apiData.igs && Array.isArray(apiData.igs) && apiData.igs.length > 0) {
+              setIgs(apiData.igs);
+            }
+            if (apiData.execoms && Array.isArray(apiData.execoms) && apiData.execoms.length > 0) {
+              setExecoms(apiData.execoms);
+            }
+            if (apiData.about && Object.keys(apiData.about).length > 0) {
+              setAbout((prev) => ({ ...prev, ...apiData.about }));
+            }
             
             try {
               localStorage.setItem(STORAGE_KEY, JSON.stringify(apiData));
@@ -302,29 +307,33 @@ export function AdminHomepage() {
     }
   };
 
-  // Card Handlers
+  // Card Handlers with Functional State Setters
   const updateCard = (index: number, field: keyof CustomCard, value: string) => {
-    const updated = [...cards];
-    updated[index] = { ...updated[index], [field]: value };
-    setCards(updated);
+    setCards((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
   };
 
   const addCard = () => {
-    const newCard: CustomCard = {
-      id: String(Date.now()),
-      number: String(cards.length + 1).padStart(2, '0'),
-      meta: 'µLEARN GECI • NEW SHOWCASE',
-      title: 'New Showcase Card',
-      description: 'Enter card description here...',
-      image: '',
-      link: '/events',
-      ctaText: 'Learn More'
-    };
-    setCards([...cards, newCard]);
+    setCards((prev) => {
+      const newCard: CustomCard = {
+        id: String(Date.now()),
+        number: String(prev.length + 1).padStart(2, '0'),
+        meta: 'µLEARN GECI • NEW SHOWCASE',
+        title: `New Showcase Card #${prev.length + 1}`,
+        description: 'Enter card description here...',
+        image: '',
+        link: '/events',
+        ctaText: 'Learn More'
+      };
+      return [...prev, newCard];
+    });
   };
 
   const removeCard = (index: number) => {
-    setCards(cards.filter((_, i) => i !== index));
+    setCards((prev) => prev.filter((_, i) => i !== index));
   };
 
   // IG Handlers

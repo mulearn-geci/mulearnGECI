@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const HomepageConfig = require('../models/HomepageConfig');
 
-// GET homepage customizer config
+// GET homepage customizer config (returns latest document)
 router.get('/', async (req, res) => {
   try {
-    let config = await HomepageConfig.findOne({ key: 'main_config' });
+    let configs = await HomepageConfig.find({ key: 'main_config' }).sort({ updatedAt: -1 });
+    let config = configs[0];
     if (!config) {
       config = new HomepageConfig({ key: 'main_config' });
+      await config.save();
     }
     return res.json({ 
       success: true, 
@@ -28,8 +30,15 @@ router.post('/', async (req, res) => {
   try {
     const { cards, igs, execoms, about } = req.body;
     
-    let config = await HomepageConfig.findOne({ key: 'main_config' });
-    if (!config) {
+    let configs = await HomepageConfig.find({ key: 'main_config' }).sort({ updatedAt: -1 });
+    let config;
+    if (configs.length > 0) {
+      config = configs[0];
+      if (configs.length > 1) {
+        const duplicateIds = configs.slice(1).map(c => c._id);
+        await HomepageConfig.deleteMany({ _id: { $in: duplicateIds } }).catch(() => {});
+      }
+    } else {
       config = new HomepageConfig({ key: 'main_config' });
     }
 

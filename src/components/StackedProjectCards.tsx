@@ -172,7 +172,7 @@ export const StackedProjectCards: React.FC = () => {
           <div>
             <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Campus Highlights</span>
+              <span>Campus Highlights • {cards.length} Active Cards</span>
             </div>
             <h2 className="font-display text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
               Community Highlights & Stories
@@ -180,21 +180,26 @@ export const StackedProjectCards: React.FC = () => {
           </div>
 
           {/* Navigation Controls */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handlePrev}
-              aria-label="Previous Highlight"
-              className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleNext}
-              aria-label="Next Highlight"
-              className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+          <div className="flex items-center space-x-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
+              Showing 3 of {cards.length} Cards (Click arrow or drag to cycle)
+            </span>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handlePrev}
+                aria-label="Previous Highlight"
+                className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleNext}
+                aria-label="Next Highlight"
+                className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
