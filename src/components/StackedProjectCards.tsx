@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowUpRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -83,7 +83,7 @@ export const StackedProjectCards: React.FC = () => {
     });
   };
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
     if (info.offset.x < -80) {
       handleNext();
     } else if (info.offset.x > 80) {

@@ -8,7 +8,6 @@ import {
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';
 import { StackedProjectCards } from '../components/StackedProjectCards';
-import { SmoothScroll } from '../components/SmoothScroll';
 
 // Section 4.2 Services / Core Pillars Data
 const SERVICES = [
@@ -133,8 +132,7 @@ export function Home() {
   };
 
   return (
-    <SmoothScroll>
-      <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white">
+    <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white">
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
         <section ref={heroRef} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
@@ -626,6 +624,5 @@ export function Home() {
         </footer>
 
       </div>
-    </SmoothScroll>
   );
 }
