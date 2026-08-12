@@ -120,28 +120,12 @@ const INTEREST_GROUPS = [
     badge: 'Startups'
   },
   {
-    title: 'Media Team',
-    domain: 'Creative Media',
-    description: 'Spearhead campus branding, photography, video production, event coverage, and digital marketing.',
-    icon: Video,
-    link: '/events',
-    badge: 'Creative'
-  },
-  {
     title: 'Mucomics',
     domain: 'Visual Storytelling',
     description: 'Creative tech comics, digital illustrations, visual stories, and artistic expressions celebrating learning.',
     icon: BookOpen,
     link: '/events',
     badge: 'Comics'
-  },
-  {
-    title: 'Alumni Connect Team',
-    domain: 'Alumni Network',
-    description: 'Bridge current GECI students with graduated seniors working at top global tech firms for mentorship.',
-    icon: GraduationCap,
-    link: '/events',
-    badge: 'Mentorship'
   }
 ];
 
