@@ -192,12 +192,14 @@ export function Home() {
     };
 
     const loadCustomConfig = async () => {
+      let localData: any = null;
+
       // 1. Local cache first for instant update
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
-          const parsed = JSON.parse(saved);
-          applyConfigFromObj(parsed);
+          localData = JSON.parse(saved);
+          applyConfigFromObj(localData);
         }
       } catch (e) {}
 
@@ -205,7 +207,12 @@ export function Home() {
       try {
         const apiRes = await homepageAPI.getConfig();
         if (apiRes.success && apiRes.data) {
-          applyConfigFromObj(apiRes.data);
+          const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
+          const serverTime = apiRes.data?.updatedAt ? new Date(apiRes.data.updatedAt).getTime() : 0;
+
+          if (!localData || serverTime > localTime) {
+            applyConfigFromObj(apiRes.data);
+          }
         }
       } catch (e) {}
 

@@ -209,55 +209,43 @@ export function AdminHomepage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing config on mount (First from localStorage, then API merge)
+  // Load existing config on mount (First from localStorage, then API merge if server is newer)
   useEffect(() => {
     const fetchConfig = async () => {
-      let localParsed: any = null;
+      let localData: any = null;
 
-      // 1. Read local storage FIRST so draft / added cards are NEVER lost on refresh!
+      // 1. Read local storage FIRST for instant UI rendering
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-          localParsed = JSON.parse(saved);
-          if (localParsed.cards && localParsed.cards.length > 0) setCards(localParsed.cards);
-          if (localParsed.igs && localParsed.igs.length > 0) setIgs(localParsed.igs);
-          if (localParsed.execoms && localParsed.execoms.length > 0) setExecoms(localParsed.execoms);
-          if (localParsed.about && Object.keys(localParsed.about).length > 0) setAbout((prev) => ({ ...prev, ...localParsed.about }));
+          localData = JSON.parse(saved);
+          if (localData.cards && localData.cards.length > 0) setCards(localData.cards);
+          if (localData.igs && localData.igs.length > 0) setIgs(localData.igs);
+          if (localData.execoms && localData.execoms.length > 0) setExecoms(localData.execoms);
+          if (localData.about && Object.keys(localData.about).length > 0) setAbout((prev) => ({ ...prev, ...localData.about }));
         }
       } catch (err) {}
 
-      // 2. Fetch from backend API & merge safely
+      // 2. Fetch from backend API
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
-          const apiCards = res.data.cards || [];
-          const apiIgs = res.data.igs || [];
-          const apiExecoms = res.data.execoms || [];
-          const apiAbout = res.data.about || {};
+          const apiData = res.data;
+          
+          const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
+          const serverTime = apiData?.updatedAt ? new Date(apiData.updatedAt).getTime() : 0;
 
-          // Only overwrite local cards if server has equal or MORE cards than local cache
-          if (apiCards.length >= (localParsed?.cards?.length || 0) && apiCards.length > 0) {
-            setCards(apiCards);
+          // Only overwrite from server if server timestamp is NEWER than local storage OR local storage was empty
+          if (!localData || serverTime > localTime) {
+            if (apiData.cards && apiData.cards.length > 0) setCards(apiData.cards);
+            if (apiData.igs && apiData.igs.length > 0) setIgs(apiData.igs);
+            if (apiData.execoms && apiData.execoms.length > 0) setExecoms(apiData.execoms);
+            if (apiData.about && Object.keys(apiData.about).length > 0) setAbout((prev) => ({ ...prev, ...apiData.about }));
+            
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(apiData));
+            } catch (e) {}
           }
-          if (apiIgs.length >= (localParsed?.igs?.length || 0) && apiIgs.length > 0) {
-            setIgs(apiIgs);
-          }
-          if (apiExecoms.length >= (localParsed?.execoms?.length || 0) && apiExecoms.length > 0) {
-            setExecoms(apiExecoms);
-          }
-          if (Object.keys(apiAbout).length > 0) {
-            setAbout((prev) => ({ ...prev, ...apiAbout }));
-          }
-
-          // Keep local storage in sync with authoritative server data
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({
-              cards: apiCards.length >= (localParsed?.cards?.length || 0) ? apiCards : (localParsed?.cards || apiCards),
-              igs: apiIgs.length >= (localParsed?.igs?.length || 0) ? apiIgs : (localParsed?.igs || apiIgs),
-              execoms: apiExecoms.length >= (localParsed?.execoms?.length || 0) ? apiExecoms : (localParsed?.execoms || apiExecoms),
-              about: Object.keys(apiAbout).length > 0 ? apiAbout : (localParsed?.about || apiAbout)
-            }));
-          } catch (e) {}
         }
       } catch (e) {}
     };

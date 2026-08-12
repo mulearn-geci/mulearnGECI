@@ -82,12 +82,14 @@ export const StackedProjectCards: React.FC = () => {
     };
 
     const loadCustomConfig = async () => {
+      let localData: any = null;
+
       // 1. Check local storage cache first for instant update
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
-          const parsed = JSON.parse(saved);
-          if (applyCardsFromObj(parsed.cards)) return;
+          localData = JSON.parse(saved);
+          if (localData.cards) applyCardsFromObj(localData.cards);
         }
       } catch (e) {}
 
@@ -95,7 +97,12 @@ export const StackedProjectCards: React.FC = () => {
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data && res.data.cards) {
-          applyCardsFromObj(res.data.cards);
+          const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
+          const serverTime = res.data?.updatedAt ? new Date(res.data.updatedAt).getTime() : 0;
+
+          if (!localData || serverTime > localTime) {
+            applyCardsFromObj(res.data.cards);
+          }
         }
       } catch (err) {}
     };
