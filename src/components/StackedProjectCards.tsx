@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowUpRight, ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, Award, Users, BookOpen, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+import MulearnGroupImg from '../img/mulearnGroup.jpg';
+import AlbertImg from '../img/albert.jpeg';
+import NavyaImg from '../img/NavyaMariamJohn.jpg';
+import JeevanImg from '../img/JEEVANPRAKASH.jpeg';
 
 export interface ProjectCard {
   id: string;
@@ -10,55 +15,50 @@ export interface ProjectCard {
   title: string;
   description: string;
   image: string;
-  bgColor: string;
-  darkBgColor: string;
   link: string;
+  ctaText: string;
 }
 
 const PROJECTS: ProjectCard[] = [
   {
     id: '1',
     number: '01',
-    meta: '2026 • TECH • CAMPUS PLATFORM',
-    title: 'µLearn GECI Campus Leaderboard & XP Engine',
-    description: 'A real-time proof-of-work tracking platform that connects student commits, LinkedIn posts, and karma points into a interactive climbing ladder.',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop',
-    bgColor: '#f8f9fa',
-    darkBgColor: '#18181b',
-    link: '/leaderboard'
+    meta: 'µLEARN GECI • CAMPUS LEADERBOARD',
+    title: 'Live Campus Karma XP & Streak Ranking System',
+    description: 'Track daily GitHub commits, LinkedIn proof-of-work posts, and karma points earned across all GECI engineering departments in real time.',
+    image: MulearnGroupImg,
+    link: '/leaderboard',
+    ctaText: 'View Leaderboard'
   },
   {
     id: '2',
     number: '02',
-    meta: '2026 • AI & INNOVATION • HACKATHON',
-    title: 'Autonomous AI & Hardware Innovation Hub',
-    description: 'Empowering Robotics, AI, and IoT student teams to engineer real-world hardware prototypes with industry mentors and peer code reviews.',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop',
-    bgColor: '#f1f5f9',
-    darkBgColor: '#1e293b',
-    link: '/events'
+    meta: 'LEADERSHIP & ARCHITECTURE • EXECOM',
+    title: 'Meet the Executive Board & Domain Leads',
+    description: 'Our student office bearers and domain mentors coordinate technical interest groups, coding bootcamps, and hackathons year-round.',
+    image: AlbertImg,
+    link: '/execom',
+    ctaText: 'Meet Execom Board'
   },
   {
     id: '3',
     number: '03',
-    meta: '2026 • COMMUNITY • ALUMNI MENTORSHIP',
-    title: 'Global Alumni & Industry Placement Network',
-    description: 'Bridging current college engineering talents with graduated alumni leaders in top global tech firms for mock interviews and job referrals.',
-    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop',
-    bgColor: '#f4f4f5',
-    darkBgColor: '#27272a',
-    link: '/alumni'
+    meta: 'EVENTS & HACKATHONS • WORKSHOPS',
+    title: 'Hands-On Bootcamps & 24-Hour Hackathons',
+    description: 'Join campus workshops on Full-Stack Web Dev, AI/ML, Cloud DevOps, and Robotics engineered to turn theory into working code.',
+    image: JeevanImg,
+    link: '/events',
+    ctaText: 'Explore Events'
   },
   {
     id: '4',
     number: '04',
-    meta: '2026 • BOOTCAMP • 60-DAY CHALLENGE',
-    title: 'The 60-Day Full-Stack & Devops Challenge',
-    description: 'A 60-day intensive building spree where students ship production code daily, build public streaks, and showcase projects to recruiters.',
-    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
-    bgColor: '#f8fafc',
-    darkBgColor: '#0f172a',
-    link: '/events'
+    meta: 'ALUMNI & CAREERS • PLACEMENT NETWORK',
+    title: 'Global Alumni Mentorship & Job Referral Hub',
+    description: 'Connect directly with graduated seniors working at top global tech firms for mock technical interviews, project guidance, and referrals.',
+    image: NavyaImg,
+    link: '/alumni',
+    ctaText: 'Connect with Alumni'
   }
 ];
 
@@ -109,10 +109,10 @@ export const StackedProjectCards: React.FC = () => {
           <div>
             <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Featured Initiatives</span>
+              <span>Campus Highlights</span>
             </div>
             <h2 className="font-display text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-              Latest Projects & Labs
+              Community Highlights & Stories
             </h2>
           </div>
 
@@ -120,14 +120,14 @@ export const StackedProjectCards: React.FC = () => {
           <div className="flex items-center space-x-3">
             <button
               onClick={handlePrev}
-              aria-label="Previous Project"
+              aria-label="Previous Highlight"
               className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={handleNext}
-              aria-label="Next Project"
+              aria-label="Next Highlight"
               className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
             >
               <ChevronRight className="w-5 h-5" />
@@ -136,11 +136,10 @@ export const StackedProjectCards: React.FC = () => {
         </div>
 
         {/* Stacked Cards Container */}
-        <div className="relative h-[650px] md:h-[580px] w-full flex items-center justify-center">
+        <div className="relative h-[650px] md:h-[540px] w-full flex items-center justify-center">
           <AnimatePresence mode="popLayout">
             {cards.slice(0, 3).map((card, index) => {
               const isFront = index === 0;
-              // Stack calculations: Background cards stack upwards (-30px) and scale down (1 - index * 0.05)
               const yOffset = -index * 28;
               const scale = 1 - index * 0.05;
               const zIndex = 30 - index * 10;
@@ -165,35 +164,32 @@ export const StackedProjectCards: React.FC = () => {
                   drag={isFront ? "x" : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={isFront ? handleDragEnd : undefined}
-                  style={{
-                    backgroundColor: card.bgColor,
-                  }}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[520px] rounded-3xl p-6 md:p-10 border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden cursor-pointer dark:bg-gray-800 transition-colors duration-300 ${
+                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[500px] rounded-3xl p-6 md:p-10 border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden cursor-pointer bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white transition-colors duration-300 ${
                     isFront ? 'cursor-grab active:cursor-grabbing' : ''
                   }`}
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-8 items-center">
                     
-                    {/* Left Half (Meta, Number, Content, Button) */}
+                    {/* Left Half (Meta, Number, High Contrast Text, Button) */}
                     <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
                       <div>
                         {/* Number Badge & Meta Tag */}
                         <div className="flex items-center space-x-4 mb-6">
-                          <div className="w-12 h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
+                          <div className="w-12 h-12 rounded-full border border-blue-600/30 text-white font-display font-bold text-sm flex items-center justify-center bg-blue-600 shadow-md">
                             {card.number}
                           </div>
-                          <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
+                          <span className="text-xs uppercase tracking-wider font-bold text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-3 py-1 rounded-full">
                             {card.meta}
                           </span>
                         </div>
 
-                        {/* Title */}
-                        <h3 className="font-display text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
+                        {/* Title - CRISP HIGH CONTRAST */}
+                        <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 leading-tight">
                           {card.title}
                         </h3>
 
-                        {/* Description */}
-                        <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed line-clamp-3">
+                        {/* Description - CRISP HIGH CONTRAST */}
+                        <p className="text-slate-700 dark:text-slate-200 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
                           {card.description}
                         </p>
                       </div>
@@ -202,15 +198,15 @@ export const StackedProjectCards: React.FC = () => {
                       <div className="pt-6">
                         <Link
                           to={card.link}
-                          className="inline-flex items-center space-x-3 bg-gray-900 hover:bg-blue-600 dark:bg-white dark:hover:bg-blue-500 text-white dark:text-gray-900 dark:hover:text-white px-7 py-3.5 rounded-full font-medium text-sm transition-all duration-300 shadow-md group"
+                          className="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/20 group"
                         >
-                          <span>Explore Case Study</span>
+                          <span>{card.ctaText}</span>
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                       </div>
                     </div>
 
-                    {/* Right Half (Image & Abstract Glassmorphism Overlay) */}
+                    {/* Right Half (Real µLearn Group Image & Glass Overlay) */}
                     <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group">
                       <img
                         src={card.image}
@@ -219,9 +215,12 @@ export const StackedProjectCards: React.FC = () => {
                       />
 
                       {/* Glassmorphism Abstract Floating Shapes */}
-                      <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/50 shadow-lg pointer-events-none transform -rotate-6" />
-                      <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none transform rotate-12" />
-                      <div className="absolute top-1/2 right-12 w-12 h-12 rounded-full backdrop-blur-sm bg-blue-500/20 border border-white/30 shadow-md pointer-events-none" />
+                      <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/50 shadow-lg pointer-events-none transform -rotate-6 flex items-center justify-center text-blue-600">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none transform rotate-12 flex items-center justify-center text-amber-400">
+                        <Award className="w-8 h-8" />
+                      </div>
                     </div>
 
                   </div>

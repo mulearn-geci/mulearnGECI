@@ -1,57 +1,95 @@
 import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowUpRight, Maximize2, Zap, Layout, ChevronDown, 
-  ArrowUp, Sparkles, Star, Users, CheckCircle, ShieldCheck,
-  Compass, Code, Laptop, ExternalLink
+  ArrowUpRight, Trophy, Calendar, Users, GraduationCap, ChevronDown, 
+  ArrowUp, Sparkles, Star, CheckCircle, Code, BookOpen, Award, Rocket
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';
 import { StackedProjectCards } from '../components/StackedProjectCards';
 
-// Section 4.2 Services / Core Pillars Data
-const SERVICES = [
+import AlbertImg from '../img/albert.jpeg';
+import AvaniImg from '../img/avani.jpg';
+import JeevanImg from '../img/JEEVANPRAKASH.jpeg';
+
+// Section 4.2 Website Feature Navigation Boxes
+const WEBSITE_PAGES = [
   {
-    icon: Zap,
-    title: 'Hackathons & Sprints',
-    description: 'Intensive 24-hour building sprees and 60-day challenges to translate theoretical engineering into production code.'
+    icon: Trophy,
+    title: 'Karma XP Leaderboard',
+    description: 'Track live Karma points, daily commit streaks, and department rankings across CSE, IT, ECE, EEE, ME, and RAI.',
+    link: '/leaderboard'
   },
   {
-    icon: Maximize2,
-    title: 'Skill Bootcamps',
-    description: 'Peer-led learning circles covering Full-Stack Web Development, AI/ML models, Robotics, and Cloud DevOps.'
+    icon: Calendar,
+    title: 'Events & Workshops',
+    description: 'Discover upcoming campus hackathons, 24-hour coding sprints, technical workshops, and hands-on bootcamps.',
+    link: '/events'
   },
   {
-    icon: Layout,
-    title: 'Innovation Labs',
-    description: 'Dedicated campus hardware labs and open-source hubs for prototyping real-world software and IoT hardware.'
+    icon: Users,
+    title: 'Execom Board',
+    description: 'Meet our dedicated student office bearers, domain leads, and mentors leading µLearn GECI initiatives.',
+    link: '/execom'
   },
   {
-    icon: ArrowUpRight,
-    title: 'Industry & Alumni Network',
-    description: 'Direct mentorship, mock technical interviews, and job placement referrals connected to global alumni engineers.'
+    icon: GraduationCap,
+    title: 'Alumni Network',
+    description: 'Connect with graduated seniors working at top global tech companies for career guidance, mock interviews, and referrals.',
+    link: '/alumni'
   }
 ];
 
-// Section 4.5 Execom Team Members
+// Section 4.5 Execom Team Members with Real Images
 const TEAM_MEMBERS = [
   {
     name: 'Albert George',
     role: 'Campus Lead & Lead Architect',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop',
+    image: AlbertImg,
     department: 'Computer Science & Eng.'
   },
   {
-    name: 'Avani R',
+    name: 'Avani M U',
     role: 'Technical Lead & Developer',
-    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974&auto=format&fit=crop',
+    image: AvaniImg,
     department: 'Electronics & Comm.'
   },
   {
     name: 'Jeevan Prakash',
     role: 'Events & Operations Lead',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop',
+    image: JeevanImg,
     department: 'Robotics & AI'
+  }
+];
+
+// Section 4.6 µLearn Core Goal & Proof of Work Journey
+const GOALS_JOURNEY = [
+  {
+    step: '01',
+    title: '1. Learn & Upskill',
+    tagline: 'Peer-to-Peer Skill Acquisition',
+    description: 'Join interest groups across Web Dev, AI/ML, Cyber Security, Cloud, and Robotics. Learn directly from senior student mentors.',
+    icon: BookOpen,
+    highlighted: false,
+    link: '/events'
+  },
+  {
+    step: '02',
+    title: '2. Build & Ship Daily',
+    tagline: 'Public Proof-of-Work Engine',
+    description: 'Build real-world software and hardware projects. Push daily commits on GitHub and document your progress publicly on LinkedIn.',
+    icon: Code,
+    highlighted: true,
+    link: '/leaderboard'
+  },
+  {
+    step: '03',
+    title: '3. Rank & Get Recruited',
+    tagline: 'Karma Ladder & Alumni Referrals',
+    description: 'Earn Karma XP points for every verified commit. Climb the campus leaderboard and unlock placement referrals from alumni leaders.',
+    icon: Award,
+    highlighted: false,
+    link: '/alumni'
   }
 ];
 
@@ -72,31 +110,6 @@ const FAQS = [
   {
     question: 'How can alumni stay connected with current students?',
     answer: 'Alumni can join our dedicated Alumni Network tab to mentor students, post job referral opportunities, and view active campus project showcases.'
-  }
-];
-
-// Section 4.6 Learning Tracks & Tiers
-const TRACKS = [
-  {
-    name: 'Starter Track',
-    badge: 'Beginner',
-    tagline: 'Ideal for 1st & 2nd year students starting their coding journey.',
-    features: ['HTML/CSS/JS Basics', 'Git & GitHub Workflows', 'Weekly Discord Huddles', 'Community Karma XP'],
-    highlighted: false
-  },
-  {
-    name: 'Pioneer Track',
-    badge: 'Most Popular',
-    tagline: 'Full-stack engineering, AI projects & 60-day building streaks.',
-    features: ['React & Node.js Architecture', 'Automated CI/CD & Cloud', 'Direct Industry Mentorship', 'Live Leaderboard Ladder', 'Placement Referrals'],
-    highlighted: true
-  },
-  {
-    name: 'Research & AI Track',
-    badge: 'Advanced',
-    tagline: 'Deep dive into Machine Learning, Robotics, and IoT Hardware.',
-    features: ['PyTorch & LLM Fine-tuning', 'ROS & Autonomous Hardware', 'Research Paper Publishing', 'Lab Hardware Access'],
-    highlighted: false
   }
 ];
 
@@ -127,7 +140,7 @@ export function Home() {
           {/* Dark Overlay gradient for contrast */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0d0d0d] z-10 pointer-events-none" />
 
-          {/* Hero Content (Centered Vertically & Parallax transform) */}
+          {/* Hero Content */}
           <motion.div
             style={{ y: heroY }}
             className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 w-full flex flex-col items-start justify-center pt-16"
@@ -231,48 +244,53 @@ export function Home() {
           </div>
         </section>
 
-        {/* ─── 4.2 Services / Core Pillars Section ─────────────────────────── */}
+        {/* ─── 4.2 Website Pages & Navigation Section ─────────────────────── */}
         <section className="py-24 md:py-32 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
             {/* Header */}
             <div className="mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
-                What We Offer
+                Explore The Platform
               </span>
               <h2 className="font-display text-4xl md:text-6xl font-bold leading-tight">
-                Our Core Pillars & Offerings
+                Everything You Need to Scale Your Engineering Skills
               </h2>
             </div>
 
-            {/* 4-Column Grid */}
+            {/* 4-Column Grid for Website Pages */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {SERVICES.map((service, index) => {
-                const IconComp = service.icon;
+              {WEBSITE_PAGES.map((page, index) => {
+                const IconComp = page.icon;
                 return (
                   <motion.div
-                    key={service.title}
+                    key={page.title}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.15 }}
-                    className="p-8 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 hover:border-blue-500/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                    className="p-8 rounded-2xl bg-slate-50 dark:bg-gray-800 border border-slate-200 dark:border-gray-700/60 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
-                      <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                      <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-600/20">
                         <IconComp className="w-7 h-7" />
                       </div>
-                      <h3 className="font-display text-xl font-bold mb-3 text-gray-900 dark:text-white">
-                        {service.title}
+                      <h3 className="font-display text-xl font-bold mb-3 text-slate-900 dark:text-white">
+                        {page.title}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                        {service.description}
+                      <p className="text-slate-600 dark:text-gray-300 text-sm leading-relaxed font-medium">
+                        {page.description}
                       </p>
                     </div>
 
-                    <div className="pt-6 mt-6 border-t border-gray-200 dark:border-gray-700/50 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
-                      <span>Learn More</span>
-                      <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                    <div className="pt-6 mt-6 border-t border-slate-200 dark:border-gray-700/50">
+                      <Link
+                        to={page.link}
+                        className="inline-flex items-center space-x-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 group-hover:translate-x-1 transition-transform"
+                      >
+                        <span>Explore Page</span>
+                        <ArrowUpRight className="w-4 h-4" />
+                      </Link>
                     </div>
                   </motion.div>
                 );
@@ -282,7 +300,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* ─── 4.3 Latest Projects (Stacked Cards Carousel) ────────────────── */}
+        {/* ─── 4.3 Latest Highlights & Stories (Stacked Cards Carousel) ────── */}
         <StackedProjectCards />
 
         {/* ─── 4.4 About Section (Masonry Parallax) ────────────────────────── */}
@@ -397,7 +415,7 @@ export function Home() {
             </motion.div>
           </div>
 
-          {/* 3-Column Team Grid */}
+          {/* 3-Column Team Grid with Real Images */}
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {TEAM_MEMBERS.map((member, index) => (
@@ -447,69 +465,70 @@ export function Home() {
           </div>
         </section>
 
-        {/* ─── 4.6 FAQ & Pricing / Learning Tracks ─────────────────────────── */}
+        {/* ─── 4.6 µLearn Goals & Proof of Work Journey ────────────────────── */}
         <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
-            {/* Learning Tracks / Pricing Tiers */}
+            {/* Header */}
             <div className="text-center max-w-3xl mx-auto mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
-                Learning Paths
+                Our Core Mission
               </span>
               <h2 className="font-display text-4xl md:text-6xl font-bold mb-4 leading-tight">
-                Pick Your Learning Track
+                The µLearn Proof-of-Work Engine
               </h2>
               <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
-                Whether you are writing your first line of HTML or fine-tuning ML models, there is a dedicated track for you.
+                From writing your first line of code to getting hired by top engineering firms in 3 simple steps.
               </p>
             </div>
 
-            {/* 3 Tier Cards (Center Pro tier highlighted black) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-32">
-              {TRACKS.map((track) => {
-                const isHighlight = track.highlighted;
+            {/* 3 Step Goal Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mb-32">
+              {GOALS_JOURNEY.map((goal) => {
+                const IconComp = goal.icon;
+                const isHighlight = goal.highlighted;
                 return (
                   <div
-                    key={track.name}
-                    className={`rounded-3xl p-8 transition-all duration-300 shadow-xl border ${
+                    key={goal.title}
+                    className={`rounded-3xl p-8 transition-all duration-300 shadow-xl border flex flex-col justify-between ${
                       isHighlight
                         ? 'bg-black text-white dark:bg-gray-900 border-blue-500 md:-translate-y-4 shadow-blue-500/10'
                         : 'bg-white text-gray-900 dark:bg-gray-800 dark:text-white border-gray-200 dark:border-gray-700'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-6">
-                      <span className={`text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full ${
-                        isHighlight ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                      }`}>
-                        {track.badge}
-                      </span>
-                    </div>
-
-                    <h3 className="font-display text-2xl font-bold mb-2">
-                      {track.name}
-                    </h3>
-                    <p className={`text-sm mb-8 ${isHighlight ? 'text-gray-300' : 'text-gray-600 dark:text-gray-400'}`}>
-                      {track.tagline}
-                    </p>
-
-                    <div className="space-y-3 mb-8">
-                      {track.features.map((feat) => (
-                        <div key={feat} className="flex items-center space-x-3 text-sm">
-                          <CheckCircle className={`w-4 h-4 flex-shrink-0 ${isHighlight ? 'text-blue-400' : 'text-blue-600 dark:text-blue-400'}`} />
-                          <span>{feat}</span>
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <div className={`w-12 h-12 rounded-full font-display font-bold text-sm flex items-center justify-center ${
+                          isHighlight ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
+                        }`}>
+                          {goal.step}
                         </div>
-                      ))}
+                        <span className={`text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full ${
+                          isHighlight ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'bg-slate-100 text-slate-700 dark:bg-gray-700 dark:text-gray-300'
+                        }`}>
+                          {goal.tagline}
+                        </span>
+                      </div>
+
+                      <h3 className="font-display text-2xl font-bold mb-3">
+                        {goal.title}
+                      </h3>
+
+                      <p className={`text-sm leading-relaxed mb-6 ${isHighlight ? 'text-gray-300' : 'text-gray-600 dark:text-gray-400'}`}>
+                        {goal.description}
+                      </p>
                     </div>
 
                     <Link
-                      to="/events"
-                      className={`w-full py-3.5 rounded-full font-bold text-sm inline-flex items-center justify-center transition-all ${
+                      to={goal.link}
+                      className={`w-full py-3.5 rounded-full font-bold text-sm inline-flex items-center justify-center space-x-2 transition-all ${
                         isHighlight
                           ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'
                           : 'bg-gray-900 hover:bg-blue-600 text-white dark:bg-white dark:hover:bg-blue-500 dark:text-gray-900 dark:hover:text-white'
                       }`}
                     >
-                      Join Track
+                      <span>Get Started</span>
+                      <ArrowUpRight className="w-4 h-4" />
                     </Link>
                   </div>
                 );
