@@ -27,25 +27,19 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { cards, igs, execoms, about } = req.body;
-    let config = await HomepageConfig.findOne({ key: 'main_config' });
     
-    if (!config) {
-      config = new HomepageConfig({ 
-        key: 'main_config', 
-        cards: cards || [], 
-        igs: igs || [], 
-        execoms: execoms || [],
-        about: about || {}
-      });
-    } else {
-      if (cards !== undefined) config.cards = cards;
-      if (igs !== undefined) config.igs = igs;
-      if (execoms !== undefined) config.execoms = execoms;
-      if (about !== undefined) config.about = about;
-      config.updatedAt = new Date();
-    }
-    
-    await config.save();
+    const updateData = { updatedAt: new Date() };
+    if (cards !== undefined) updateData.cards = cards;
+    if (igs !== undefined) updateData.igs = igs;
+    if (execoms !== undefined) updateData.execoms = execoms;
+    if (about !== undefined) updateData.about = about;
+
+    const config = await HomepageConfig.findOneAndUpdate(
+      { key: 'main_config' },
+      { $set: updateData },
+      { upsert: true, new: true, runValidators: true }
+    );
+
     return res.json({ 
       success: true, 
       message: 'Homepage configuration saved successfully!', 

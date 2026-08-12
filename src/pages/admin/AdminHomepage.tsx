@@ -212,19 +212,7 @@ export function AdminHomepage() {
   // Load existing config on mount (First from localStorage, then API overlay)
   useEffect(() => {
     const fetchConfig = async () => {
-      // 1. Read local storage cache first
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.cards && parsed.cards.length > 0) setCards(parsed.cards);
-          if (parsed.igs && parsed.igs.length > 0) setIgs(parsed.igs);
-          if (parsed.execoms && parsed.execoms.length > 0) setExecoms(parsed.execoms);
-          if (parsed.about && Object.keys(parsed.about).length > 0) setAbout((prev) => ({ ...prev, ...parsed.about }));
-        }
-      } catch (err) {}
-
-      // 2. Fetch from backend API
+      // 1. Fetch from backend API
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
@@ -232,6 +220,21 @@ export function AdminHomepage() {
           if (res.data.igs && res.data.igs.length > 0) setIgs(res.data.igs);
           if (res.data.execoms && res.data.execoms.length > 0) setExecoms(res.data.execoms);
           if (res.data.about && Object.keys(res.data.about).length > 0) setAbout((prev) => ({ ...prev, ...res.data.about }));
+          
+          // Cache in local storage
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(res.data));
+          } catch {}
+        } else {
+            // Fallback: Read local storage cache
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.cards && parsed.cards.length > 0) setCards(parsed.cards);
+                if (parsed.igs && parsed.igs.length > 0) setIgs(parsed.igs);
+                if (parsed.execoms && parsed.execoms.length > 0) setExecoms(parsed.execoms);
+                if (parsed.about && Object.keys(parsed.about).length > 0) setAbout((prev) => ({ ...prev, ...parsed.about }));
+            }
         }
       } catch (e) {}
     };
@@ -242,16 +245,20 @@ export function AdminHomepage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const config = { cards, igs, execoms, about, updatedAt: new Date().toISOString() };
+      const configPayload = { cards, igs, execoms, about, updatedAt: new Date().toISOString() };
       
-      // 1. Save locally FIRST for instant responsiveness
+      // 1. Save to backend database FIRST for worldwide persistence
+      const apiRes = await homepageAPI.saveConfig({ cards, igs, execoms, about });
+
+      // 2. Save to local storage cache
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        const dataToSave = (apiRes && apiRes.data) ? apiRes.data : configPayload;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
       } catch (storageErr) {
         console.warn('Local storage quota warning:', storageErr);
       }
 
-      // 2. Notify all open tabs on the browser immediately
+      // 3. Notify all open tabs on the browser immediately
       window.dispatchEvent(new Event('mulearn_config_updated'));
       if (typeof BroadcastChannel !== 'undefined') {
         try {
@@ -261,13 +268,15 @@ export function AdminHomepage() {
         } catch (bcErr) {}
       }
 
-      // 3. Save to backend database for worldwide persistence
-      await homepageAPI.saveConfig({ cards, igs, execoms, about }).catch(() => {});
-
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3500);
     } catch (e: any) {
-      console.error('Failed to save homepage config:', e);
+      console.error('Failed to save homepage config to database:', e);
+      // Fallback: save locally
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards, igs, execoms, about }));
+        window.dispatchEvent(new Event('mulearn_config_updated'));
+      } catch (err) {}
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3500);
     } finally {
