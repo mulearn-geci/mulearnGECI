@@ -115,7 +115,7 @@ export function Home() {
     <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white">
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
-        <section ref={heroRef} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
+        <section className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
           {/* Full Screen WebGL Shader Canvas */}
           <HeroShaderCanvas />
 
