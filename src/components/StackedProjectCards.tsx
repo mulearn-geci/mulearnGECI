@@ -61,6 +61,7 @@ const PROJECTS: ProjectCard[] = [
 
 export const StackedProjectCards: React.FC = () => {
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
+  const [viewMode, setViewMode] = useState<'stacked' | 'grid'>('stacked');
 
   useEffect(() => {
     const applyCardsFromObj = (cardsArr: any[]) => {
@@ -89,7 +90,9 @@ export const StackedProjectCards: React.FC = () => {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
           localData = JSON.parse(saved);
-          if (localData.cards) applyCardsFromObj(localData.cards);
+          if (localData.cards && Array.isArray(localData.cards) && localData.cards.length > 0) {
+            applyCardsFromObj(localData.cards);
+          }
         }
       } catch (e) {}
 
@@ -97,13 +100,10 @@ export const StackedProjectCards: React.FC = () => {
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data && res.data.cards) {
-          const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
-          const serverTime = res.data?.updatedAt ? new Date(res.data.updatedAt).getTime() : 0;
-
           const localCount = localData?.cards?.length || 0;
           const serverCount = res.data?.cards?.length || 0;
 
-          if (!localData || serverCount > localCount) {
+          if (!localData || serverCount >= localCount) {
             applyCardsFromObj(res.data.cards);
           }
         }
@@ -168,135 +168,229 @@ export const StackedProjectCards: React.FC = () => {
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
             <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3">
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Campus Highlights • {cards.length} Active Cards</span>
+              <span>Campus Highlights • {cards.length} Total Cards</span>
             </div>
             <h2 className="font-display text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
               Community Highlights & Stories
             </h2>
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex items-center space-x-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-              Showing 3 of {cards.length} Cards (Click arrow or drag to cycle)
-            </span>
-            <div className="flex items-center space-x-2">
+          {/* Controls: View Mode Toggle & Next/Prev */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center space-x-1">
               <button
-                onClick={handlePrev}
-                aria-label="Previous Highlight"
-                className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+                onClick={() => setViewMode('stacked')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'stacked'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
               >
-                <ChevronLeft className="w-5 h-5" />
+                Stacked 3D View
               </button>
               <button
-                onClick={handleNext}
-                aria-label="Next Highlight"
-                className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+                onClick={() => setViewMode('grid')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
               >
-                <ChevronRight className="w-5 h-5" />
+                All Cards Grid ({cards.length})
               </button>
             </div>
+
+            {viewMode === 'stacked' && (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handlePrev}
+                  aria-label="Previous Highlight"
+                  className="w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  aria-label="Next Highlight"
+                  className="w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Stacked Cards Container */}
-        <div className="relative h-[650px] md:h-[540px] w-full flex items-center justify-center">
-          <AnimatePresence mode="popLayout">
-            {cards.slice(0, 3).map((card, index) => {
-              const isFront = index === 0;
-              const yOffset = -index * 28;
-              const scale = 1 - index * 0.05;
-              const zIndex = 30 - index * 10;
+        {/* View Mode 1: Grid View (Renders ALL cards simultaneously) */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {cards.map((card, index) => (
+              <motion.div
+                key={card.id || index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                className="bg-slate-50 dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-xl flex flex-col justify-between group"
+              >
+                <div className="space-y-4">
+                  <div className="h-48 rounded-2xl overflow-hidden relative border border-gray-200 dark:border-gray-700">
+                    <img
+                      src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
+                      alt={card.title}
+                      className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 bg-blue-600 text-white font-bold text-xs px-3 py-1 rounded-full shadow-md">
+                      #{card.number || String(index + 1).padStart(2, '0')}
+                    </div>
+                  </div>
+                  <span className="text-xs uppercase tracking-wider font-bold text-blue-600 dark:text-blue-400 block">
+                    {card.meta}
+                  </span>
+                  <h3 className="font-display text-xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                    {card.title}
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-xs font-medium leading-relaxed line-clamp-3">
+                    {card.description}
+                  </p>
+                </div>
 
-              return (
-                <motion.div
-                  key={`${card.id}-${card.title.slice(0, 15)}-${index}`}
-                  layout
-                  initial={{ scale: 0.9, y: 50, opacity: 0 }}
-                  animate={{
-                    scale,
-                    y: yOffset,
-                    opacity: 1 - index * 0.15,
-                    zIndex
-                  }}
-                  exit={{ scale: 0.8, y: -100, opacity: 0 }}
-                  transition={{
-                    duration: 0.6,
-                    ease: [0.16, 1, 0.3, 1]
-                  }}
-                  onClick={() => bringToFront(index)}
-                  drag={isFront ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  onDragEnd={isFront ? handleDragEnd : undefined}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[500px] rounded-3xl p-6 md:p-10 border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden cursor-pointer bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white transition-colors duration-300 ${
-                    isFront ? 'cursor-grab active:cursor-grabbing' : ''
-                  }`}
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-8 items-center">
-                    
-                    {/* Left Half (Meta, Number, High Contrast Text, Button) */}
-                    <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
-                      <div>
-                        {/* Number Badge & Meta Tag */}
-                        <div className="flex items-center space-x-4 mb-6">
-                          <div className="w-12 h-12 rounded-full border border-blue-600/30 text-white font-display font-bold text-sm flex items-center justify-center bg-blue-600 shadow-md">
-                            {card.number}
+                <div className="pt-6">
+                  <Link
+                    to={card.link}
+                    className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-bold text-xs transition-colors shadow-md group/btn"
+                  >
+                    <span>{card.ctaText || 'Learn More'}</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          /* View Mode 2: Stacked 3D View */
+          <div>
+            <div className="relative h-[650px] md:h-[540px] w-full flex items-center justify-center">
+              <AnimatePresence mode="popLayout">
+                {cards.slice(0, Math.min(cards.length, 5)).map((card, index) => {
+                  const isFront = index === 0;
+                  const yOffset = -index * 24;
+                  const scale = 1 - index * 0.04;
+                  const zIndex = 50 - index * 10;
+
+                  return (
+                    <motion.div
+                      key={`${card.id}-${card.title.slice(0, 15)}-${index}`}
+                      layout
+                      initial={{ scale: 0.9, y: 50, opacity: 0 }}
+                      animate={{
+                        scale,
+                        y: yOffset,
+                        opacity: Math.max(0.3, 1 - index * 0.15),
+                        zIndex
+                      }}
+                      exit={{ scale: 0.8, y: -100, opacity: 0 }}
+                      transition={{
+                        duration: 0.5,
+                        ease: [0.16, 1, 0.3, 1]
+                      }}
+                      onClick={() => bringToFront(index)}
+                      drag={isFront ? "x" : false}
+                      dragConstraints={{ left: 0, right: 0 }}
+                      onDragEnd={isFront ? handleDragEnd : undefined}
+                      className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[500px] rounded-3xl p-6 md:p-10 border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden cursor-pointer bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white transition-colors duration-300 ${
+                        isFront ? 'cursor-grab active:cursor-grabbing' : ''
+                      }`}
+                    >
+                      <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-8 items-center">
+                        
+                        {/* Left Half */}
+                        <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
+                          <div>
+                            <div className="flex items-center space-x-4 mb-6">
+                              <div className="w-12 h-12 rounded-full border border-blue-600/30 text-white font-display font-bold text-sm flex items-center justify-center bg-blue-600 shadow-md">
+                                {card.number}
+                              </div>
+                              <span className="text-xs uppercase tracking-wider font-bold text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-3 py-1 rounded-full">
+                                {card.meta}
+                              </span>
+                            </div>
+
+                            <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 leading-tight">
+                              {card.title}
+                            </h3>
+
+                            <p className="text-slate-700 dark:text-slate-200 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
+                              {card.description}
+                            </p>
                           </div>
-                          <span className="text-xs uppercase tracking-wider font-bold text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/40 px-3 py-1 rounded-full">
-                            {card.meta}
-                          </span>
+
+                          <div className="pt-6 flex items-center space-x-4">
+                            <Link
+                              to={card.link}
+                              className="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/20 group"
+                            >
+                              <span>{card.ctaText}</span>
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleNext();
+                              }}
+                              className="inline-flex items-center space-x-2 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors"
+                            >
+                              <span>Next Card</span>
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
 
-                        {/* Title - CRISP HIGH CONTRAST */}
-                        <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 leading-tight">
-                          {card.title}
-                        </h3>
+                        {/* Right Half */}
+                        <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group">
+                          <img
+                            src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
+                            alt={card.title}
+                            className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
+                          />
 
-                        {/* Description - CRISP HIGH CONTRAST */}
-                        <p className="text-slate-700 dark:text-slate-200 text-sm md:text-base font-medium leading-relaxed line-clamp-3">
-                          {card.description}
-                        </p>
+                          <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/50 shadow-lg pointer-events-none transform -rotate-6 flex items-center justify-center text-blue-600">
+                            <Sparkles className="w-6 h-6" />
+                          </div>
+                          <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none transform rotate-12 flex items-center justify-center text-amber-400">
+                            <Award className="w-8 h-8" />
+                          </div>
+                        </div>
+
                       </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
 
-                      {/* CTA Button */}
-                      <div className="pt-6">
-                        <Link
-                          to={card.link}
-                          className="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-600/20 group"
-                        >
-                          <span>{card.ctaText}</span>
-                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Right Half (Real µLearn Group Image & Glass Overlay) */}
-                    <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group">
-                      <img
-                        src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
-                        alt={card.title}
-                        className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
-                      />
-
-                      {/* Glassmorphism Abstract Floating Shapes */}
-                      <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/40 dark:bg-gray-900/40 border border-white/50 shadow-lg pointer-events-none transform -rotate-6 flex items-center justify-center text-blue-600">
-                        <Sparkles className="w-6 h-6" />
-                      </div>
-                      <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none transform rotate-12 flex items-center justify-center text-amber-400">
-                        <Award className="w-8 h-8" />
-                      </div>
-                    </div>
-
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
+            {/* Quick Card Switcher Pills */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+              {cards.map((card, idx) => (
+                <button
+                  key={card.id || idx}
+                  onClick={() => bringToFront(idx)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                    idx === 0
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-md scale-105'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  #{card.number || String(idx + 1).padStart(2, '0')} {card.title.slice(0, 18)}...
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </section>
