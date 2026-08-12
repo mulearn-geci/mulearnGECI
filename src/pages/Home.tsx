@@ -11,6 +11,9 @@ import { StackedProjectCards } from '../components/StackedProjectCards';
 import { execomAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 
+import RejinImg from '../img/Rejin.jpg';
+import NidhinImg from '../img/Nidhin.jpg';
+
 // Section 4.2 Website Feature Navigation Boxes
 const WEBSITE_PAGES = [
   {
@@ -39,24 +42,24 @@ const WEBSITE_PAGES = [
   }
 ];
 
-// Section 4.5 Placeholder Slots for Execom Team (Names & Photos space reserved)
+// Section 4.5 Official Execom Leadership Team
 const DEFAULT_EXECOM_SLOTS = [
   {
-    name: 'Albert George',
-    role: 'Campus Lead & Lead Architect',
-    department: 'Computer Science & Eng.',
-    image: ''
+    name: 'Prof. Rejin R',
+    role: 'Campus Enabler',
+    department: 'Engineering',
+    image: RejinImg
   },
   {
-    name: 'Avani M U',
-    role: 'Technical Lead & Developer',
-    department: 'Electronics & Comm.',
-    image: ''
+    name: 'Nidhin Gireesh',
+    role: 'Campus Lead',
+    department: 'Engineering',
+    image: NidhinImg
   },
   {
-    name: 'Jeevan Prakash',
-    role: 'Events & Operations Lead',
-    department: 'Robotics & AI',
+    name: 'Aparna Anilkumar',
+    role: 'Co - Lead',
+    department: 'Engineering',
     image: ''
   }
 ];
