@@ -8,7 +8,7 @@ import {
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';
 import { StackedProjectCards } from '../components/StackedProjectCards';
-import { execomAPI } from '../services/api';
+import { execomAPI, homepageAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
 
 import RejinImg from '../img/Rejin.jpg';
@@ -159,7 +159,28 @@ export function Home() {
 
   // Dynamically fetch Execom members & load custom admin config
   useEffect(() => {
-    const loadCustomConfig = () => {
+    const loadCustomConfig = async () => {
+      try {
+        const apiRes = await homepageAPI.getConfig();
+        if (apiRes.success && apiRes.data) {
+          if (apiRes.data.igs && apiRes.data.igs.length > 0) {
+            const formattedIgs = apiRes.data.igs.map((ig: any, i: number) => ({
+              title: ig.title,
+              domain: ig.domain || 'Domain',
+              description: ig.description,
+              icon: INTEREST_GROUPS[i % INTEREST_GROUPS.length]?.icon || Code2,
+              link: ig.link || '/events',
+              badge: ig.badge || 'Active'
+            }));
+            setInterestGroups(formattedIgs);
+          }
+          if (apiRes.data.execoms && apiRes.data.execoms.length > 0) {
+            setExecomMembers(apiRes.data.execoms);
+          }
+          return;
+        }
+      } catch (e) {}
+
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
@@ -179,9 +200,7 @@ export function Home() {
             setExecomMembers(parsed.execoms);
           }
         }
-      } catch (e) {
-        console.warn('Error loading custom config:', e);
-      }
+      } catch (e) {}
     };
 
     loadCustomConfig();

@@ -6,6 +6,7 @@ import {
   Upload, X
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
+import { homepageAPI } from '../../services/api';
 
 export interface CustomCard {
   id: string;
@@ -178,32 +179,67 @@ export function AdminHomepage() {
     }
   ]);
 
-  // Load existing config on mount
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load existing config on mount (First from API, fallback to localStorage)
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.cards) setCards(parsed.cards);
-        if (parsed.igs) setIgs(parsed.igs);
-        if (parsed.execoms) setExecoms(parsed.execoms);
+    const fetchConfig = async () => {
+      try {
+        const res = await homepageAPI.getConfig();
+        if (res.success && res.data) {
+          if (res.data.cards && res.data.cards.length > 0) setCards(res.data.cards);
+          if (res.data.igs && res.data.igs.length > 0) setIgs(res.data.igs);
+          if (res.data.execoms && res.data.execoms.length > 0) setExecoms(res.data.execoms);
+        }
+      } catch (e) {
+        console.warn('API config fetch failed, loading from local cache:', e);
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.cards) setCards(parsed.cards);
+            if (parsed.igs) setIgs(parsed.igs);
+            if (parsed.execoms) setExecoms(parsed.execoms);
+          }
+        } catch (err) {
+          console.warn('Local storage parse error:', err);
+        }
       }
-    } catch (e) {
-      console.warn('Error loading custom config:', e);
-    }
+    };
+    fetchConfig();
   }, []);
 
   // Save Config
-  const handleSave = () => {
+  const handleSave = async () => {
+    setIsSaving(true);
     try {
       const config = { cards, igs, execoms, updatedAt: new Date().toISOString() };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      
+      // Save to backend database
+      await homepageAPI.saveConfig({ cards, igs, execoms });
+
+      // Save to local storage cache
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      } catch (storageErr) {
+        console.warn('Local storage quota warning:', storageErr);
+      }
+
       // Dispatch custom storage event so active pages update immediately
       window.dispatchEvent(new Event('mulearn_config_updated'));
       setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3000);
-    } catch (e) {
+      setTimeout(() => setSavedSuccess(false), 3500);
+    } catch (e: any) {
       console.error('Failed to save homepage config:', e);
+      // Fallback: save locally
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ cards, igs, execoms }));
+        window.dispatchEvent(new Event('mulearn_config_updated'));
+      } catch (err) {}
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3500);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -317,9 +353,15 @@ export function AdminHomepage() {
           <div className="flex items-center space-x-3">
             <button
               onClick={handleSave}
-              className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-6 rounded-2xl text-sm transition-all shadow-lg shadow-blue-600/20"
+              disabled={isSaving}
+              className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-400 text-white font-bold py-3.5 px-6 rounded-2xl text-sm transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
             >
-              {savedSuccess ? (
+              {isSaving ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                  <span>Saving Changes...</span>
+                </>
+              ) : savedSuccess ? (
                 <>
                   <CheckCircle className="w-4 h-4 text-green-300" />
                   <span>Changes Saved Live!</span>

@@ -415,4 +415,28 @@ export const leaderboardAPI = {
     }
     return response.json();
   }
+};
+
+// Homepage Customizer API
+export const homepageAPI = {
+  getConfig: async () => {
+    const response = await fetch(`${API_BASE_URL}/homepage-config`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch homepage configuration');
+    }
+    return response.json();
+  },
+
+  saveConfig: async (config: { cards?: any[]; igs?: any[]; execoms?: any[] }) => {
+    const response = await fetch(`${API_BASE_URL}/homepage-config`, {
+      method: 'POST',
+      headers: createAuthHeaders(),
+      body: JSON.stringify(config),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to save homepage configuration');
+    }
+    return response.json();
+  }
 };

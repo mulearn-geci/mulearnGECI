@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, Award, Users, BookOpen, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { homepageAPI } from '../services/api';
 
 import MulearnGroupImg from '../img/mulearnGroup.jpg';
 import AlbertImg from '../img/albert.jpeg';
@@ -66,7 +67,25 @@ export const StackedProjectCards: React.FC = () => {
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
 
   useEffect(() => {
-    const loadCustomConfig = () => {
+    const loadCustomConfig = async () => {
+      try {
+        const res = await homepageAPI.getConfig();
+        if (res.success && res.data && res.data.cards && res.data.cards.length > 0) {
+          const formatted = res.data.cards.map((c: any, i: number) => ({
+            id: c.id || String(i + 1),
+            number: String(i + 1).padStart(2, '0'),
+            meta: c.meta || 'SHOWCASE',
+            title: c.title,
+            description: c.description,
+            image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
+            link: c.link || '/events',
+            ctaText: c.ctaText || 'Learn More'
+          }));
+          setCards(formatted);
+          return;
+        }
+      } catch (err) {}
+
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
@@ -85,9 +104,7 @@ export const StackedProjectCards: React.FC = () => {
             setCards(formatted);
           }
         }
-      } catch (e) {
-        console.warn('Error reading custom cards:', e);
-      }
+      } catch (e) {}
     };
 
     loadCustomConfig();
