@@ -101,7 +101,13 @@ export const HeroShaderCanvas: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl');
+    let gl: WebGLRenderingContext | null = null;
+    try {
+      gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    } catch (e) {
+      console.warn('WebGL context creation failed:', e);
+      return;
+    }
     if (!gl) return;
 
     // Compile Shader Helper
