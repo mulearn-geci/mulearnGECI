@@ -420,7 +420,13 @@ export const leaderboardAPI = {
 // Homepage Customizer API
 export const homepageAPI = {
   getConfig: async () => {
-    const response = await fetch(`${API_BASE_URL}/homepage-config`);
+    const response = await fetch(`${API_BASE_URL}/homepage-config?t=${Date.now()}`, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch homepage configuration');
     }

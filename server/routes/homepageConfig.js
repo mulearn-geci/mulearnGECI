@@ -2,9 +2,14 @@ const express = require('express');
 const router = express.Router();
 const HomepageConfig = require('../models/HomepageConfig');
 
-// GET homepage customizer config (returns latest document)
+// GET homepage customizer config (returns latest document with strict cache-busting)
 router.get('/', async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+
     let configs = await HomepageConfig.find({ key: 'main_config' }).sort({ updatedAt: -1 });
     let config = configs[0];
     if (!config) {
