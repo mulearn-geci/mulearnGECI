@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const HomepageConfig = require('../models/HomepageConfig');
 
-// GET homepage customizer config (Atomic findOne with strict cache-busting)
+// GET homepage customizer config (Atomic findOne with strict cache-busting and deduplication)
 router.get('/', async (req, res) => {
   try {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -10,7 +10,17 @@ router.get('/', async (req, res) => {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
 
-    let config = await HomepageConfig.findOne({ key: 'main_config' });
+    // 1. Find all documents to detect and clean up ghost duplicates
+    const allConfigs = await HomepageConfig.find({ key: 'main_config' });
+    
+    if (allConfigs.length > 1) {
+      // Sort by updatedAt descending (newest first)
+      allConfigs.sort((a, b) => b.updatedAt - a.updatedAt);
+      const toDelete = allConfigs.slice(1).map(c => c._id);
+      await HomepageConfig.deleteMany({ _id: { $in: toDelete } });
+    }
+
+    let config = allConfigs.length > 0 ? allConfigs[0] : null;
     
     if (!config) {
       config = await HomepageConfig.findOneAndUpdate(
@@ -53,7 +63,13 @@ router.post('/', async (req, res) => {
       updateFields.execoms = execoms;
     }
     if (about !== undefined && about && typeof about === 'object') {
-      const existing = await HomepageConfig.findOne({ key: 'main_config' });
+      const allConfigs = await HomepageConfig.find({ key: 'main_config' });
+      if (allConfigs.length > 1) {
+        allConfigs.sort((a, b) => b.updatedAt - a.updatedAt);
+        const toDelete = allConfigs.slice(1).map(c => c._id);
+        await HomepageConfig.deleteMany({ _id: { $in: toDelete } });
+      }
+      const existing = allConfigs.length > 0 ? allConfigs[0] : null;
       const existingAbout = existing?.about || {};
       updateFields.about = { ...existingAbout, ...about };
     }
