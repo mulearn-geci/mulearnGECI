@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const HomepageConfig = require('../models/HomepageConfig');
 
-// GET homepage customizer config (returns latest document with strict cache-busting)
+// GET homepage customizer config (Atomic findOne with strict cache-busting)
 router.get('/', async (req, res) => {
   try {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -10,12 +10,16 @@ router.get('/', async (req, res) => {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
 
-    let configs = await HomepageConfig.find({ key: 'main_config' }).sort({ updatedAt: -1 });
-    let config = configs[0];
+    let config = await HomepageConfig.findOne({ key: 'main_config' });
+    
     if (!config) {
-      config = new HomepageConfig({ key: 'main_config' });
-      await config.save();
+      config = await HomepageConfig.findOneAndUpdate(
+        { key: 'main_config' },
+        { $setOnInsert: { key: 'main_config', cards: [], igs: [], execoms: [], about: {}, updatedAt: new Date() } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      );
     }
+
     return res.json({ 
       success: true, 
       data: config 
@@ -30,47 +34,40 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST / UPDATE homepage customizer config
+// POST / UPDATE homepage customizer config (Atomic findOneAndUpdate with upsert)
 router.post('/', async (req, res) => {
   try {
     const { cards, igs, execoms, about } = req.body;
     
-    let configs = await HomepageConfig.find({ key: 'main_config' }).sort({ updatedAt: -1 });
-    let config;
-    if (configs.length > 0) {
-      config = configs[0];
-      if (configs.length > 1) {
-        const duplicateIds = configs.slice(1).map(c => c._id);
-        await HomepageConfig.deleteMany({ _id: { $in: duplicateIds } }).catch(() => {});
-      }
-    } else {
-      config = new HomepageConfig({ key: 'main_config' });
-    }
+    const updateFields = {
+      updatedAt: new Date()
+    };
 
     if (cards !== undefined && Array.isArray(cards)) {
-      config.cards = cards;
-      config.markModified('cards');
+      updateFields.cards = cards;
     }
     if (igs !== undefined && Array.isArray(igs)) {
-      config.igs = igs;
-      config.markModified('igs');
+      updateFields.igs = igs;
     }
     if (execoms !== undefined && Array.isArray(execoms)) {
-      config.execoms = execoms;
-      config.markModified('execoms');
+      updateFields.execoms = execoms;
     }
     if (about !== undefined && about && typeof about === 'object') {
-      config.about = { ...(config.about || {}), ...about };
-      config.markModified('about');
+      const existing = await HomepageConfig.findOne({ key: 'main_config' });
+      const existingAbout = existing?.about || {};
+      updateFields.about = { ...existingAbout, ...about };
     }
-    config.updatedAt = new Date();
 
-    await config.save();
+    const updatedConfig = await HomepageConfig.findOneAndUpdate(
+      { key: 'main_config' },
+      { $set: updateFields },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
     return res.json({ 
       success: true, 
       message: 'Homepage configuration saved successfully!', 
-      data: config 
+      data: updatedConfig 
     });
   } catch (err) {
     console.error('Error saving homepage config:', err);
