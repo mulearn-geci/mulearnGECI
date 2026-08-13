@@ -7,25 +7,25 @@ const HomepageConfigSchema = new mongoose.Schema({
     unique: true 
   },
   cards: { 
-    type: Array, 
+    type: [mongoose.Schema.Types.Mixed], 
     default: [] 
   },
   igs: { 
-    type: Array, 
+    type: [mongoose.Schema.Types.Mixed], 
     default: [] 
   },
   execoms: { 
-    type: Array, 
+    type: [mongoose.Schema.Types.Mixed], 
     default: [] 
   },
   about: {
-    type: Object,
+    type: mongoose.Schema.Types.Mixed,
     default: {}
   },
   updatedAt: { 
     type: Date, 
     default: Date.now 
   }
-});
+}, { strict: false });
 
 module.exports = mongoose.model('HomepageConfig', HomepageConfigSchema);
