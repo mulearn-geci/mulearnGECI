@@ -168,7 +168,7 @@ export const StackedProjectCards: React.FC = () => {
   };
 
   return (
-    <section className="py-20 md:py-28 bg-slate-900 text-white transition-colors duration-300 overflow-hidden relative">
+    <section className="py-20 md:py-28 bg-slate-900 text-white transition-colors duration-300 relative">
       {/* Background Subtle Gradient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
 
