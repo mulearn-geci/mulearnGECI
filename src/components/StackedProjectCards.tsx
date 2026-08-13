@@ -102,13 +102,16 @@ export const StackedProjectCards: React.FC = () => {
       // 2. Fetch from backend API
       try {
         const res = await homepageAPI.getConfig();
+        console.log('API RESPONSE (StackedProjectCards):', res.data);
         if (res.success && res.data && res.data.cards && Array.isArray(res.data.cards)) {
           const serverCards = res.data.cards;
           if (localCardsArr.length === 0 || serverCards.length >= localCardsArr.length) {
             applyCardsFromObj(serverCards);
           }
         }
-      } catch (err) {}
+      } catch (err) {
+        console.error('API FETCH ERROR (StackedProjectCards):', err);
+      }
     };
 
     loadCustomConfig();

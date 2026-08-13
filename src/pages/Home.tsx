@@ -206,18 +206,18 @@ export function Home() {
       // 2. API fetch
       try {
         const apiRes = await homepageAPI.getConfig();
+        console.log('API RESPONSE (Home.tsx):', apiRes.data);
         if (apiRes.success && apiRes.data) {
-          const localTime = localData?.updatedAt ? new Date(localData.updatedAt).getTime() : 0;
-          const serverTime = apiRes.data?.updatedAt ? new Date(apiRes.data.updatedAt).getTime() : 0;
-
           const localCount = localData?.cards?.length || 0;
           const serverCount = apiRes.data?.cards?.length || 0;
 
-          if (!localData || serverCount > localCount) {
+          if (!localData || serverCount >= localCount) {
             applyConfigFromObj(apiRes.data);
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('API FETCH ERROR (Home.tsx):', e);
+      }
 
       // 3. Fallback to Execom API only if no custom execom exists
       if (!hasCustomExecom) {
