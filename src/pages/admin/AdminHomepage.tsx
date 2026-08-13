@@ -381,11 +381,11 @@ export function AdminHomepage() {
     setExecoms(execoms.filter((_, i) => i !== index));
   };
 
-  // File Upload Helper
+  // File Upload Helper (FileReader + Canvas Base64 Compression to 800px & 0.7 quality)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, onRead: (dataUrl: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      const compressedDataUrl = await compressImageToDataUrl(file, 1200, 1200, 0.75);
+      const compressedDataUrl = await compressImageToDataUrl(file, 800, 800, 0.7);
       if (compressedDataUrl) {
         onRead(compressedDataUrl);
       }
