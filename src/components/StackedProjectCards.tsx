@@ -85,33 +85,28 @@ export const StackedProjectCards: React.FC = () => {
     };
 
     const loadCustomConfig = async () => {
-      let localCardsArr: any[] = [];
+      // 1. Always fetch fresh data from backend database first
+      try {
+        const res = await homepageAPI.getConfig();
+        console.log('API RESPONSE (StackedProjectCards):', res.data);
+        if (res.success && res.data && res.data.cards && Array.isArray(res.data.cards) && res.data.cards.length > 0) {
+          applyCardsFromObj(res.data.cards);
+          return;
+        }
+      } catch (err) {
+        console.warn('API fetch failed, falling back to local storage cache:', err);
+      }
 
-      // 1. Check local storage cache first for instant update
+      // 2. Fallback to local storage cache only if API request fails or returns empty
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed.cards && Array.isArray(parsed.cards) && parsed.cards.length > 0) {
-            localCardsArr = parsed.cards;
             applyCardsFromObj(parsed.cards);
           }
         }
       } catch (e) {}
-
-      // 2. Fetch from backend API
-      try {
-        const res = await homepageAPI.getConfig();
-        console.log('API RESPONSE (StackedProjectCards):', res.data);
-        if (res.success && res.data && res.data.cards && Array.isArray(res.data.cards)) {
-          const serverCards = res.data.cards;
-          if (localCardsArr.length === 0 || serverCards.length >= localCardsArr.length) {
-            applyCardsFromObj(serverCards);
-          }
-        }
-      } catch (err) {
-        console.error('API FETCH ERROR (StackedProjectCards):', err);
-      }
     };
 
     loadCustomConfig();

@@ -192,32 +192,26 @@ export function Home() {
     };
 
     const loadCustomConfig = async () => {
-      let localData: any = null;
-
-      // 1. Local cache first for instant update
-      try {
-        const saved = localStorage.getItem('mulearn_homepage_custom_config');
-        if (saved) {
-          localData = JSON.parse(saved);
-          applyConfigFromObj(localData);
-        }
-      } catch (e) {}
-
-      // 2. API fetch
+      // 1. Always fetch fresh data from backend API first
       try {
         const apiRes = await homepageAPI.getConfig();
         console.log('API RESPONSE (Home.tsx):', apiRes.data);
         if (apiRes.success && apiRes.data) {
-          const localCount = localData?.cards?.length || 0;
-          const serverCount = apiRes.data?.cards?.length || 0;
-
-          if (!localData || serverCount >= localCount) {
-            applyConfigFromObj(apiRes.data);
-          }
+          applyConfigFromObj(apiRes.data);
+          return;
         }
       } catch (e) {
-        console.error('API FETCH ERROR (Home.tsx):', e);
+        console.warn('API fetch failed in Home.tsx, falling back to local storage cache:', e);
       }
+
+      // 2. Fallback to local storage cache only if API request fails
+      try {
+        const saved = localStorage.getItem('mulearn_homepage_custom_config');
+        if (saved) {
+          const localData = JSON.parse(saved);
+          applyConfigFromObj(localData);
+        }
+      } catch (e) {}
 
       // 3. Fallback to Execom API only if no custom execom exists
       if (!hasCustomExecom) {
