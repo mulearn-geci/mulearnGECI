@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, Award, Layers } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { homepageAPI } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
@@ -61,8 +61,8 @@ const PROJECTS: ProjectCard[] = [
 
 export const StackedProjectCards: React.FC = () => {
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [viewMode, setViewMode] = useState<'stacked' | 'grid'>('stacked');
+  const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const applyCardsFromObj = (cardsArr: any[]) => {
@@ -125,93 +125,52 @@ export const StackedProjectCards: React.FC = () => {
     };
   }, []);
 
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % cards.length);
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -420, behavior: 'smooth' });
+    }
   };
 
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length);
-  };
-
-  const goToCard = (index: number) => {
-    setActiveIndex(index);
-  };
-
-  // Build the stacked cards deck (top card + 2 stacked cards behind)
-  const renderStackedDeck = () => {
-    const total = cards.length;
-    if (total === 0) return null;
-
-    // Show 3 cards in stack: top card (0), second card (1), third card (2)
-    const stackIndices = [0, 1, 2].map(offset => (activeIndex + offset) % total);
-
-    return (
-      <div className="relative w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto h-[500px] md:h-[540px] flex items-center justify-center select-none" style={{ touchAction: 'none' }}>
-        {stackIndices.map((cardIndex, stackOffset) => {
-          const card = cards[cardIndex];
-          const isTop = stackOffset === 0;
-
-          // Visual stacking offsets:
-          // Top card: scale 1, y: 0, zIndex: 30
-          // 2nd card: scale 0.94, y: 16, zIndex: 20
-          // 3rd card: scale 0.88, y: 32, zIndex: 10
-          const scale = 1 - stackOffset * 0.06;
-          const yOffset = stackOffset * 16;
-          const zIndex = 30 - stackOffset * 10;
-          const opacity = 1 - stackOffset * 0.2;
-
-          return (
-            <FlashcardItem
-              key={`${card.id || cardIndex}-${cardIndex}`}
-              card={card}
-              isTop={isTop}
-              scale={scale}
-              yOffset={yOffset}
-              zIndex={zIndex}
-              opacity={opacity}
-              onSwipeRight={handleNext}
-              onSwipeLeft={handleNext}
-            />
-          );
-        })}
-      </div>
-    );
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 420, behavior: 'smooth' });
+    }
   };
 
   return (
     <section className="py-16 md:py-24 bg-slate-900 text-white transition-colors duration-300 relative overflow-hidden">
       {/* Background Subtle Ambient Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-16 relative z-10">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 relative z-10">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-bold text-blue-400 mb-3 bg-blue-950/80 px-3.5 py-1.5 rounded-full border border-blue-800/50 shadow-sm">
+            <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-extrabold text-blue-400 mb-3 bg-blue-950/80 px-3.5 py-1.5 rounded-full border border-blue-800/50 shadow-sm">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Campus Highlights • {cards.length} Cards</span>
+              <span>Campus Highlights • {cards.length} Total Cards</span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-extrabold text-white leading-tight">
               Community Highlights & Stories
             </h2>
             <p className="text-slate-400 text-xs md:text-sm mt-2 font-medium">
-              Drag or swipe flashcards left/right to browse campus initiatives
+              Swipe horizontally or click arrows to explore all {cards.length} landscape highlight cards
             </p>
           </div>
 
-          {/* Controls: View Mode Toggle & Next/Prev */}
+          {/* Controls: Mode Toggle & Scroll Buttons */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="bg-slate-800/90 p-1 rounded-2xl border border-slate-700 flex items-center space-x-1 shadow-md">
               <button
-                onClick={() => setViewMode('stacked')}
+                onClick={() => setViewMode('carousel')}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'stacked'
+                  viewMode === 'carousel'
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Flashcard Deck
+                Landscape Carousel
               </button>
               <button
                 onClick={() => setViewMode('grid')}
@@ -225,21 +184,18 @@ export const StackedProjectCards: React.FC = () => {
               </button>
             </div>
 
-            {viewMode === 'stacked' && (
+            {viewMode === 'carousel' && (
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={handlePrev}
-                  aria-label="Previous Flashcard"
+                  onClick={scrollLeft}
+                  aria-label="Scroll Left"
                   className="w-10 h-10 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                <span className="text-xs font-bold text-slate-300 bg-slate-800 px-3 py-2.5 rounded-xl border border-slate-700 min-w-[90px] text-center">
-                  {activeIndex + 1} / {cards.length}
-                </span>
                 <button
-                  onClick={handleNext}
-                  aria-label="Next Flashcard"
+                  onClick={scrollRight}
+                  aria-label="Scroll Right"
                   className="w-10 h-10 rounded-full border border-slate-700 bg-slate-800 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
                 >
                   <ChevronRight className="w-5 h-5" />
@@ -249,27 +205,72 @@ export const StackedProjectCards: React.FC = () => {
           </div>
         </div>
 
-        {/* MODE 1: FLASHCARD DECK VIEW */}
-        {viewMode === 'stacked' ? (
-          <div>
-            {renderStackedDeck()}
+        {/* MODE 1: SMOOTH HORIZONTAL SCROLL-SNAP CAROUSEL */}
+        {viewMode === 'carousel' ? (
+          <div
+            ref={scrollContainerRef}
+            className="overflow-x-auto flex gap-6 pb-8 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {cards.map((card, index) => (
+              <motion.div
+                key={card.id || index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: index * 0.05 }}
+                className="w-[85vw] sm:w-[420px] md:w-[540px] lg:w-[600px] shrink-0 snap-center rounded-3xl bg-slate-800/90 border border-slate-700/80 p-6 md:p-8 shadow-2xl flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-300"
+              >
+                <div>
+                  {/* Card Meta Tag & Number */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-xs uppercase tracking-wider font-extrabold text-blue-400 bg-blue-950/90 px-3.5 py-1 rounded-full border border-blue-800/50">
+                      {card.meta}
+                    </span>
+                    <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center shadow-md">
+                      #{card.number || String(index + 1).padStart(2, '0')}
+                    </div>
+                  </div>
 
-            {/* Quick Interactive Card Switcher Pills */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto">
-              {cards.map((card, idx) => (
-                <button
-                  key={card.id || idx}
-                  onClick={() => goToCard(idx)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-                    idx === activeIndex
-                      ? 'bg-blue-600 text-white border-blue-500 shadow-lg scale-105'
-                      : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-white'
-                  }`}
-                >
-                  #{card.number || String(idx + 1).padStart(2, '0')} {card.title.slice(0, 16)}...
-                </button>
-              ))}
-            </div>
+                  {/* Cinematic Landscape Image (16:9 Aspect Ratio) */}
+                  <div className="relative w-full aspect-video md:h-64 rounded-2xl overflow-hidden mb-6 border border-slate-700/80">
+                    <img
+                      src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
+                      alt={card.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute top-3 left-3 w-9 h-9 rounded-xl backdrop-blur-md bg-slate-900/70 border border-slate-700 flex items-center justify-center text-blue-400">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full backdrop-blur-md bg-slate-900/70 border border-slate-700 flex items-center justify-center text-amber-400">
+                      <Award className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  {/* Card Title & Description */}
+                  <h3 className="font-display text-xl md:text-2xl font-extrabold text-white mb-3 leading-snug">
+                    {card.title}
+                  </h3>
+
+                  <p className="text-slate-300 text-xs md:text-sm font-medium leading-relaxed line-clamp-3">
+                    {card.description}
+                  </p>
+                </div>
+
+                {/* Footer CTA Button */}
+                <div className="pt-6 mt-4 border-t border-slate-700/60 flex items-center justify-between">
+                  <Link
+                    to={card.link}
+                    className="inline-flex items-center space-x-2.5 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full font-bold text-xs md:text-sm transition-all duration-300 shadow-lg shadow-blue-600/20 group/btn"
+                  >
+                    <span>{card.ctaText || 'Explore Feature'}</span>
+                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+
+                  <span className="text-[11px] font-bold text-slate-400">
+                    Card {index + 1} of {cards.length}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
           </div>
         ) : (
           /* MODE 2: ALL CARDS GRID VIEW */
@@ -283,7 +284,7 @@ export const StackedProjectCards: React.FC = () => {
                 className="bg-slate-800/90 rounded-3xl p-6 border border-slate-700 shadow-2xl flex flex-col justify-between group hover:border-blue-500/50 transition-all"
               >
                 <div className="space-y-4">
-                  <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-700/80">
+                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-700/80">
                     <img
                       src={getImageUrl(card.image) || PROJECTS[index % PROJECTS.length]?.image}
                       alt={card.title}
@@ -320,121 +321,5 @@ export const StackedProjectCards: React.FC = () => {
 
       </div>
     </section>
-  );
-};
-
-// Sub-component for individual draggable flashcard item
-interface FlashcardItemProps {
-  card: ProjectCard;
-  isTop: boolean;
-  scale: number;
-  yOffset: number;
-  zIndex: number;
-  opacity: number;
-  onSwipeRight: () => void;
-  onSwipeLeft: () => void;
-}
-
-const FlashcardItem: React.FC<FlashcardItemProps> = ({
-  card,
-  isTop,
-  scale,
-  yOffset,
-  zIndex,
-  opacity,
-  onSwipeRight,
-  onSwipeLeft,
-}) => {
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-12, 12]);
-
-  const handleDragEnd = (_: any, info: any) => {
-    const threshold = 100;
-    const velocity = info.velocity.x;
-    const offset = info.offset.x;
-
-    if (offset > threshold || velocity > 400) {
-      onSwipeRight();
-    } else if (offset < -threshold || velocity < -400) {
-      onSwipeLeft();
-    }
-  };
-
-  return (
-    <motion.div
-      style={{
-        x: isTop ? x : 0,
-        rotate: isTop ? rotate : 0,
-        zIndex,
-        touchAction: 'none',
-      }}
-      drag={isTop ? 'x' : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      onDragEnd={isTop ? handleDragEnd : undefined}
-      animate={{
-        scale,
-        y: yOffset,
-        opacity,
-      }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`absolute inset-0 w-full h-full rounded-3xl bg-slate-800 border border-slate-700/80 shadow-2xl p-5 md:p-7 flex flex-col justify-between ${
-        isTop ? 'cursor-grab active:cursor-grabbing border-blue-500/40 shadow-blue-900/20' : 'pointer-events-none'
-      }`}
-    >
-      {/* Top Badge & Number */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs uppercase tracking-wider font-extrabold text-blue-400 bg-blue-950/90 px-3 py-1 rounded-full border border-blue-800/50">
-            {card.meta}
-          </span>
-          <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center shadow-md">
-            {card.number}
-          </div>
-        </div>
-
-        {/* Card Image */}
-        <div className="relative h-44 md:h-52 rounded-2xl overflow-hidden border border-slate-700/80 mb-4 group">
-          <img
-            src={getImageUrl(card.image)}
-            alt={card.title}
-            className="w-full h-full object-cover rounded-2xl"
-          />
-          <div className="absolute top-3 left-3 w-9 h-9 rounded-xl backdrop-blur-md bg-slate-900/70 border border-slate-700 flex items-center justify-center text-blue-400">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full backdrop-blur-md bg-slate-900/70 border border-slate-700 flex items-center justify-center text-amber-400">
-            <Award className="w-4 h-4" />
-          </div>
-        </div>
-
-        {/* Title & Description */}
-        <h3 className="font-display text-lg md:text-xl font-extrabold text-white mb-2 leading-snug line-clamp-2">
-          {card.title}
-        </h3>
-
-        <p className="text-slate-300 text-xs md:text-sm font-medium leading-relaxed line-clamp-3">
-          {card.description}
-        </p>
-      </div>
-
-      {/* Footer CTA & Swipe Hint */}
-      <div className="pt-3 border-t border-slate-700/60 flex items-center justify-between">
-        <Link
-          to={card.link}
-          className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-full font-bold text-xs transition-colors shadow-md group"
-          onClick={(e) => isTop && e.stopPropagation()}
-        >
-          <span>{card.ctaText || 'Learn More'}</span>
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-        </Link>
-
-        {isTop && (
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center space-x-1">
-            <Layers className="w-3 h-3 text-blue-400" />
-            <span>Drag to swipe</span>
-          </span>
-        )}
-      </div>
-    </motion.div>
   );
 };
