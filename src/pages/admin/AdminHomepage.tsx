@@ -209,30 +209,16 @@ export function AdminHomepage() {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load existing config on mount (First from localStorage, then API merge if server is newer & count safe)
+  // Load existing config on mount (Server API is the absolute source of truth)
   useEffect(() => {
     const fetchConfig = async () => {
-      let localData: any = null;
-
-      // 1. Read local storage FIRST for instant UI rendering
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          localData = JSON.parse(saved);
-          if (localData.cards && localData.cards.length > 0) setCards(localData.cards);
-          if (localData.igs && localData.igs.length > 0) setIgs(localData.igs);
-          if (localData.execoms && localData.execoms.length > 0) setExecoms(localData.execoms);
-          if (localData.about && Object.keys(localData.about).length > 0) setAbout((prev) => ({ ...prev, ...localData.about }));
-        }
-      } catch (err) {}
-
-      // 2. Fetch from backend API & apply source of truth
+      // 1. Fetch from backend API first (Absolute source of truth)
       try {
         const res = await homepageAPI.getConfig();
         if (res.success && res.data) {
           const apiData = res.data;
-          if (apiData.cards && Array.isArray(apiData.cards) && apiData.cards.length > 0) {
-            setCards(apiData.cards);
+          if (apiData.cards && Array.isArray(apiData.cards)) {
+            setCards(apiData.cards.length > 0 ? apiData.cards : []);
           }
           if (apiData.igs && Array.isArray(apiData.igs) && apiData.igs.length > 0) {
             setIgs(apiData.igs);
@@ -247,8 +233,23 @@ export function AdminHomepage() {
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(apiData));
           } catch (e) {}
+          return;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('API fetch warning in AdminHomepage:', e);
+      }
+
+      // 2. Read local storage cache ONLY if API network request failed
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const localData = JSON.parse(saved);
+          if (localData.cards && Array.isArray(localData.cards)) setCards(localData.cards);
+          if (localData.igs && Array.isArray(localData.igs) && localData.igs.length > 0) setIgs(localData.igs);
+          if (localData.execoms && Array.isArray(localData.execoms) && localData.execoms.length > 0) setExecoms(localData.execoms);
+          if (localData.about && Object.keys(localData.about).length > 0) setAbout((prev) => ({ ...prev, ...localData.about }));
+        }
+      } catch (err) {}
     };
     fetchConfig();
   }, []);
@@ -270,8 +271,11 @@ export function AdminHomepage() {
       // 2. Save to backend database for worldwide persistence across all devices
       try {
         const apiRes = await homepageAPI.saveConfig({ cards, igs, execoms, about });
-        if (apiRes && apiRes.success && apiRes.data && apiRes.data.cards && apiRes.data.cards.length >= cards.length) {
+        if (apiRes && apiRes.success && apiRes.data) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(apiRes.data));
+          if (apiRes.data.cards && Array.isArray(apiRes.data.cards)) {
+            setCards(apiRes.data.cards);
+          }
         }
       } catch (apiErr) {
         console.warn('Backend API save warning (retained in local cache):', apiErr);
