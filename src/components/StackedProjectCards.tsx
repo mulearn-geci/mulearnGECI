@@ -71,9 +71,9 @@ export const StackedProjectCards: React.FC = () => {
         const formatted = cardsArr.map((c: any, i: number) => ({
           id: c.id || String(i + 1),
           number: c.number || String(i + 1).padStart(2, '0'),
-          meta: c.meta || 'CAMPUS SHOWCASE',
-          title: c.title || `Showcase Card #${i + 1}`,
-          description: c.description || 'Discover campus initiatives, community achievements, and student projects at µLearn GECI.',
+          meta: c.meta !== undefined && c.meta !== null ? c.meta : 'CAMPUS SHOWCASE',
+          title: c.title !== undefined && c.title !== null ? c.title : `Showcase Card #${i + 1}`,
+          description: c.description !== undefined && c.description !== null ? c.description : 'Discover campus initiatives, community achievements, and student projects at µLearn GECI.',
           image: c.image && c.image.trim() !== '' ? c.image : PROJECTS[i % PROJECTS.length].image,
           link: c.link || '/events',
           ctaText: c.ctaText || 'Learn More'
@@ -85,15 +85,16 @@ export const StackedProjectCards: React.FC = () => {
     };
 
     const loadCustomConfig = async () => {
-      let localData: any = null;
+      let localCardsArr: any[] = [];
 
       // 1. Check local storage cache first for instant update
       try {
         const saved = localStorage.getItem('mulearn_homepage_custom_config');
         if (saved) {
-          localData = JSON.parse(saved);
-          if (localData.cards && Array.isArray(localData.cards) && localData.cards.length > 0) {
-            applyCardsFromObj(localData.cards);
+          const parsed = JSON.parse(saved);
+          if (parsed.cards && Array.isArray(parsed.cards) && parsed.cards.length > 0) {
+            localCardsArr = parsed.cards;
+            applyCardsFromObj(parsed.cards);
           }
         }
       } catch (e) {}
@@ -101,12 +102,10 @@ export const StackedProjectCards: React.FC = () => {
       // 2. Fetch from backend API
       try {
         const res = await homepageAPI.getConfig();
-        if (res.success && res.data && res.data.cards) {
-          const localCount = localData?.cards?.length || 0;
-          const serverCount = res.data?.cards?.length || 0;
-
-          if (!localData || serverCount >= localCount) {
-            applyCardsFromObj(res.data.cards);
+        if (res.success && res.data && res.data.cards && Array.isArray(res.data.cards)) {
+          const serverCards = res.data.cards;
+          if (localCardsArr.length === 0 || serverCards.length >= localCardsArr.length) {
+            applyCardsFromObj(serverCards);
           }
         }
       } catch (err) {}

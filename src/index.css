@@ -6,6 +6,24 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Primary Dark Mode Background Redesign using #3A7DFE and #C031FF */
+.dark body,
+html.dark {
+  background-color: #090d16;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(58, 125, 254, 0.25), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(192, 49, 255, 0.18), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 0% 80%, rgba(58, 125, 254, 0.18), transparent 70%),
+    linear-gradient(180deg, #070a12 0%, #0b101d 50%, #070a12 100%);
+  background-attachment: fixed;
+  color: #f8fafc;
+}
+
+.dark .bg-gray-900,
+.dark .bg-slate-900 {
+  background-color: transparent !important;
+}
+
 @layer utilities {
   .text-stroke {
     -webkit-text-stroke: 1.5px currentColor;
