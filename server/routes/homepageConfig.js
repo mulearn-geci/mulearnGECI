@@ -47,20 +47,20 @@ router.post('/', async (req, res) => {
       config = new HomepageConfig({ key: 'main_config' });
     }
 
-    if (Array.isArray(cards)) {
+    if (cards !== undefined && Array.isArray(cards)) {
       config.cards = cards;
       config.markModified('cards');
     }
-    if (Array.isArray(igs)) {
+    if (igs !== undefined && Array.isArray(igs)) {
       config.igs = igs;
       config.markModified('igs');
     }
-    if (Array.isArray(execoms)) {
+    if (execoms !== undefined && Array.isArray(execoms)) {
       config.execoms = execoms;
       config.markModified('execoms');
     }
-    if (about && typeof about === 'object') {
-      config.about = about;
+    if (about !== undefined && about && typeof about === 'object') {
+      config.about = { ...(config.about || {}), ...about };
       config.markModified('about');
     }
     config.updatedAt = new Date();
