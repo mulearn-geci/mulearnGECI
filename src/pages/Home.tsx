@@ -648,10 +648,10 @@ export function Home() {
 
                     <Link
                       to={ig.link}
-                      className="w-full py-3 rounded-full font-bold text-xs inline-flex items-center justify-center space-x-2 bg-slate-900 hover:bg-blue-600 text-white dark:bg-white dark:hover:bg-blue-500 dark:text-slate-900 dark:hover:text-white transition-all shadow-md group-hover:shadow-blue-500/20"
+                      className="w-full py-3.5 px-4 rounded-2xl font-bold text-sm inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white shadow-md shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 group/btn border border-blue-400/30"
                     >
-                      <span>Explore Events</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      <span className="tracking-wide">Explore Events</span>
+                      <ArrowUpRight className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                     </Link>
                   </motion.div>
                 );
