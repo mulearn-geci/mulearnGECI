@@ -31,14 +31,14 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2.5 group">
+            <Link to="/" className="flex items-center space-x-2 group">
               <img
                 src="/mulearn-logo.png"
-                alt="µLearn Logo"
-                className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+                alt="µ Logo"
+                className="w-8 h-8 md:w-9 md:h-9 object-contain group-hover:scale-105 transition-transform duration-300"
               />
-              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
-                µLearn <span className="text-gray-900 dark:text-white font-bold">GECI</span>
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 via-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                Learn <span className="text-gray-900 dark:text-white font-bold">GECI</span>
               </span>
             </Link>
 

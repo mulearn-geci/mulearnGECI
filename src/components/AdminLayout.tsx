@@ -68,10 +68,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto scrollbar-none">
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">µ</span>
-              </div>
-              <span className="text-lg font-bold text-gray-900 dark:text-white">µLearn Admin</span>
+              <img src="/mulearn-logo.png" alt="µ Logo" className="w-8 h-8 object-contain" />
+              <span className="text-lg font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                Learn <span className="text-gray-900 dark:text-white">Admin</span>
+              </span>
             </Link>
             <button
               className="lg:hidden"
