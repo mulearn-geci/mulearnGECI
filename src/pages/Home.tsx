@@ -372,10 +372,10 @@ export function Home() {
             
             <div className="mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
-                Explore The Platform
+                Discover µLearn GECI • Campus Ecosystem
               </span>
               <h2 className="font-display text-4xl md:text-6xl font-bold leading-tight">
-                Everything You Need to Scale Your Engineering Skills
+                Empowering GECI Engineers to Learn, Build & Lead
               </h2>
             </div>
 
