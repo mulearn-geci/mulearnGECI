@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { homepageAPI } from '../../services/api';
-import { compressImageToDataUrl } from '../../utils/imageUtils';
+import { compressImageToDataUrl, compressBase64DataUrl } from '../../utils/imageUtils';
 
 export interface CustomCard {
   id: string;
@@ -53,6 +53,7 @@ const STORAGE_KEY = 'mulearn_homepage_custom_config';
 export function AdminHomepage() {
   const [activeTab, setActiveTab] = useState<'cards' | 'igs' | 'execom' | 'about'>('cards');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Default stacked cards
   const [cards, setCards] = useState<CustomCard[]>([
@@ -255,31 +256,62 @@ export function AdminHomepage() {
   // Save Config
   const handleSave = async () => {
     setIsSaving(true);
+    setSaveError(null);
     try {
+      // 1. Compress any heavy Base64 images to stay safely under Vercel's payload limit
+      const compressedCards = await Promise.all(
+        cards.map(async (c) => {
+          if (c.image && c.image.startsWith('data:image/')) {
+            const compressedImg = await compressBase64DataUrl(c.image, 800, 800, 0.65);
+            return { ...c, image: compressedImg };
+          }
+          return c;
+        })
+      );
+
+      const compressedAbout = { ...about };
+      if (about.photo1 && about.photo1.startsWith('data:image/')) {
+        compressedAbout.photo1 = await compressBase64DataUrl(about.photo1, 800, 800, 0.65);
+      }
+      if (about.photo2 && about.photo2.startsWith('data:image/')) {
+        compressedAbout.photo2 = await compressBase64DataUrl(about.photo2, 800, 800, 0.65);
+      }
+      if (about.photo3 && about.photo3.startsWith('data:image/')) {
+        compressedAbout.photo3 = await compressBase64DataUrl(about.photo3, 800, 800, 0.65);
+      }
+
       const nowIso = new Date().toISOString();
-      const configPayload = { cards, igs, execoms, about, updatedAt: nowIso };
-      
-      // 1. Save locally FIRST for zero-delay responsiveness
+      const configPayload = {
+        cards: compressedCards,
+        igs,
+        execoms,
+        about: compressedAbout,
+        updatedAt: nowIso
+      };
+
+      // 2. Save locally for zero-delay responsiveness
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(configPayload));
       } catch (storageErr) {
         console.warn('Local storage quota warning:', storageErr);
       }
 
-      // 2. Save to backend database for worldwide persistence across all devices
-      try {
-        const apiRes = await homepageAPI.saveConfig({ cards, igs, execoms, about });
-        if (apiRes && apiRes.success && apiRes.data) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(apiRes.data));
-          if (apiRes.data.cards && Array.isArray(apiRes.data.cards)) {
-            setCards(apiRes.data.cards);
-          }
+      // 3. Save to backend database for worldwide persistence across all devices
+      const apiRes = await homepageAPI.saveConfig({
+        cards: compressedCards,
+        igs,
+        execoms,
+        about: compressedAbout
+      });
+
+      if (apiRes && apiRes.success && apiRes.data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(apiRes.data));
+        if (apiRes.data.cards && Array.isArray(apiRes.data.cards)) {
+          setCards(apiRes.data.cards);
         }
-      } catch (apiErr) {
-        console.warn('Backend API save warning (retained in local cache):', apiErr);
       }
 
-      // 3. Dispatch local events so all browser tabs update immediately
+      // 4. Dispatch local events so all browser tabs update immediately
       window.dispatchEvent(new Event('mulearn_config_updated'));
       if (typeof BroadcastChannel !== 'undefined') {
         try {
@@ -293,8 +325,8 @@ export function AdminHomepage() {
       setTimeout(() => setSavedSuccess(false), 3500);
     } catch (e: any) {
       console.error('Failed to save homepage config:', e);
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3500);
+      setSaveError(e.message || 'Failed to save to server. Please try again.');
+      setTimeout(() => setSaveError(null), 6000);
     } finally {
       setIsSaving(false);
     }
@@ -438,6 +470,13 @@ export function AdminHomepage() {
             </a>
           </div>
         </div>
+
+        {saveError && (
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 p-4 rounded-2xl text-sm flex items-center space-x-2 animate-pulse">
+            <X className="w-5 h-5 flex-shrink-0 text-red-500" />
+            <span className="font-semibold">{saveError}</span>
+          </div>
+        )}
 
         {/* Tab Selection Navigation */}
         <div className="flex border-b border-gray-200 dark:border-gray-700 space-x-4 overflow-x-auto">

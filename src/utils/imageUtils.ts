@@ -156,3 +156,38 @@ export const compressImageToDataUrl = async (file: File, maxWidth = 800, maxHeig
     reader.onerror = () => resolve('');
   });
 };
+
+export const compressBase64DataUrl = async (dataUrl: string, maxWidth = 800, maxHeight = 800, quality = 0.65): Promise<string> => {
+  if (!dataUrl || !dataUrl.startsWith('data:image/')) return dataUrl;
+  if (dataUrl.length < 150000) return dataUrl;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = dataUrl;
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+      if (width > maxWidth || height > maxHeight) {
+        if (width > height) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        } else {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(dataUrl);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+  });
+};
+
