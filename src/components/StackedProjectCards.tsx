@@ -282,15 +282,10 @@ export const StackedProjectCards: React.FC = () => {
                         className="w-full h-full object-cover rounded-2xl group-hover/img:scale-105 transition-transform duration-700"
                       />
 
-                      {/* Sparkles icon – top-left overlay badge */}
-                      <div className="absolute top-5 left-5 w-10 h-10 rounded-xl backdrop-blur-md bg-white/40 dark:bg-gray-900/50 border border-white/50 dark:border-gray-600/50 shadow-lg flex items-center justify-center pointer-events-none">
-                        <Sparkles className="w-4 h-4 text-amber-500" />
+                      {/* Clean Sparkles badge on top-left of image */}
+                      <div className="absolute top-4 left-4 w-9 h-9 rounded-xl backdrop-blur-md bg-black/40 border border-white/20 shadow-lg flex items-center justify-center pointer-events-none">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
                       </div>
-
-                      {/* Glassmorphism Abstract Floating Shapes */}
-                      <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none -rotate-6" />
-                      <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/25 dark:bg-gray-900/25 border border-white/30 shadow-lg pointer-events-none rotate-12" />
-                      <div className="absolute top-1/2 right-10 w-12 h-12 rounded-full backdrop-blur-sm bg-blue-500/15 border border-white/25 shadow-md pointer-events-none" />
                     </div>
 
                   </div>
