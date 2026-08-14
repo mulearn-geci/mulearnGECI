@@ -123,7 +123,8 @@ export const StackedProjectCards: React.FC = () => {
     };
   }, []);
 
-  // Stacked card navigation — cycle cards like a deck
+  /* ── Stacked deck navigation ─────────────────────────────── */
+
   const handleNext = () => {
     setCards((prev) => {
       const copy = [...prev];
@@ -143,11 +144,8 @@ export const StackedProjectCards: React.FC = () => {
   };
 
   const handleDragEnd = (_: any, info: PanInfo) => {
-    if (info.offset.x < -80) {
-      handleNext();
-    } else if (info.offset.x > 80) {
-      handlePrev();
-    }
+    if (info.offset.x < -80) handleNext();
+    else if (info.offset.x > 80) handlePrev();
   };
 
   const bringToFront = (index: number) => {
@@ -159,14 +157,15 @@ export const StackedProjectCards: React.FC = () => {
     });
   };
 
-  // Find position of front card in the full deck for counter
   const frontCardIndex = allCards.findIndex(c => c.id === cards[0]?.id);
 
+  /* ── Render ──────────────────────────────────────────────── */
+
   return (
-    <section className="py-20 md:py-28 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
+    <section className="py-24 md:py-32 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
         
-        {/* Section Header */}
+        {/* ── Section Header ──────────────────────────────── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
             <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3">
@@ -174,17 +173,15 @@ export const StackedProjectCards: React.FC = () => {
               <span>Featured Initiatives</span>
             </div>
             <h2 className="font-display text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-              Community Highlights
+              Latest Projects & Labs
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2 max-w-lg">
-              Drag cards or use arrows to explore — {allCards.length} highlight cards from the µLearn GECI community
-            </p>
           </div>
 
           {/* Navigation Controls */}
           <div className="flex items-center space-x-3">
-            <span className="text-sm font-bold text-gray-400 dark:text-gray-500 mr-2 tabular-nums">
-              {(frontCardIndex >= 0 ? frontCardIndex + 1 : 1).toString().padStart(2, '0')} / {allCards.length.toString().padStart(2, '0')}
+            {/* Card counter */}
+            <span className="text-sm font-bold text-gray-400 dark:text-gray-500 mr-1 tabular-nums select-none">
+              {(frontCardIndex >= 0 ? frontCardIndex + 1 : 1).toString().padStart(2, '0')}&nbsp;/&nbsp;{allCards.length.toString().padStart(2, '0')}
             </span>
             <button
               onClick={handlePrev}
@@ -203,14 +200,15 @@ export const StackedProjectCards: React.FC = () => {
           </div>
         </div>
 
-        {/* Stacked Cards Container */}
-        <div className="relative h-[620px] md:h-[540px] w-full flex items-center justify-center">
+        {/* ── Stacked Cards Container ─────────────────────── */}
+        <div className="relative h-[650px] md:h-[580px] w-full flex items-center justify-center">
           <AnimatePresence mode="popLayout">
-            {cards.slice(0, 4).map((card, index) => {
+            {cards.slice(0, 3).map((card, index) => {
               const isFront = index === 0;
-              const yOffset = -index * 24;
-              const scale = 1 - index * 0.045;
-              const zIndex = 40 - index * 10;
+              // Stack: cards behind move up and scale down
+              const yOffset = -index * 28;
+              const scale = 1 - index * 0.05;
+              const zIndex = 30 - index * 10;
 
               return (
                 <motion.div
@@ -220,41 +218,41 @@ export const StackedProjectCards: React.FC = () => {
                   animate={{
                     scale,
                     y: yOffset,
-                    opacity: 1 - index * 0.12,
-                    zIndex
+                    opacity: 1 - index * 0.15,
+                    zIndex,
                   }}
-                  exit={{ scale: 0.85, y: -80, opacity: 0 }}
+                  exit={{ scale: 0.8, y: -100, opacity: 0 }}
                   transition={{
-                    duration: 0.55,
-                    ease: [0.16, 1, 0.3, 1]
+                    duration: 0.6,
+                    ease: [0.16, 1, 0.3, 1],
                   }}
                   onClick={() => bringToFront(index)}
-                  drag={isFront ? "x" : false}
+                  drag={isFront ? 'x' : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={isFront ? handleDragEnd : undefined}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[560px] md:h-[480px] rounded-3xl p-6 md:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
+                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[520px] rounded-3xl p-6 md:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
                     isFront
                       ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing'
-                      : 'bg-gray-50 dark:bg-gray-800/80 border-gray-200/60 dark:border-gray-700/60 cursor-pointer'
+                      : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/60 cursor-pointer'
                   }`}
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-6 md:gap-8 items-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-8 items-center">
                     
-                    {/* Left Half — Content */}
-                    <div className="lg:col-span-5 flex flex-col justify-between h-full py-2">
+                    {/* ─ Left Half: Content ─────────────── */}
+                    <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
                       <div>
-                        {/* Number Badge & Meta */}
-                        <div className="flex items-center space-x-3 mb-5">
-                          <div className="w-10 h-10 rounded-full border border-blue-500/30 text-blue-600 dark:text-blue-400 font-display font-bold text-xs flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
+                        {/* Number Badge & Meta Tag */}
+                        <div className="flex items-center space-x-4 mb-6">
+                          <div className="w-12 h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
                             {card.number}
                           </div>
-                          <span className="text-[10px] uppercase tracking-wider font-bold text-blue-600 dark:text-blue-400">
+                          <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
                             {card.meta}
                           </span>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
+                        <h3 className="font-display text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
                           {card.title}
                         </h3>
 
@@ -264,29 +262,35 @@ export const StackedProjectCards: React.FC = () => {
                         </p>
                       </div>
 
-                      {/* CTA Button */}
+                      {/* ── CTA Button (vibrant gradient) ─ */}
                       <div className="pt-6">
                         <Link
                           to={card.link}
-                          className="inline-flex items-center space-x-2.5 bg-gray-900 hover:bg-blue-600 dark:bg-white dark:hover:bg-blue-500 text-white dark:text-gray-900 dark:hover:text-white px-7 py-3.5 rounded-full font-semibold text-sm transition-all duration-300 shadow-md group/cta"
+                          className="inline-flex items-center space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-8 py-4 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
                         >
-                          <span>{card.ctaText || 'Explore'}</span>
+                          <span className="tracking-wide">{card.ctaText || 'Explore'}</span>
                           <ArrowRight className="w-4 h-4 group-hover/cta:translate-x-1 transition-transform" />
                         </Link>
                       </div>
                     </div>
 
-                    {/* Right Half — Image */}
-                    <div className="lg:col-span-7 relative h-[200px] md:h-full rounded-2xl overflow-hidden group/img">
+                    {/* ─ Right Half: Image & Glass Shapes ─ */}
+                    <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group/img">
                       <img
                         src={getImageUrl(card.image) || PROJECTS[(parseInt(card.number) - 1) % PROJECTS.length]?.image}
                         alt={card.title}
                         className="w-full h-full object-cover rounded-2xl group-hover/img:scale-105 transition-transform duration-700"
                       />
 
-                      {/* Glassmorphism floating shapes */}
-                      <div className="absolute top-6 left-6 w-14 h-14 rounded-2xl backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none -rotate-6" />
-                      <div className="absolute bottom-6 right-6 w-16 h-16 rounded-full backdrop-blur-md bg-white/25 dark:bg-gray-900/25 border border-white/30 shadow-lg pointer-events-none rotate-12" />
+                      {/* Sparkles icon – top-left overlay badge */}
+                      <div className="absolute top-5 left-5 w-10 h-10 rounded-xl backdrop-blur-md bg-white/40 dark:bg-gray-900/50 border border-white/50 dark:border-gray-600/50 shadow-lg flex items-center justify-center pointer-events-none">
+                        <Sparkles className="w-4 h-4 text-amber-500" />
+                      </div>
+
+                      {/* Glassmorphism Abstract Floating Shapes */}
+                      <div className="absolute top-6 left-6 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/40 shadow-lg pointer-events-none -rotate-6" />
+                      <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full backdrop-blur-md bg-white/25 dark:bg-gray-900/25 border border-white/30 shadow-lg pointer-events-none rotate-12" />
+                      <div className="absolute top-1/2 right-10 w-12 h-12 rounded-full backdrop-blur-sm bg-blue-500/15 border border-white/25 shadow-md pointer-events-none" />
                     </div>
 
                   </div>
@@ -296,8 +300,8 @@ export const StackedProjectCards: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        {/* Card indicator dots */}
-        <div className="flex justify-center mt-6 space-x-2">
+        {/* ── Card indicator dots ─────────────────────────── */}
+        <div className="flex justify-center mt-8 space-x-2.5">
           {allCards.map((card, i) => (
             <button
               key={card.id}
@@ -305,10 +309,10 @@ export const StackedProjectCards: React.FC = () => {
                 const idx = cards.findIndex(c => c.id === card.id);
                 if (idx >= 0) bringToFront(idx);
               }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+              className={`rounded-full transition-all duration-300 cursor-pointer ${
                 cards[0]?.id === card.id
-                  ? 'bg-blue-600 dark:bg-blue-400 scale-125'
-                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
+                  ? 'w-8 h-2.5 bg-blue-600 dark:bg-blue-400'
+                  : 'w-2.5 h-2.5 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
               }`}
               aria-label={`Go to card ${i + 1}`}
             />
