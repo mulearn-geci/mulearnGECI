@@ -282,7 +282,7 @@ export function Home() {
               className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-8 text-xs font-semibold uppercase tracking-widest text-blue-300 shadow-xl"
             >
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>µLearn GECI • Student Innovation Hub</span>
+              <span>🚀 µLearn GECI • Learn. Build. Level Up.</span>
             </motion.div>
 
             <motion.h1
@@ -291,19 +291,16 @@ export function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="font-display text-5xl sm:text-7xl md:text-[92px] lg:text-[104px] font-bold text-white leading-[1.08] tracking-tight mb-8"
             >
-              We create smart & <br className="hidden sm:block" />
-              effective digital{' '}
+              Where Curiosity Meets <br className="hidden sm:block" />
+              Real-World Innovatio
               <span className="relative inline-flex items-center">
-                solutio
-                <span className="relative">
-                  n
-                  <motion.span
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: 1.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute top-1/2 left-full -translate-y-1/2 ml-2 w-[100px] sm:w-[220px] md:w-[380px] lg:w-[450px] h-2.5 bg-white rounded-r-full shadow-lg origin-left"
-                  />
-                </span>
+                n
+                <motion.span
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 1.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-1/2 left-full -translate-y-1/2 ml-2 w-[100px] sm:w-[220px] md:w-[380px] lg:w-[450px] h-2.5 bg-white rounded-r-full shadow-lg origin-left"
+                />
               </span>
             </motion.h1>
 
@@ -313,7 +310,7 @@ export function Home() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-gray-300 text-base md:text-xl max-w-2xl leading-relaxed mb-10"
             >
-              Empowering Government Engineering College Idukki students through peer-to-peer coding sprints, real-world proof of work, and live karma leaderboards.
+              Join GEC Idukki's premier student-led tech community. Master cutting-edge technologies, build verified proof-of-work, and climb the live campus leaderboard together.
             </motion.p>
 
             <motion.div
