@@ -162,40 +162,48 @@ export function AdminPosts() {
                   </div>
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 leading-tight">
-                    {post.title}
-                  </h3>
-                  
-                  {/*<div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                    <div className="flex items-center space-x-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{post.category || 'announcement'}</span>
+                <div className="p-6 flex flex-col justify-between flex-1">
+                  <div>
+                    <div className="flex items-center justify-between mb-2 gap-2">
+                      <span className="text-[11px] uppercase tracking-wider font-extrabold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full">
+                        {post.category || 'Event'}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {post.eventDate ? new Date(post.eventDate).toLocaleDateString() : new Date(post.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
-                  </div>*/}
 
-                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-snug line-clamp-2">
+                      {post.title}
+                    </h3>
+
+                    {post.description && (
+                      <p className="text-gray-600 dark:text-gray-300 text-xs line-clamp-2 mb-4">
+                        {post.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex items-center space-x-2">
                       <button 
                         onClick={() => handleEditPost(post)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
+                        className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-lg transition-colors cursor-pointer"
+                        title="Edit post"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button 
                         onClick={() => handleDeletePost(post)}
-                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-colors cursor-pointer"
+                        title="Delete post"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
-                    <button 
-                      onClick={() => handleViewDetails(post)}
-                      className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium"
-                    >
-                      View Details
-                    </button>
+                    <span className="text-xs font-semibold text-gray-400">
+                      #{index + 1}
+                    </span>
                   </div>
                 </div>
               </motion.div>

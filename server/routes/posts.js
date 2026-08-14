@@ -1,8 +1,9 @@
 const express = require('express');
 const Post = require('../models/Post');
 const { auth, adminAuth } = require('../middleware/auth');
-const { upload, handleUploadError, deleteFile } = require('../middleware/upload');
+const { upload, handleUploadError, deleteFile, processUploadedFile } = require('../middleware/upload');
 const { validatePost, validateObjectId, validatePagination } = require('../middleware/validation');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -12,20 +13,17 @@ const router = express.Router();
 router.get('/', validatePagination, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     
     // Build filter object
     const filter = {};
     
-    if (req.query.status) {
+    if (req.query.status && req.query.status !== 'all') {
       filter.status = req.query.status;
-    } else {
-      // Only show published posts for public access
-      filter.status = 'published';
     }
     
-    if (req.query.category) {
+    if (req.query.category && req.query.category !== 'all') {
       filter.category = req.query.category;
     }
     
@@ -33,26 +31,22 @@ router.get('/', validatePagination, async (req, res) => {
       filter.featured = req.query.featured === 'true';
     }
     
-    if (req.query.author) {
-      filter.author = req.query.author;
-    }
-    
     if (req.query.search) {
       filter.$or = [
         { title: { $regex: req.query.search, $options: 'i' } },
         { description: { $regex: req.query.search, $options: 'i' } },
-        { tags: { $in: [new RegExp(req.query.search, 'i')] } }
+        { location: { $regex: req.query.search, $options: 'i' } },
+        { category: { $regex: req.query.search, $options: 'i' } }
       ];
     }
 
-    // Get posts with pagination
+    // Get posts sorted by eventDate / createdAt descending
     const posts = await Post.find(filter)
       .populate('author', 'name email')
-      .sort({ publishedAt: -1, createdAt: -1 })
+      .sort({ eventDate: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Get total count for pagination
     const total = await Post.countDocuments(filter);
     const totalPages = Math.ceil(total / limit);
 
@@ -60,15 +54,14 @@ router.get('/', validatePagination, async (req, res) => {
       success: true,
       data: posts,
       pagination: {
-        currentPage: page,
-        totalPages,
-        totalPosts: total,
-        hasNext: page < totalPages,
-        hasPrev: page > 1
+        page,
+        limit,
+        total,
+        pages: totalPages
       }
     });
   } catch (error) {
-    console.error('Get posts error:', error);
+    logger.error('Get posts error', { error: error.message });
     res.status(500).json({
       success: false,
       message: 'Server error while fetching posts'
@@ -90,24 +83,16 @@ router.get('/:id', validateObjectId, async (req, res) => {
       });
     }
 
-    // Only show published posts to public, unless user is admin
-    if (post.status !== 'published' && (!req.user || req.user.role !== 'admin')) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found'
-      });
-    }
-
-    // Increment views
-    post.views += 1;
-    await post.save();
+    // Increment views safely
+    post.views = (post.views || 0) + 1;
+    await post.save().catch(() => {});
 
     res.json({
       success: true,
       data: post
     });
   } catch (error) {
-    console.error('Get post error:', error);
+    logger.error('Get post error', { error: error.message });
     res.status(500).json({
       success: false,
       message: 'Server error while fetching post'
@@ -120,18 +105,29 @@ router.get('/:id', validateObjectId, async (req, res) => {
 // @access  Private (Admin only)
 router.post('/', adminAuth, upload.single('image'), handleUploadError, validatePost, async (req, res) => {
   try {
-    if (!req.file) {
+    let image = '';
+    
+    // Support file upload or base64 Data URL sent in body
+    if (req.file) {
+      image = processUploadedFile(req.file, 'posts');
+    } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
+      image = req.body.image.trim();
+    }
+
+    if (!image) {
       return res.status(400).json({
         success: false,
-        message: 'Image is required'
+        message: 'Post image is required'
       });
     }
 
     const {
       title,
-      /*description,
+      description,
       content,
-      category,*/
+      category,
+      eventDate,
+      location,
       tags,
       status,
       featured,
@@ -139,22 +135,32 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateP
       imageAlt
     } = req.body;
 
+    let parsedTags = [];
+    if (tags) {
+      try {
+        parsedTags = typeof tags === 'string' ? JSON.parse(tags) : (Array.isArray(tags) ? tags : [tags]);
+      } catch (e) {
+        parsedTags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+      }
+    }
+
     const post = new Post({
-      title,
-      /*description,
-      content,
-      category,*/
-      image: `/uploads/posts/${req.file.filename}`,
-      imageAlt: imageAlt || title,
-      tags: tags ? JSON.parse(tags) : [],
-      status: status || 'draft',
-      featured: featured === 'true',
-      registrationLink,
-      author: req.user.id
+      title: title ? title.trim() : '',
+      description: description ? description.trim() : '',
+      content: content ? content.trim() : '',
+      category: category ? category.trim() : 'event',
+      eventDate: eventDate ? new Date(eventDate) : undefined,
+      location: location ? location.trim() : '',
+      image,
+      imageAlt: imageAlt || title || '',
+      tags: parsedTags,
+      status: status || 'published',
+      featured: featured === true || featured === 'true',
+      registrationLink: registrationLink ? registrationLink.trim() : '',
+      author: req.user ? req.user._id || req.user.id : undefined
     });
 
     await post.save();
-    await post.populate('author', 'name email');
 
     res.status(201).json({
       success: true,
@@ -162,15 +168,14 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateP
       data: post
     });
   } catch (error) {
-    // Delete uploaded file if post creation fails
     if (req.file) {
       deleteFile(req.file.path);
     }
     
-    console.error('Create post error:', error);
+    logger.error('Create post error', { error: error.message });
     res.status(500).json({
       success: false,
-      message: 'Server error while creating post'
+      message: error.message || 'Server error while creating post'
     });
   }
 });
@@ -191,38 +196,50 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
 
     const {
       title,
-      /*description,
+      description,
       content,
-      category,*/
+      category,
+      eventDate,
+      location,
       tags,
       status,
       featured,
       registrationLink,
-      imageAlt
+      imageAlt,
+      image: bodyImage,
+      removeImage
     } = req.body;
 
     // Update fields
-    post.title = title || post.title;
-    /*post.description = description || post.description;
-    post.content = content || post.content;
-    post.category = category || post.category;*/
-    post.tags = tags ? JSON.parse(tags) : post.tags;
-    post.status = status || post.status;
-    post.featured = featured !== undefined ? featured === 'true' : post.featured;
-    post.registrationLink = registrationLink || post.registrationLink;
-    post.imageAlt = imageAlt || post.imageAlt;
+    if (title !== undefined) post.title = title.trim();
+    if (description !== undefined) post.description = description.trim();
+    if (content !== undefined) post.content = content.trim();
+    if (category !== undefined) post.category = category.trim();
+    if (eventDate !== undefined) post.eventDate = eventDate ? new Date(eventDate) : undefined;
+    if (location !== undefined) post.location = location.trim();
+    if (status !== undefined) post.status = status;
+    if (featured !== undefined) post.featured = featured === true || featured === 'true';
+    if (registrationLink !== undefined) post.registrationLink = registrationLink ? registrationLink.trim() : '';
+    if (imageAlt !== undefined) post.imageAlt = imageAlt;
 
-    // Update image if new one is uploaded
-    if (req.file) {
-      // Delete old image
-      if (post.image && post.image.startsWith('/uploads/')) {
-        deleteFile(post.image.substring(1)); // Remove leading slash
+    if (tags !== undefined) {
+      try {
+        post.tags = typeof tags === 'string' ? JSON.parse(tags) : (Array.isArray(tags) ? tags : [tags]);
+      } catch (e) {
+        post.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
       }
-      post.image = `/uploads/posts/${req.file.filename}`;
+    }
+
+    // Update image
+    if (req.file) {
+      post.image = processUploadedFile(req.file, 'posts');
+    } else if (bodyImage && typeof bodyImage === 'string' && bodyImage.trim() !== '') {
+      post.image = bodyImage.trim();
+    } else if (removeImage === 'true') {
+      post.image = '';
     }
 
     await post.save();
-    await post.populate('author', 'name email');
 
     res.json({
       success: true,
@@ -230,15 +247,14 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
       data: post
     });
   } catch (error) {
-    // Delete uploaded file if update fails
     if (req.file) {
       deleteFile(req.file.path);
     }
     
-    console.error('Update post error:', error);
+    logger.error('Update post error', { error: error.message });
     res.status(500).json({
       success: false,
-      message: 'Server error while updating post'
+      message: error.message || 'Server error while updating post'
     });
   }
 });
@@ -257,9 +273,9 @@ router.delete('/:id', adminAuth, validateObjectId, async (req, res) => {
       });
     }
 
-    // Delete associated image
+    // Delete associated image if local file
     if (post.image && post.image.startsWith('/uploads/')) {
-      deleteFile(post.image.substring(1)); // Remove leading slash
+      deleteFile(post.image.substring(1));
     }
 
     await Post.findByIdAndDelete(req.params.id);
@@ -269,41 +285,10 @@ router.delete('/:id', adminAuth, validateObjectId, async (req, res) => {
       message: 'Post deleted successfully'
     });
   } catch (error) {
-    console.error('Delete post error:', error);
+    logger.error('Delete post error', { error: error.message });
     res.status(500).json({
       success: false,
       message: 'Server error while deleting post'
-    });
-  }
-});
-
-// @route   PUT /api/posts/:id/like
-// @desc    Like/unlike post
-// @access  Public
-router.put('/:id/like', validateObjectId, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found'
-      });
-    }
-
-    post.likes += 1;
-    await post.save();
-
-    res.json({
-      success: true,
-      message: 'Post liked successfully',
-      likes: post.likes
-    });
-  } catch (error) {
-    console.error('Like post error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while liking post'
     });
   }
 });

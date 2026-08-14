@@ -46,28 +46,28 @@ const validateUserLogin = [
 const validatePost = [
   body('title')
     .trim()
-    .isLength({ min: 5, max: 200 })
-    .withMessage('Title must be between 5 and 200 characters'),
-  /*body('description')
-    .trim()
-    .isLength({ min: 10, max: 2000 })
-    .withMessage('Description must be between 10 and 2000 characters'),
+    .isLength({ min: 2, max: 250 })
+    .withMessage('Title must be between 2 and 250 characters'),
+  body('description')
+    .optional()
+    .trim(),
+  body('content')
+    .optional()
+    .trim(),
   body('category')
     .optional()
-    .isIn(['announcement', 'event', 'news', 'achievement', 'workshop', 'competition'])
-    .withMessage('Invalid category'),*/
+    .trim(),
+  body('eventDate')
+    .optional(),
+  body('location')
+    .optional()
+    .trim(),
   body('status')
     .optional()
     .isIn(['draft', 'published', 'archived'])
     .withMessage('Invalid status'),
   body('registrationLink')
-    .optional()
-    .isURL()
-    .withMessage('Registration link must be a valid URL'),
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array'),
+    .optional(),
   handleValidationErrors
 ];
 

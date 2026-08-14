@@ -5,18 +5,31 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Title is required'],
     trim: true,
-    maxlength: [200, 'Title cannot exceed 200 characters']
+    maxlength: [250, 'Title cannot exceed 250 characters']
   },
-  /*description: {
+  description: {
     type: String,
-    required: [true, 'Description is required'],
     trim: true,
-    maxlength: [2000, 'Description cannot exceed 2000 characters']
+    default: ''
   },
   content: {
     type: String,
-    trim: true
-  },*/
+    trim: true,
+    default: ''
+  },
+  category: {
+    type: String,
+    trim: true,
+    default: 'event'
+  },
+  eventDate: {
+    type: Date
+  },
+  location: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   image: {
     type: String,
     required: [true, 'Image is required']
@@ -25,11 +38,6 @@ const postSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  /*category: {
-    type: String,
-    enum: ['announcement', 'event', 'news', 'achievement', 'workshop', 'competition'],
-    default: 'announcement'
-  },*/
   tags: [{
     type: String,
     trim: true
@@ -37,7 +45,7 @@ const postSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['draft', 'published', 'archived'],
-    default: 'draft'
+    default: 'published'
   },
   featured: {
     type: Boolean,
@@ -45,14 +53,7 @@ const postSchema = new mongoose.Schema({
   },
   registrationLink: {
     type: String,
-    trim: true,
-    validate: {
-      validator: function(v) {
-        if (!v) return true;
-        return /^https?:\/\/.+/.test(v);
-      },
-      message: 'Registration link must be a valid URL'
-    }
+    trim: true
   },
   views: {
     type: Number,
@@ -63,16 +64,16 @@ const postSchema = new mongoose.Schema({
     default: 0
   },
   publishedAt: {
-    type: Date
+    type: Date,
+    default: Date.now
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
   },
   slug: {
-    type: String,
-    unique: true
+    type: String
   }
 }, {
   timestamps: true
@@ -80,8 +81,8 @@ const postSchema = new mongoose.Schema({
 
 // Create slug from title
 postSchema.pre('save', function(next) {
-  if (this.isModified('title')) {
-    this.slug = this.title
+  if (this.isModified('title') || !this.slug) {
+    this.slug = (this.title || 'post')
       .toLowerCase()
       .replace(/[^a-zA-Z0-9]/g, '-')
       .replace(/-+/g, '-')
@@ -97,8 +98,8 @@ postSchema.pre('save', function(next) {
 
 // Index for better performance
 postSchema.index({ status: 1, publishedAt: -1 });
-postSchema.index({ author: 1 });
 postSchema.index({ slug: 1 });
 postSchema.index({ tags: 1 });
+postSchema.index({ eventDate: -1 });
 
 module.exports = mongoose.model('Post', postSchema);
