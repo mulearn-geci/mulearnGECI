@@ -67,16 +67,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       } transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col justify-between flex-shrink-0`}>
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto scrollbar-none">
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-            <Link to="/" className="flex items-center group">
-              <img
-                src="/mulearn-logo.png"
-                alt="µ"
-                className="h-7 w-auto object-contain mr-0.5 group-hover:scale-105 transition-transform"
-              />
-              <span className="text-xl font-black tracking-tight text-blue-600 dark:text-blue-400">
-                Learn
+            <Link to="/" className="flex items-baseline gap-1.5 select-none">
+              <span className="flex items-baseline leading-none">
+                <img
+                  src="/mulearn-logo.png"
+                  alt="µ"
+                  className="h-5 w-auto object-contain inline-block -mb-[2px]"
+                />
+                <span className="text-lg font-black bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 bg-clip-text text-transparent tracking-tight">
+                  Learn
+                </span>
               </span>
-              <span className="text-sm font-black uppercase px-1.5 py-0.5 ml-2 bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 rounded">
+              <span className="text-[11px] font-black uppercase px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-[5px] tracking-wider leading-none">
                 Admin
               </span>
             </Link>

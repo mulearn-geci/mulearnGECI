@@ -30,17 +30,20 @@ export function Header() {
       <header className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center group">
-              <img
-                src="/mulearn-logo.png"
-                alt="µ"
-                className="h-8 sm:h-9 w-auto object-contain mr-0.5 group-hover:scale-105 transition-transform"
-              />
-              <span className="text-2xl font-black tracking-tight text-blue-600 dark:text-blue-400">
-                Learn
+            {/* Logo — µLearn GECI wordmark */}
+            <Link to="/" className="flex items-baseline gap-2 group select-none">
+              {/* µLearn as one seamless unit */}
+              <span className="flex items-baseline leading-none group-hover:scale-[1.03] transition-transform origin-left">
+                <img
+                  src="/mulearn-logo.png"
+                  alt="µ"
+                  className="h-6 w-auto object-contain inline-block -mb-[3px]"
+                />
+                <span className="text-[22px] font-black bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 bg-clip-text text-transparent tracking-tight">
+                  Learn
+                </span>
               </span>
-              <span className="text-2xl font-extrabold text-gray-900 dark:text-white ml-2 tracking-tight">
+              <span className="text-[22px] font-extrabold text-gray-800 dark:text-gray-100 tracking-tight">
                 GECI
               </span>
             </Link>

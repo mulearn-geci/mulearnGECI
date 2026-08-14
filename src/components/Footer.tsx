@@ -8,20 +8,22 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center group">
-              <img
-                src="/mulearn-logo.png"
-                alt="µ"
-                className="h-8 sm:h-9 w-auto object-contain mr-0.5"
-              />
-              <span className="text-2xl font-black tracking-tight text-blue-400">
-                Learn
+            <Link to="/" className="inline-flex items-baseline gap-2 select-none">
+              <span className="flex items-baseline leading-none">
+                <img
+                  src="/mulearn-logo.png"
+                  alt="µ"
+                  className="h-6 w-auto object-contain inline-block -mb-[3px]"
+                />
+                <span className="text-[22px] font-black bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-tight">
+                  Learn
+                </span>
               </span>
-              <span className="text-2xl font-extrabold text-white ml-2 tracking-tight">
+              <span className="text-[22px] font-extrabold text-white tracking-tight">
                 GECI
               </span>
             </Link>
-            <p className="text-gray-400 dark:text-gray-400 text-sm leading-relaxed">
+            <p className="text-gray-400 text-sm leading-relaxed">
               Empowering students through innovation, collaboration, and continuous learning in technology and beyond.
             </p>
           </div>

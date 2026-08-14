@@ -336,50 +336,43 @@ export function Home() {
             </motion.div>
           </motion.div>
 
-          {/* Bottom Right Animated µLearn Rotating Orbit & Floating Logo */}
+          {/* Bottom Right — µLearn Orbit Badge */}
           <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto">
             <motion.div 
-              whileHover={{ scale: 1.08 }}
-              className="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center cursor-pointer group"
+              whileHover={{ scale: 1.06 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center cursor-pointer group"
             >
-              {/* Pulsing ambient glow */}
-              <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-blue-600/40 via-purple-600/40 to-indigo-500/30 blur-xl group-hover:blur-2xl transition-all duration-500" />
+              {/* Soft ambient glow */}
+              <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-blue-500/30 via-purple-500/20 to-indigo-400/20 blur-2xl opacity-80 group-hover:opacity-100 transition-opacity duration-700" />
 
-              {/* Rotating Circular Orbit Typography */}
+              {/* Rotating text orbit */}
               <motion.svg
                 animate={{ rotate: 360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-                className="w-full h-full text-white/80 drop-shadow-md"
+                transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+                className="w-full h-full"
                 viewBox="0 0 100 100"
               >
                 <path
-                  id="circlePath"
-                  d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
+                  id="orbitPath"
+                  d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"
                   fill="none"
                 />
-                <text className="text-[8.5px] uppercase tracking-widest font-black fill-white">
-                  <textPath href="#circlePath">
-                    • µLEARN GECI • INNOVATE • EMPOWER • BUILD •
+                <text className="text-[8px] uppercase tracking-[0.25em] font-bold fill-white/70">
+                  <textPath href="#orbitPath">
+                    µLEARN GECI · INNOVATE · EMPOWER · BUILD ·
                   </textPath>
                 </text>
               </motion.svg>
 
-              {/* Center Floating µLearn Gradient Logo */}
-              <div className="absolute inset-0 m-auto w-14 h-14 md:w-16 md:h-16 bg-white/10 dark:bg-gray-900/80 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center p-2.5 shadow-2xl group-hover:border-blue-400/60 transition-colors">
+              {/* Glassmorphic center with floating µ logo */}
+              <div className="absolute inset-0 m-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/[0.07] backdrop-blur-xl border border-white/20 shadow-[0_0_30px_rgba(99,102,241,0.15)] flex items-center justify-center p-2 group-hover:border-white/40 transition-all duration-500">
                 <motion.img
                   src="/mulearn-logo.png"
-                  alt="µLearn Logo"
-                  animate={{ 
-                    y: [-2, 2, -2],
-                    scale: [1, 1.05, 1],
-                    filter: [
-                      'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))',
-                      'drop-shadow(0 0 14px rgba(192, 49, 255, 0.7))',
-                      'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))'
-                    ]
-                  }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-full h-full object-contain"
+                  alt="µLearn"
+                  animate={{ y: [-1.5, 1.5, -1.5] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-full h-full object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]"
                 />
               </div>
             </motion.div>
