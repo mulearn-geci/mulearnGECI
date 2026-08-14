@@ -336,13 +336,20 @@ export function Home() {
             </motion.div>
           </motion.div>
 
-          <div className="absolute bottom-8 right-6 md:bottom-12 md:right-16 z-30 pointer-events-auto">
-            <div className="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center">
-              {/* Rotating Ring Text */}
+          {/* Bottom Right Animated µLearn Rotating Orbit & Floating Logo */}
+          <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto">
+            <motion.div 
+              whileHover={{ scale: 1.08 }}
+              className="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center cursor-pointer group"
+            >
+              {/* Pulsing ambient glow */}
+              <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-blue-600/40 via-purple-600/40 to-indigo-500/30 blur-xl group-hover:blur-2xl transition-all duration-500" />
+
+              {/* Rotating Circular Orbit Typography */}
               <motion.svg
                 animate={{ rotate: 360 }}
                 transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-                className="w-full h-full text-white/80"
+                className="w-full h-full text-white/80 drop-shadow-md"
                 viewBox="0 0 100 100"
               >
                 <path
@@ -350,39 +357,32 @@ export function Home() {
                   d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
                   fill="none"
                 />
-                <text className="text-[9px] uppercase tracking-widest font-extrabold fill-white/90">
+                <text className="text-[8.5px] uppercase tracking-widest font-black fill-white">
                   <textPath href="#circlePath">
-                    • µLEARN GECI • LEARN • BUILD • SHIP
+                    • µLEARN GECI • INNOVATE • EMPOWER • BUILD •
                   </textPath>
                 </text>
               </motion.svg>
 
-              {/* Glowing Interactive µLearn Logo Center Orb */}
-              <motion.div
-                animate={{ 
-                  scale: [1, 1.06, 1],
-                  boxShadow: [
-                    '0 0 20px rgba(99, 102, 241, 0.35)',
-                    '0 0 35px rgba(168, 85, 247, 0.55)',
-                    '0 0 20px rgba(99, 102, 241, 0.35)'
-                  ]
-                }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: 'easeInOut' 
-                }}
-                className="absolute inset-0 m-auto w-14 h-14 md:w-16 md:h-16 bg-white/10 dark:bg-gray-900/80 backdrop-blur-xl border border-white/40 dark:border-white/20 rounded-full flex items-center justify-center group cursor-pointer"
-              >
-                <motion.img 
-                  src="/mulearn-logo.png" 
-                  alt="µLearn Logo" 
-                  whileHover={{ scale: 1.15, rotate: 10 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                  className="w-9 h-9 md:w-10 md:h-10 object-contain drop-shadow-[0_2px_8px_rgba(99,102,241,0.5)]" 
+              {/* Center Floating µLearn Gradient Logo */}
+              <div className="absolute inset-0 m-auto w-14 h-14 md:w-16 md:h-16 bg-white/10 dark:bg-gray-900/80 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center p-2.5 shadow-2xl group-hover:border-blue-400/60 transition-colors">
+                <motion.img
+                  src="/mulearn-logo.png"
+                  alt="µLearn Logo"
+                  animate={{ 
+                    y: [-2, 2, -2],
+                    scale: [1, 1.05, 1],
+                    filter: [
+                      'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))',
+                      'drop-shadow(0 0 14px rgba(192, 49, 255, 0.7))',
+                      'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))'
+                    ]
+                  }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-full h-full object-contain"
                 />
-              </motion.div>
-            </div>
+              </div>
+            </motion.div>
           </div>
         </section>
 
