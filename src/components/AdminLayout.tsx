@@ -18,6 +18,7 @@ import DarkModeToggle from './DarkModeToggle';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title?: string;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {

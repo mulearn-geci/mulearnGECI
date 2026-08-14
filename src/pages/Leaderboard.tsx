@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Trophy, Sparkles, Search, Filter, Flame, Zap, Award, 
-  Crown, GraduationCap, Users, BookOpen, ChevronRight, 
-  ArrowUpRight, Star, ShieldCheck, LayoutGrid, List, Activity, X
+  Sparkles, Search, Zap, 
+  Crown, Users, LayoutGrid, List, Activity, X
 } from 'lucide-react';
 import { leaderboardAPI } from '../services/api';
 
@@ -109,7 +108,7 @@ export function Leaderboard() {
     return [...members].sort((a, b) => (b?.karma || 0) - (a?.karma || 0));
   }, [members]);
 
-  const maxKarma = sortedMembers[0]?.karma || 1;
+
 
   // Separate active campus members vs alumni members
   const activeMembersList = useMemo(() => {
@@ -302,7 +301,13 @@ export function Leaderboard() {
 
       {/* ─── Main Content Area ─────────────────────────────────────────── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {filteredMembers.length === 0 ? (
+        {loading && members.length === 0 ? (
+          <div className="text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3" />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Loading Live Climbers...</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Connecting to live campus karma rankings...</p>
+          </div>
+        ) : filteredMembers.length === 0 ? (
           <div className="text-center py-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm">
             <Users className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">No Climbers Found</h3>

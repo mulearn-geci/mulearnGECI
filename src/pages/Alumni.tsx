@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, Linkedin, Github, Mail, Instagram,
-  Briefcase, GraduationCap, Award, Building2,
+  Search, Linkedin, Github, Mail, Instagram, GraduationCap, Award, Building2,
   Filter, ChevronDown, Check, Sparkles,
   Globe, TrendingUp, HeartHandshake, Rocket, Loader2
 } from 'lucide-react';

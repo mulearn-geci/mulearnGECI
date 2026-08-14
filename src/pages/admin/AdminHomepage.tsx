@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { 
-  Sparkles, Plus, Trash2, Edit3, Save, RefreshCw, CheckCircle, 
-  Image as ImageIcon, Layers, Users, Layout, ArrowRight, ExternalLink,
+  Sparkles, Plus, Trash2, Save, RefreshCw, CheckCircle, Layers, Users, Layout, ExternalLink,
   Upload, X, Info
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';

@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Target, Eye, Heart, Users, Award, Rocket } from 'lucide-react';
+import { Target, Eye, Heart, Users, Award } from 'lucide-react';
 const Group = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop';
 
 export function About() {

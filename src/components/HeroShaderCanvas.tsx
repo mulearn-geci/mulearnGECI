@@ -165,7 +165,7 @@ export const HeroShaderCanvas: React.FC = () => {
     const timeLocation = gl.getUniformLocation(program, 'u_time');
 
     let animationFrameId: number;
-    let startTime = performance.now();
+    const startTime = performance.now();
     let isVisible = true;
 
     const resize = () => {

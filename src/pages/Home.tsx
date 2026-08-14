@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpRight, Trophy, Calendar, Users, GraduationCap, ChevronDown, 
   ArrowUp, Sparkles, Star, Code2, ShieldCheck, Smartphone, Palette,
-  Gamepad2, Rocket, Video, BookOpen, User
+  Gamepad2, Rocket, BookOpen, User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { HeroShaderCanvas } from '../components/HeroShaderCanvas';

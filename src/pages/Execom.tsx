@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Award, Target, Linkedin, Mail, Github, Instagram, Phone, Code2, Loader2 } from 'lucide-react';
+import { Users, Award, Target, Linkedin, Mail, Github, Instagram, Code2, Loader2 } from 'lucide-react';
 import { execomAPI } from '../services/api';
 import { getImageUrl, extractGoogleDriveFileId } from '../utils/imageUtils';
 

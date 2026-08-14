@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { Mail, Phone, MapPin, Send, MessageCircle, Users, Calendar } from 'lucide-react';
 import { contactAPI } from '../services/api';
-import { a } from 'framer-motion/client';
+
 
 interface ContactFormData {
   name: string;
@@ -224,7 +224,7 @@ export function Contact() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Contact Information</h2>
                 <div className="space-y-6">
-                  {contactInfo.map((info, index) => (
+                  {contactInfo.map((info) => (
                     <div key={info.title} className="flex items-start space-x-4">
                       <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
                         <info.icon className="h-6 w-6 text-blue-600 dark:text-blue-300" />

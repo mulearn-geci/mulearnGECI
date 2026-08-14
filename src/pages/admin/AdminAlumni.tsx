@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Search, Upload, Link as LinkIcon, X, Loader2, GripVertical, Check, GraduationCap } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Upload, Link as LinkIcon, X, Loader2, GripVertical, Check } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { alumniAPI } from '../../services/api';
