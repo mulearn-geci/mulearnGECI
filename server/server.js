@@ -74,7 +74,8 @@ app.use('/api', limiter);
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://mulearngeci.vercel.app'
+  'https://mulearngeci.vercel.app',
+  'https://mulearn-geci-mu.vercel.app'
 ];
 
 app.use(cors({
