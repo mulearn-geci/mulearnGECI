@@ -31,14 +31,18 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-1.5 flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform duration-300">
-                <img src="/mulearn-logo.png" alt="µLearn Logo" className="w-full h-full object-contain filter drop-shadow" />
-              </div>
-              <div className="flex items-center space-x-1.5">
-                <span className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">µLearn</span>
-                <span className="text-xs font-black uppercase px-2 py-0.5 bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-400 rounded-md tracking-wider">GECI</span>
-              </div>
+            <Link to="/" className="flex items-center group">
+              <img
+                src="/mulearn-logo.png"
+                alt="µ"
+                className="h-8 sm:h-9 w-auto object-contain mr-0.5 group-hover:scale-105 transition-transform"
+              />
+              <span className="text-2xl font-black tracking-tight text-blue-600 dark:text-blue-400">
+                Learn
+              </span>
+              <span className="text-2xl font-extrabold text-gray-900 dark:text-white ml-2 tracking-tight">
+                GECI
+              </span>
             </Link>
 
             {/* Desktop Navigation */}
