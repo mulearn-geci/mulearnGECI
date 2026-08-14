@@ -279,10 +279,10 @@ export function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-8 text-xs font-semibold uppercase tracking-widest text-blue-300 shadow-xl"
+              className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-8 text-xs font-semibold tracking-wider text-blue-300 shadow-xl"
             >
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>🚀 µLearn GECI • Learn. Build. Level Up.</span>
+              <span>🚀 µLearn GECI • Learn • Build • Level Up</span>
             </motion.div>
 
             <motion.h1
@@ -358,9 +358,9 @@ export function Home() {
                   d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"
                   fill="none"
                 />
-                <text className="text-[8px] uppercase tracking-[0.25em] font-bold fill-white/70">
+                <text className="text-[7.5px] font-bold tracking-[0.14em] fill-white/80">
                   <textPath href="#orbitPath">
-                    µLEARN GECI · INNOVATE · EMPOWER · BUILD ·
+                    µLEARN GECI • INNOVATE • EMPOWER • BUILD •
                   </textPath>
                 </text>
               </motion.svg>
