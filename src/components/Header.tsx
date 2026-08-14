@@ -31,11 +31,15 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 px-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg ">µLearn</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">GECI</span>
+            <Link to="/" className="flex items-center space-x-2.5 group">
+              <img
+                src="/mulearn-logo.png"
+                alt="µLearn Logo"
+                className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
+                µLearn <span className="text-gray-900 dark:text-white font-bold">GECI</span>
+              </span>
             </Link>
 
             {/* Desktop Navigation */}

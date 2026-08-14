@@ -336,12 +336,13 @@ export function Home() {
             </motion.div>
           </motion.div>
 
-          <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto">
-            <div className="relative w-28 h-28 md:w-36 md:h-36 flex items-center justify-center">
+          <div className="absolute bottom-8 right-6 md:bottom-12 md:right-16 z-30 pointer-events-auto">
+            <div className="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center">
+              {/* Rotating Ring Text */}
               <motion.svg
                 animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                className="w-full h-full text-white/70"
+                transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                className="w-full h-full text-white/80"
                 viewBox="0 0 100 100"
               >
                 <path
@@ -349,16 +350,38 @@ export function Home() {
                   d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
                   fill="none"
                 />
-                <text className="text-[9.5px] uppercase tracking-widest font-semibold fill-white">
+                <text className="text-[9px] uppercase tracking-widest font-extrabold fill-white/90">
                   <textPath href="#circlePath">
-                    µLEARN GECI • INNOVATE • EMPOWER •
+                    • µLEARN GECI • LEARN • BUILD • SHIP
                   </textPath>
                 </text>
               </motion.svg>
 
-              <div className="absolute inset-0 m-auto w-10 h-10 md:w-12 md:h-12 bg-white/10 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-amber-400 shadow-xl">
-                <Star className="w-5 h-5 fill-amber-400" />
-              </div>
+              {/* Glowing Interactive µLearn Logo Center Orb */}
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.06, 1],
+                  boxShadow: [
+                    '0 0 20px rgba(99, 102, 241, 0.35)',
+                    '0 0 35px rgba(168, 85, 247, 0.55)',
+                    '0 0 20px rgba(99, 102, 241, 0.35)'
+                  ]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: 'easeInOut' 
+                }}
+                className="absolute inset-0 m-auto w-14 h-14 md:w-16 md:h-16 bg-white/10 dark:bg-gray-900/80 backdrop-blur-xl border border-white/40 dark:border-white/20 rounded-full flex items-center justify-center group cursor-pointer"
+              >
+                <motion.img 
+                  src="/mulearn-logo.png" 
+                  alt="µLearn Logo" 
+                  whileHover={{ scale: 1.15, rotate: 10 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="w-9 h-9 md:w-10 md:h-10 object-contain drop-shadow-[0_2px_8px_rgba(99,102,241,0.5)]" 
+                />
+              </motion.div>
             </div>
           </div>
         </section>
