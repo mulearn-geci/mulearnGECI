@@ -204,7 +204,7 @@ export const StackedProjectCards: React.FC = () => {
         </div>
 
         {/* ── Stacked Cards Container ─────────────────────── */}
-        <div className="relative h-[420px] md:h-[580px] w-full flex items-center justify-center">
+        <div className="relative min-h-[440px] sm:min-h-[480px] md:min-h-[520px] lg:min-h-[560px] w-full flex items-center justify-center">
           <AnimatePresence mode="popLayout">
             {cards.slice(0, isMobile ? 1 : 3).map((card, index) => {
               const isFront = index === 0;
@@ -213,7 +213,7 @@ export const StackedProjectCards: React.FC = () => {
               const zIndex = 30 - index * 10;
 
               return (
-                  <motion.div
+                <motion.div
                   key={card.id}
                   {...(!isMobile && { layout: true })}
                   initial={{ scale: 0.9, y: 50, opacity: 0 }}
@@ -232,61 +232,61 @@ export const StackedProjectCards: React.FC = () => {
                   drag={isFront && !isMobile ? 'x' : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={isFront && !isMobile ? handleDragEnd : undefined}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[380px] md:h-[520px] rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
+                  className={`absolute inset-x-0 mx-auto max-w-[1200px] w-full min-h-[400px] sm:min-h-[440px] md:min-h-[480px] lg:h-[500px] rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
                     isFront
                       ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing'
                       : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/60 cursor-pointer'
                   }`}
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-4 md:gap-8 items-center">
+                  <div className="grid grid-cols-1 md:grid-cols-12 h-full w-full gap-4 sm:gap-6 md:gap-8 items-center">
                     
                     {/* ─ Left Half: Content ─────────────── */}
-                    <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
+                    <div className="md:col-span-6 flex flex-col justify-between h-full w-full py-1 md:py-2">
                       <div>
                         {/* Number Badge & Meta Tag */}
-                        <div className="flex items-center space-x-3 md:space-x-4 mb-3 md:mb-6">
-                          <div className="w-9 h-9 md:w-12 md:h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-xs md:text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
+                        <div className="flex items-center space-x-3 md:space-x-4 mb-2 sm:mb-3 md:mb-6">
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-12 md:h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-xs md:text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
                             {card.number}
                           </div>
-                          <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
+                          <span className="text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
                             {card.meta}
                           </span>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-display text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4 leading-tight">
+                        <h3 className="font-display text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4 leading-tight">
                           {card.title}
                         </h3>
 
                         {/* Description */}
-                        <p className="text-gray-600 dark:text-gray-300 text-xs md:text-base leading-relaxed line-clamp-2 md:line-clamp-3">
+                        <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed line-clamp-2 md:line-clamp-3">
                           {card.description}
                         </p>
                       </div>
 
                       {/* ── CTA Button (vibrant gradient) ─ */}
-                      <div className="pt-3 md:pt-6">
+                      <div className="pt-2 sm:pt-3 md:pt-6">
                         <Link
                           to={card.link}
-                          className="inline-flex items-center space-x-2 md:space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-5 py-2.5 md:px-8 md:py-4 rounded-full font-bold text-xs md:text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
+                          className="inline-flex items-center space-x-2 md:space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-4 py-2 sm:px-5 sm:py-2.5 md:px-8 md:py-4 rounded-full font-bold text-xs md:text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
                         >
                           <span className="tracking-wide">{card.ctaText || 'Explore'}</span>
-                          <ArrowRight className="w-4 h-4 group-hover/cta:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/cta:translate-x-1 transition-transform" />
                         </Link>
                       </div>
                     </div>
 
                     {/* ─ Right Half: Image & Glass Shapes ─ */}
-                    <div className="lg:col-span-6 relative h-[140px] sm:h-[200px] md:h-full rounded-2xl overflow-hidden group/img">
+                    <div className="md:col-span-6 relative w-full aspect-[16/10] sm:aspect-video md:aspect-auto md:h-full min-h-[130px] sm:min-h-[180px] md:min-h-[240px] rounded-2xl overflow-hidden group/img">
                       <img
                         src={getImageUrl(card.image) || PROJECTS[(parseInt(card.number) - 1) % PROJECTS.length]?.image}
                         alt={card.title}
-                        className="w-full h-full object-cover rounded-2xl group-hover/img:scale-105 transition-transform duration-700"
+                        className="w-full h-full object-cover object-center rounded-2xl group-hover/img:scale-105 transition-transform duration-700"
                       />
 
                       {/* Clean Sparkles badge on top-left of image */}
-                      <div className="absolute top-4 left-4 w-9 h-9 rounded-xl backdrop-blur-md bg-black/40 border border-white/20 shadow-lg flex items-center justify-center pointer-events-none">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
+                      <div className="absolute top-3 left-3 md:top-4 md:left-4 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-xl backdrop-blur-md bg-black/40 border border-white/20 shadow-lg flex items-center justify-center pointer-events-none">
+                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
                       </div>
                     </div>
 
