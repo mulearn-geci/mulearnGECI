@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -62,6 +62,9 @@ const PROJECTS: ProjectCard[] = [
 export const StackedProjectCards: React.FC = () => {
   const [allCards, setAllCards] = useState<ProjectCard[]>(PROJECTS);
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
+
+  // Mobile detection for disabling expensive animations
+  const isMobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, []);
 
   useEffect(() => {
     const applyCardsFromObj = (cardsArr: any[]) => {
@@ -172,7 +175,7 @@ export const StackedProjectCards: React.FC = () => {
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Featured Initiatives</span>
             </div>
-            <h2 className="font-display text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
               Latest Projects & Labs
             </h2>
           </div>
@@ -201,19 +204,18 @@ export const StackedProjectCards: React.FC = () => {
         </div>
 
         {/* ── Stacked Cards Container ─────────────────────── */}
-        <div className="relative h-[650px] md:h-[580px] w-full flex items-center justify-center">
+        <div className="relative h-[420px] md:h-[580px] w-full flex items-center justify-center">
           <AnimatePresence mode="popLayout">
-            {cards.slice(0, 3).map((card, index) => {
+            {cards.slice(0, isMobile ? 1 : 3).map((card, index) => {
               const isFront = index === 0;
-              // Stack: cards behind move up and scale down
               const yOffset = -index * 28;
               const scale = 1 - index * 0.05;
               const zIndex = 30 - index * 10;
 
               return (
-                <motion.div
+                  <motion.div
                   key={card.id}
-                  layout
+                  {...(!isMobile && { layout: true })}
                   initial={{ scale: 0.9, y: 50, opacity: 0 }}
                   animate={{
                     scale,
@@ -223,14 +225,14 @@ export const StackedProjectCards: React.FC = () => {
                   }}
                   exit={{ scale: 0.8, y: -100, opacity: 0 }}
                   transition={{
-                    duration: 0.6,
+                    duration: isMobile ? 0.35 : 0.6,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                   onClick={() => bringToFront(index)}
-                  drag={isFront ? 'x' : false}
+                  drag={isFront && !isMobile ? 'x' : false}
                   dragConstraints={{ left: 0, right: 0 }}
-                  onDragEnd={isFront ? handleDragEnd : undefined}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[580px] md:h-[520px] rounded-3xl p-6 md:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
+                  onDragEnd={isFront && !isMobile ? handleDragEnd : undefined}
+                  className={`absolute inset-x-0 mx-auto max-w-[1200px] h-[380px] md:h-[520px] rounded-3xl p-4 sm:p-6 md:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
                     isFront
                       ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing'
                       : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/60 cursor-pointer'
@@ -252,7 +254,7 @@ export const StackedProjectCards: React.FC = () => {
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-display text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
+                        <h3 className="font-display text-xl sm:text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4 leading-tight">
                           {card.title}
                         </h3>
 
@@ -275,7 +277,7 @@ export const StackedProjectCards: React.FC = () => {
                     </div>
 
                     {/* ─ Right Half: Image & Glass Shapes ─ */}
-                    <div className="lg:col-span-6 relative h-[240px] md:h-full rounded-2xl overflow-hidden group/img">
+                    <div className="lg:col-span-6 relative h-[140px] sm:h-[200px] md:h-full rounded-2xl overflow-hidden group/img">
                       <img
                         src={getImageUrl(card.image) || PROJECTS[(parseInt(card.number) - 1) % PROJECTS.length]?.image}
                         alt={card.title}

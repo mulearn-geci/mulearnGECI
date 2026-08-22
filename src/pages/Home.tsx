@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpRight, Trophy, Calendar, Users, GraduationCap, ChevronDown, 
@@ -249,14 +249,17 @@ export function Home() {
     };
   }, []);
 
+  // Mobile detection for animation strategy
+  const isMobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, []);
+
   // Element Refs
   const heroRef = useRef<HTMLDivElement>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  // Parallax transform for Hero Section
+  // Parallax transform for Hero Section — disabled on mobile for performance
   const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 1000], [0, 250]);
+  const heroY = useTransform(scrollY, [0, 1000], [0, isMobile ? 0 : 250]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -273,7 +276,7 @@ export function Home() {
 
           <motion.div
             style={{ y: heroY }}
-            className="relative z-20 max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 w-full flex flex-col items-start justify-center pt-16"
+            className="relative z-20 max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 lg:px-24 w-full flex flex-col items-start justify-center pt-8 sm:pt-16"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -289,7 +292,7 @@ export function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="font-display text-5xl sm:text-7xl md:text-[92px] lg:text-[104px] font-bold text-white leading-[1.08] tracking-tight mb-8"
+              className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-[92px] xl:text-[104px] font-bold text-white leading-[1.08] tracking-tight mb-5 sm:mb-8"
             >
               Where Curiosity Meets <br className="hidden sm:block" />
               Real-World Innovatio
@@ -299,7 +302,7 @@ export function Home() {
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ duration: 1.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute top-1/2 left-full -translate-y-1/2 ml-2 w-[100px] sm:w-[220px] md:w-[380px] lg:w-[450px] h-2.5 bg-white rounded-r-full shadow-lg origin-left"
+                  className="absolute top-1/2 left-full -translate-y-1/2 ml-1.5 w-[50px] sm:w-[100px] md:w-[220px] lg:w-[380px] xl:w-[450px] h-1.5 sm:h-2.5 bg-white rounded-r-full shadow-lg origin-left"
                 />
               </span>
             </motion.h1>
@@ -308,7 +311,7 @@ export function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-gray-300 text-base md:text-xl max-w-2xl leading-relaxed mb-10"
+              className="text-gray-300 text-sm sm:text-base md:text-xl max-w-2xl leading-relaxed mb-6 sm:mb-10"
             >
               Join GEC Idukki's premier student-led tech community. Master cutting-edge technologies, build verified proof-of-work, and climb the live campus leaderboard together.
             </motion.p>
@@ -317,11 +320,11 @@ export function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="flex flex-wrap gap-4 items-center"
+              className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-stretch sm:items-center"
             >
               <Link
                 to="/leaderboard"
-                className="bg-white hover:bg-blue-500 text-gray-900 hover:text-white px-8 py-4 rounded-full font-bold text-sm md:text-base transition-all duration-300 shadow-2xl flex items-center space-x-3 group"
+                className="bg-white hover:bg-blue-500 text-gray-900 hover:text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold text-sm md:text-base transition-all duration-300 shadow-2xl flex items-center justify-center space-x-3 group"
               >
                 <span>View Live Leaderboard</span>
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -329,7 +332,7 @@ export function Home() {
 
               <Link
                 to="/events"
-                className="border border-white/30 hover:border-white text-white px-8 py-4 rounded-full font-semibold text-sm md:text-base backdrop-blur-sm transition-all duration-300 hover:bg-white/10"
+                className="border border-white/30 hover:border-white text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-sm md:text-base transition-all duration-300 hover:bg-white/10 text-center"
               >
                 Explore Events
               </Link>
@@ -337,7 +340,7 @@ export function Home() {
           </motion.div>
 
           {/* Bottom Right — µLearn Orbit Badge */}
-          <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto">
+          <div className="absolute bottom-10 right-8 md:right-16 z-30 pointer-events-auto hidden md:block">
             <motion.div 
               whileHover={{ scale: 1.06 }}
               transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -387,7 +390,7 @@ export function Home() {
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
                 Discover µLearn GECI • Campus Ecosystem
               </span>
-              <h2 className="font-display text-4xl md:text-6xl font-bold leading-tight">
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold leading-tight">
                 Empowering GECI Engineers to Learn, Build & Lead
               </h2>
             </div>
@@ -447,7 +450,7 @@ export function Home() {
                   {aboutContent.tagline}
                 </span>
 
-                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                <h2 className="font-display text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold leading-tight">
                   {aboutContent.headline}
                 </h2>
 
@@ -475,7 +478,7 @@ export function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8 }}
-                  className="sm:col-span-1 h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
+                  className="sm:col-span-1 h-[280px] md:h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                 >
                   <img
                     src={getImageUrl(aboutContent.photo1) || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop'}
@@ -491,7 +494,7 @@ export function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="h-[220px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
+                    className="h-[160px] md:h-[220px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
                       src={getImageUrl(aboutContent.photo2) || 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop'}
@@ -505,7 +508,7 @@ export function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.4 }}
-                    className="h-[260px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
+                    className="h-[180px] md:h-[260px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
                       src={getImageUrl(aboutContent.photo3) || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop'}
@@ -530,7 +533,7 @@ export function Home() {
             <motion.div
               animate={{ x: ['0%', '-50%'] }}
               transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-              className="flex whitespace-nowrap text-5xl md:text-7xl font-display font-extrabold uppercase tracking-tight text-transparent text-stroke-dark dark:text-stroke-white space-x-8"
+              className="flex whitespace-nowrap text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-extrabold uppercase tracking-tight text-transparent text-stroke-dark dark:text-stroke-white space-x-8"
             >
               <span>MEET THE EXECOM TEAM - </span>
               <span>INNOVATORS & LEADERS - </span>
@@ -550,7 +553,7 @@ export function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.2 }}
-                  className="group relative h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-8 hover:border-blue-500 transition-all duration-300"
+                  className="group relative h-[320px] md:h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-6 md:p-8 hover:border-blue-500 transition-all duration-300"
                 >
                   {member.image ? (
                     <img
@@ -606,7 +609,7 @@ export function Home() {
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
                 Campus Interest Groups & Teams
               </span>
-              <h2 className="font-display text-4xl md:text-6xl font-bold mb-4 leading-tight">
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold mb-4 leading-tight">
                 Active Interest Groups (IGs)
               </h2>
               <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
@@ -722,7 +725,7 @@ export function Home() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-500 mb-4 block">
                   Start Building Today
                 </span>
-                <h2 className="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-tight">
+                <h2 className="font-display text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
                   Let's shape <br />
                   something new.
                 </h2>

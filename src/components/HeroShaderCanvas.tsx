@@ -170,7 +170,8 @@ export const HeroShaderCanvas: React.FC = () => {
 
     const resize = () => {
       if (!canvas) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const isMobile = window.innerWidth < 768;
+      const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 2);
       const width = canvas.parentElement?.clientWidth || window.innerWidth;
       const height = canvas.parentElement?.clientHeight || window.innerHeight;
 

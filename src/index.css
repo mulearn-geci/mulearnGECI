@@ -35,3 +35,28 @@ html.dark {
     -webkit-text-stroke: 1.5px rgba(15, 23, 42, 0.3);
   }
 }
+
+/* ── Mobile Performance Overrides (< 768px) ────────────── */
+@media (max-width: 768px) {
+  /* Disable expensive backdrop-blur on mobile GPUs */
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .backdrop-blur-xl {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  /* Smooth momentum scrolling on iOS */
+  html, body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Promote animated containers to GPU layer */
+  [data-motion],
+  .will-change-transform {
+    will-change: transform, opacity;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
