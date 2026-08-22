@@ -266,10 +266,10 @@ export function Home() {
   };
 
   return (
-    <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white">
+    <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden">
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
-        <section ref={heroRef} className="relative h-screen min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
+        <section ref={heroRef} className="relative h-screen min-h-[600px] md:min-h-[700px] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
           <HeroShaderCanvas />
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0d0d0d] z-10 pointer-events-none" />
@@ -383,10 +383,10 @@ export function Home() {
         </section>
 
         {/* ─── 4.2 Website Pages & Navigation Section ─────────────────────── */}
-        <section className="py-24 md:py-32 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+        <section className="py-12 md:py-32 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
-            <div className="mb-20">
+            <div className="mb-10 md:mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
                 Discover µLearn GECI • Campus Ecosystem
               </span>
@@ -395,17 +395,17 @@ export function Home() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
               {WEBSITE_PAGES.map((page, index) => {
                 const IconComp = page.icon;
                 return (
                   <motion.div
                     key={page.title}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, ...(isMobile ? {} : { y: 30 }) }}
+                    whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.15 }}
-                    className="p-8 rounded-2xl bg-slate-50 dark:bg-gray-800 border border-slate-200 dark:border-gray-700/60 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                    transition={{ duration: isMobile ? 0.3 : 0.6, delay: isMobile ? 0 : index * 0.15 }}
+                    className="p-5 md:p-8 rounded-2xl bg-slate-50 dark:bg-gray-800 border border-slate-200 dark:border-gray-700/60 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-600/20">
@@ -440,10 +440,10 @@ export function Home() {
         <StackedProjectCards />
 
         {/* ─── 4.4 About Section (Masonry Parallax) ────────────────────────── */}
-        <section ref={masonryRef} className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
+        <section ref={masonryRef} className="py-12 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
               
               <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6">
                 <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 block">
@@ -474,10 +474,10 @@ export function Home() {
               <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                 
                 <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, ...(isMobile ? {} : { y: 40 }) }}
+                  whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
+                  transition={{ duration: isMobile ? 0.3 : 0.8 }}
                   className="sm:col-span-1 h-[280px] md:h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                 >
                   <img
@@ -490,10 +490,10 @@ export function Home() {
                 <div className="sm:col-span-1 space-y-6">
                   
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, ...(isMobile ? {} : { y: 20 }) }}
+                    whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
+                    transition={{ duration: isMobile ? 0.3 : 0.8, delay: isMobile ? 0 : 0.2 }}
                     className="h-[160px] md:h-[220px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
@@ -504,10 +504,10 @@ export function Home() {
                   </motion.div>
 
                   <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, ...(isMobile ? {} : { y: 40 }) }}
+                    whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
+                    transition={{ duration: isMobile ? 0.3 : 0.8, delay: isMobile ? 0 : 0.4 }}
                     className="h-[180px] md:h-[260px] rounded-3xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800"
                   >
                     <img
@@ -527,9 +527,9 @@ export function Home() {
         </section>
 
         {/* ─── 4.5 Team Banner & Reserved Execom Member Slots ─────────────── */}
-        <section className="py-24 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
+        <section className="py-12 md:py-24 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300 overflow-hidden">
           
-          <div className="mb-20 overflow-hidden border-y border-gray-200 dark:border-gray-800 py-6 bg-gray-50 dark:bg-gray-950">
+          <div className="mb-10 md:mb-20 overflow-hidden border-y border-gray-200 dark:border-gray-800 py-4 md:py-6 bg-gray-50 dark:bg-gray-950">
             <motion.div
               animate={{ x: ['0%', '-50%'] }}
               transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
@@ -545,15 +545,15 @@ export function Home() {
           </div>
 
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
               {execomMembers.map((member, index) => (
                 <motion.div
                   key={member.name + index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, ...(isMobile ? {} : { y: 30 }) }}
+                  whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.2 }}
-                  className="group relative h-[320px] md:h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-6 md:p-8 hover:border-blue-500 transition-all duration-300"
+                  transition={{ duration: isMobile ? 0.3 : 0.6, delay: isMobile ? 0 : index * 0.2 }}
+                  className="group relative h-[280px] md:h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-5 md:p-8 hover:border-blue-500 transition-all duration-300"
                 >
                   {member.image ? (
                     <img
@@ -602,10 +602,10 @@ export function Home() {
         </section>
 
         {/* ─── 4.6 Official Active Interest Groups (IGs) & Teams ───────────── */}
-        <section className="py-24 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
+        <section className="py-12 md:py-32 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
             
-            <div className="text-center max-w-3xl mx-auto mb-20">
+            <div className="text-center max-w-3xl mx-auto mb-10 md:mb-20">
               <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3 block">
                 Campus Interest Groups & Teams
               </span>
@@ -618,17 +618,17 @@ export function Home() {
             </div>
 
             {/* Active Interest Groups Grid (All link to /events) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-32">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-32">
               {interestGroups.map((ig, index) => {
                 const IconComp = ig.icon;
                 return (
                   <motion.div
                     key={ig.title}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, ...(isMobile ? {} : { y: 30 }) }}
+                    whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.08 }}
-                    className="p-7 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                    transition={{ duration: isMobile ? 0.25 : 0.5, delay: isMobile ? 0 : index * 0.08 }}
+                    className="p-5 md:p-7 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-5">
@@ -711,12 +711,12 @@ export function Home() {
         </section>
 
         {/* ─── 4.7 Footer Parallax Reveal Section ─────────────────────────── */}
-        <footer ref={footerRef} className="relative bg-black text-white py-24 md:py-32 overflow-hidden border-t border-gray-900 z-10">
+        <footer ref={footerRef} className="relative bg-black text-white py-12 md:py-32 overflow-hidden border-t border-gray-900 z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, ...(isMobile ? {} : { y: 30 }) }}
+            whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: isMobile ? 0.3 : 0.8 }}
             className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24"
           >
             <div className="flex flex-col md:flex-row md:items-end justify-between pb-16 border-b border-gray-800 gap-8">

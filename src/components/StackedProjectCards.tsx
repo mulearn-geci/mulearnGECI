@@ -165,11 +165,11 @@ export const StackedProjectCards: React.FC = () => {
   /* ── Render ──────────────────────────────────────────────── */
 
   return (
-    <section className="py-24 md:py-32 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
+    <section className="py-12 md:py-32 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
         
         {/* ── Section Header ──────────────────────────────── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-16 gap-4 md:gap-6">
           <div>
             <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400 mb-3">
               <Sparkles className="w-4 h-4 text-amber-500" />
@@ -238,14 +238,14 @@ export const StackedProjectCards: React.FC = () => {
                       : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/60 cursor-pointer'
                   }`}
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-8 items-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 h-full gap-4 md:gap-8 items-center">
                     
                     {/* ─ Left Half: Content ─────────────── */}
                     <div className="lg:col-span-6 flex flex-col justify-between h-full py-2">
                       <div>
                         {/* Number Badge & Meta Tag */}
-                        <div className="flex items-center space-x-4 mb-6">
-                          <div className="w-12 h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
+                        <div className="flex items-center space-x-3 md:space-x-4 mb-3 md:mb-6">
+                          <div className="w-9 h-9 md:w-12 md:h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-xs md:text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
                             {card.number}
                           </div>
                           <span className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
@@ -259,16 +259,16 @@ export const StackedProjectCards: React.FC = () => {
                         </h3>
 
                         {/* Description */}
-                        <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed line-clamp-3">
+                        <p className="text-gray-600 dark:text-gray-300 text-xs md:text-base leading-relaxed line-clamp-2 md:line-clamp-3">
                           {card.description}
                         </p>
                       </div>
 
                       {/* ── CTA Button (vibrant gradient) ─ */}
-                      <div className="pt-6">
+                      <div className="pt-3 md:pt-6">
                         <Link
                           to={card.link}
-                          className="inline-flex items-center space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-8 py-4 rounded-full font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
+                          className="inline-flex items-center space-x-2 md:space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-5 py-2.5 md:px-8 md:py-4 rounded-full font-bold text-xs md:text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
                         >
                           <span className="tracking-wide">{card.ctaText || 'Explore'}</span>
                           <ArrowRight className="w-4 h-4 group-hover/cta:translate-x-1 transition-transform" />
