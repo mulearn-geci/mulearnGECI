@@ -270,7 +270,7 @@ export function Home() {
     <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden">
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
-        <section ref={heroRef} className="relative min-h-[80vh] sm:min-h-[85vh] md:min-h-[88vh] lg:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d] py-14 sm:py-16 md:py-24 lg:py-0">
+        <section ref={heroRef} className="relative min-h-[90vh] lg:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d] py-16 sm:py-20 md:py-28 lg:py-0">
           <HeroShaderCanvas />
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0d0d0d] z-10 pointer-events-none" />
@@ -283,7 +283,7 @@ export function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full mb-3 sm:mb-5 md:mb-6 text-xs font-semibold tracking-wider text-blue-300 shadow-xl"
+              className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm font-semibold tracking-wider text-blue-300 shadow-xl"
             >
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
               <span>🚀 µLearn GECI • Learn • Build • Level Up</span>
@@ -293,7 +293,7 @@ export function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[100px] font-bold text-white leading-[1.08] tracking-tight mb-4 sm:mb-6 md:mb-7"
+              className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[104px] 2xl:text-[112px] font-bold text-white leading-[1.04] tracking-tight mb-5 sm:mb-6 md:mb-8 max-w-5xl lg:max-w-6xl"
             >
               Where Curiosity Meets <br className="hidden sm:block" />
               Real-World Innovatio
@@ -303,7 +303,7 @@ export function Home() {
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ duration: 1.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute top-1/2 left-full -translate-y-1/2 ml-1.5 w-[35px] sm:w-[80px] md:w-[200px] lg:w-[350px] xl:w-[420px] max-w-[calc(100vw-280px)] h-1.5 sm:h-2.5 bg-white rounded-r-full shadow-lg origin-left"
+                  className="absolute top-1/2 left-full -translate-y-1/2 ml-2 w-[40px] sm:w-[100px] md:w-[220px] lg:w-[360px] xl:w-[440px] max-w-[calc(100vw-280px)] h-2 md:h-3 bg-white rounded-r-full shadow-lg origin-left"
                 />
               </span>
             </motion.h1>
@@ -312,7 +312,7 @@ export function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl leading-relaxed mb-6 sm:mb-8 md:mb-9"
+              className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl max-w-3xl leading-relaxed mb-6 sm:mb-8 md:mb-10 font-normal"
             >
               Join GEC Idukki's premier student-led tech community. Master cutting-edge technologies, build verified proof-of-work, and climb the live campus leaderboard together.
             </motion.p>
@@ -325,7 +325,7 @@ export function Home() {
             >
               <Link
                 to="/leaderboard"
-                className="bg-white hover:bg-blue-500 text-gray-900 hover:text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold text-sm md:text-base transition-all duration-300 shadow-2xl flex items-center justify-center space-x-3 group"
+                className="bg-white hover:bg-blue-500 text-gray-900 hover:text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-full font-bold text-sm md:text-base transition-all duration-300 shadow-2xl flex items-center justify-center space-x-3 group"
               >
                 <span>View Live Leaderboard</span>
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -333,7 +333,7 @@ export function Home() {
 
               <Link
                 to="/events"
-                className="border border-white/30 hover:border-white text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full font-semibold text-sm md:text-base transition-all duration-300 hover:bg-white/10 text-center"
+                className="border border-white/30 hover:border-white text-white px-7 py-3.5 sm:px-8 sm:py-4 rounded-full font-semibold text-sm md:text-base transition-all duration-300 hover:bg-white/10 text-center"
               >
                 Explore Events
               </Link>
@@ -396,7 +396,7 @@ export function Home() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8 items-stretch">
               {WEBSITE_PAGES.map((page, index) => {
                 const IconComp = page.icon;
                 return (
@@ -406,7 +406,7 @@ export function Home() {
                     whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                     viewport={{ once: true }}
                     transition={{ duration: isMobile ? 0.3 : 0.6, delay: isMobile ? 0 : index * 0.15 }}
-                    className="p-5 md:p-8 rounded-2xl bg-slate-50 dark:bg-gray-800 border border-slate-200 dark:border-gray-700/60 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                    className="h-full p-5 md:p-8 rounded-2xl bg-slate-50 dark:bg-gray-800 border border-slate-200 dark:border-gray-700/60 hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-600/20">
@@ -546,7 +546,7 @@ export function Home() {
           </div>
 
           <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8 items-stretch">
               {execomMembers.map((member, index) => (
                 <motion.div
                   key={member.name + index}
@@ -554,7 +554,7 @@ export function Home() {
                   whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                   viewport={{ once: true }}
                   transition={{ duration: isMobile ? 0.3 : 0.6, delay: isMobile ? 0 : index * 0.2 }}
-                  className="group relative h-[280px] md:h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-5 md:p-8 hover:border-blue-500 transition-all duration-300"
+                  className="group relative h-[320px] md:h-[420px] rounded-3xl overflow-hidden border border-dashed border-gray-300 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/80 shadow-xl flex flex-col justify-between p-6 md:p-8 hover:border-blue-500 transition-all duration-300"
                 >
                   {member.image ? (
                     <img
@@ -619,7 +619,7 @@ export function Home() {
             </div>
 
             {/* Active Interest Groups Grid (All link to /events) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-32">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-32 items-stretch">
               {interestGroups.map((ig, index) => {
                 const IconComp = ig.icon;
                 return (
@@ -629,7 +629,7 @@ export function Home() {
                     whileInView={{ opacity: 1, ...(isMobile ? {} : { y: 0 }) }}
                     viewport={{ once: true }}
                     transition={{ duration: isMobile ? 0.25 : 0.5, delay: isMobile ? 0 : index * 0.08 }}
-                    className="p-5 md:p-7 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                    className="h-full p-5 md:p-7 rounded-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:border-blue-500 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-5">

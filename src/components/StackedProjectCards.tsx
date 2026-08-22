@@ -204,7 +204,7 @@ export const StackedProjectCards: React.FC = () => {
         </div>
 
         {/* ── Stacked Cards Container ─────────────────────── */}
-        <div className="relative min-h-[380px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[480px] w-full flex items-center justify-center">
+        <div className="relative h-[440px] sm:h-[460px] md:h-[480px] lg:h-[500px] w-full flex items-center justify-center">
           <AnimatePresence mode="popLayout">
             {cards.slice(0, isMobile ? 1 : 3).map((card, index) => {
               const isFront = index === 0;
@@ -233,7 +233,7 @@ export const StackedProjectCards: React.FC = () => {
                   drag={isFront && !isMobile ? 'x' : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={isFront && !isMobile ? handleDragEnd : undefined}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] w-full min-h-[340px] sm:min-h-[380px] md:min-h-[420px] lg:h-[440px] rounded-3xl p-4 sm:p-6 md:p-8 lg:p-9 border shadow-2xl overflow-hidden transition-colors duration-300 ${
+                  className={`absolute inset-x-0 mx-auto max-w-[1200px] w-full h-[380px] sm:h-[400px] md:h-[440px] lg:h-[460px] rounded-3xl p-5 sm:p-6 md:p-8 lg:p-9 border shadow-2xl overflow-hidden transition-colors duration-300 ${
                     isFront
                       ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing'
                       : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/60 cursor-pointer'
@@ -278,7 +278,7 @@ export const StackedProjectCards: React.FC = () => {
                     </div>
 
                     {/* ─ Right Half: Image & Glass Shapes ─ */}
-                    <div className="md:col-span-6 lg:col-span-5 relative w-full h-[150px] sm:h-[180px] md:h-full min-h-[140px] md:min-h-[220px] rounded-2xl overflow-hidden group/img">
+                    <div className="md:col-span-6 lg:col-span-5 relative w-full h-[150px] sm:h-[180px] md:h-full rounded-2xl overflow-hidden group/img">
                       <img
                         src={getImageUrl(card.image) || PROJECTS[(parseInt(card.number) - 1) % PROJECTS.length]?.image}
                         alt={card.title}
