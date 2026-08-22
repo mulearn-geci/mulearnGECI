@@ -170,14 +170,29 @@ export const HeroShaderCanvas: React.FC = () => {
 
     const resize = () => {
       if (!canvas) return;
-      const isMobile = window.innerWidth < 768;
-      const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 2);
+      // Detect mobile/touch devices even when requesting 'Desktop Site'
+      const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      const isNarrow = typeof window !== 'undefined' && (window.innerWidth < 1024 || (window.screen && window.screen.width < 1024));
+      const isMobileDevice = isTouch || isNarrow;
+      
+      const dpr = isMobileDevice ? 1.0 : Math.min(window.devicePixelRatio || 1, 1.5);
       const width = canvas.parentElement?.clientWidth || window.innerWidth;
       const height = canvas.parentElement?.clientHeight || window.innerHeight;
 
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
+      // Cap max canvas internal buffer to prevent GPU overload on mobile in desktop mode
+      const maxDim = isMobileDevice ? 720 : 1280;
+      let targetW = Math.round(width * dpr);
+      let targetH = Math.round(height * dpr);
+
+      if (targetW > maxDim || targetH > maxDim) {
+        const scale = maxDim / Math.max(targetW, targetH);
+        targetW = Math.max(1, Math.round(targetW * scale));
+        targetH = Math.max(1, Math.round(targetH * scale));
+      }
+
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
         gl.viewport(0, 0, canvas.width, canvas.height);
       }
     };

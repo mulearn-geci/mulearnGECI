@@ -249,17 +249,18 @@ export function Home() {
     };
   }, []);
 
-  // Mobile detection for animation strategy
-  const isMobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, []);
+  // Mobile/touch detection for animation strategy
+  const isTouchDevice = useMemo(() => typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 768), []);
+  const isMobile = isTouchDevice;
 
   // Element Refs
   const heroRef = useRef<HTMLDivElement>(null);
   const masonryRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  // Parallax transform for Hero Section — disabled on mobile for performance
+  // Parallax transform for Hero Section — disabled on touch/mobile for performance
   const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 1000], [0, isMobile ? 0 : 250]);
+  const heroY = useTransform(scrollY, [0, 1000], [0, isTouchDevice ? 0 : 250]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -269,20 +270,20 @@ export function Home() {
     <div className="bg-[#0d0d0d] text-white font-sans selection:bg-blue-600 selection:text-white overflow-x-hidden">
         
         {/* ─── 4.1 Hero Section (100vh) ─────────────────────────────────────── */}
-        <section ref={heroRef} className="relative min-h-[100svh] w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d]">
+        <section ref={heroRef} className="relative min-h-[80vh] sm:min-h-[85vh] md:min-h-[88vh] lg:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0d0d0d] py-14 sm:py-16 md:py-24 lg:py-0">
           <HeroShaderCanvas />
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0d0d0d] z-10 pointer-events-none" />
 
           <motion.div
             style={{ y: heroY }}
-            className="relative z-20 max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 lg:px-24 w-full flex flex-col items-start justify-center py-6 sm:py-10 md:py-0 my-auto"
+            className="relative z-20 max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 lg:px-24 w-full flex flex-col items-start justify-center"
           >
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full mb-3 sm:mb-6 md:mb-8 text-xs font-semibold tracking-wider text-blue-300 shadow-xl"
+              className="inline-flex items-center space-x-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full mb-3 sm:mb-5 md:mb-6 text-xs font-semibold tracking-wider text-blue-300 shadow-xl"
             >
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
               <span>🚀 µLearn GECI • Learn • Build • Level Up</span>
@@ -292,7 +293,7 @@ export function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="font-display text-3xl sm:text-5xl md:text-7xl lg:text-[92px] xl:text-[104px] font-bold text-white leading-[1.08] tracking-tight mb-3 sm:mb-6 md:mb-8"
+              className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[100px] font-bold text-white leading-[1.08] tracking-tight mb-4 sm:mb-6 md:mb-7"
             >
               Where Curiosity Meets <br className="hidden sm:block" />
               Real-World Innovatio
@@ -311,7 +312,7 @@ export function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-gray-300 text-sm sm:text-base md:text-xl max-w-2xl leading-relaxed mb-5 sm:mb-8 md:mb-10"
+              className="text-gray-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl leading-relaxed mb-6 sm:mb-8 md:mb-9"
             >
               Join GEC Idukki's premier student-led tech community. Master cutting-edge technologies, build verified proof-of-work, and climb the live campus leaderboard together.
             </motion.p>

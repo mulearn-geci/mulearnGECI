@@ -63,8 +63,8 @@ export const StackedProjectCards: React.FC = () => {
   const [allCards, setAllCards] = useState<ProjectCard[]>(PROJECTS);
   const [cards, setCards] = useState<ProjectCard[]>(PROJECTS);
 
-  // Mobile detection for disabling expensive animations
-  const isMobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, []);
+  // Mobile/touch detection for disabling expensive animations
+  const isMobile = useMemo(() => typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 768), []);
 
   useEffect(() => {
     const applyCardsFromObj = (cardsArr: any[]) => {
@@ -204,35 +204,36 @@ export const StackedProjectCards: React.FC = () => {
         </div>
 
         {/* ── Stacked Cards Container ─────────────────────── */}
-        <div className="relative min-h-[440px] sm:min-h-[480px] md:min-h-[520px] lg:min-h-[560px] w-full flex items-center justify-center">
+        <div className="relative min-h-[380px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[480px] w-full flex items-center justify-center">
           <AnimatePresence mode="popLayout">
             {cards.slice(0, isMobile ? 1 : 3).map((card, index) => {
               const isFront = index === 0;
-              const yOffset = -index * 28;
-              const scale = 1 - index * 0.05;
+              // Stack downwards behind front card to prevent overlapping section header
+              const yOffset = index * 14;
+              const scale = 1 - index * 0.04;
               const zIndex = 30 - index * 10;
 
               return (
                 <motion.div
                   key={card.id}
                   {...(!isMobile && { layout: true })}
-                  initial={{ scale: 0.9, y: 50, opacity: 0 }}
+                  initial={{ scale: 0.9, y: 30, opacity: 0 }}
                   animate={{
                     scale,
                     y: yOffset,
                     opacity: 1 - index * 0.15,
                     zIndex,
                   }}
-                  exit={{ scale: 0.8, y: -100, opacity: 0 }}
+                  exit={{ scale: 0.8, y: -60, opacity: 0 }}
                   transition={{
-                    duration: isMobile ? 0.35 : 0.6,
+                    duration: isMobile ? 0.35 : 0.5,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                   onClick={() => bringToFront(index)}
                   drag={isFront && !isMobile ? 'x' : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   onDragEnd={isFront && !isMobile ? handleDragEnd : undefined}
-                  className={`absolute inset-x-0 mx-auto max-w-[1200px] w-full min-h-[400px] sm:min-h-[440px] md:min-h-[480px] lg:h-[500px] rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 border shadow-2xl overflow-hidden transition-colors duration-300 ${
+                  className={`absolute inset-x-0 mx-auto max-w-[1200px] w-full min-h-[340px] sm:min-h-[380px] md:min-h-[420px] lg:h-[440px] rounded-3xl p-4 sm:p-6 md:p-8 lg:p-9 border shadow-2xl overflow-hidden transition-colors duration-300 ${
                     isFront
                       ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing'
                       : 'bg-gray-50 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/60 cursor-pointer'
@@ -241,11 +242,11 @@ export const StackedProjectCards: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-12 h-full w-full gap-4 sm:gap-6 md:gap-8 items-center">
                     
                     {/* ─ Left Half: Content ─────────────── */}
-                    <div className="md:col-span-6 flex flex-col justify-between h-full w-full py-1 md:py-2">
+                    <div className="md:col-span-6 lg:col-span-7 flex flex-col justify-between h-full w-full py-1">
                       <div>
                         {/* Number Badge & Meta Tag */}
-                        <div className="flex items-center space-x-3 md:space-x-4 mb-2 sm:mb-3 md:mb-6">
-                          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-12 md:h-12 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-xs md:text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
+                        <div className="flex items-center space-x-3 md:space-x-4 mb-2 sm:mb-3 md:mb-4">
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full border border-blue-600/30 text-blue-600 dark:text-blue-400 font-display font-bold text-xs md:text-sm flex items-center justify-center bg-blue-50 dark:bg-blue-900/30">
                             {card.number}
                           </div>
                           <span className="text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
@@ -254,7 +255,7 @@ export const StackedProjectCards: React.FC = () => {
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-display text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-4 leading-tight">
+                        <h3 className="font-display text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3 leading-tight">
                           {card.title}
                         </h3>
 
@@ -265,10 +266,10 @@ export const StackedProjectCards: React.FC = () => {
                       </div>
 
                       {/* ── CTA Button (vibrant gradient) ─ */}
-                      <div className="pt-2 sm:pt-3 md:pt-6">
+                      <div className="pt-2 sm:pt-3 md:pt-5">
                         <Link
                           to={card.link}
-                          className="inline-flex items-center space-x-2 md:space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-4 py-2 sm:px-5 sm:py-2.5 md:px-8 md:py-4 rounded-full font-bold text-xs md:text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
+                          className="inline-flex items-center space-x-2 md:space-x-2.5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:via-blue-600 hover:to-indigo-500 text-white px-4 py-2 sm:px-5 sm:py-2.5 md:px-7 md:py-3.5 rounded-full font-bold text-xs md:text-sm transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 group/cta border border-blue-400/20"
                         >
                           <span className="tracking-wide">{card.ctaText || 'Explore'}</span>
                           <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/cta:translate-x-1 transition-transform" />
@@ -277,7 +278,7 @@ export const StackedProjectCards: React.FC = () => {
                     </div>
 
                     {/* ─ Right Half: Image & Glass Shapes ─ */}
-                    <div className="md:col-span-6 relative w-full aspect-[16/10] sm:aspect-video md:aspect-auto md:h-full min-h-[130px] sm:min-h-[180px] md:min-h-[240px] rounded-2xl overflow-hidden group/img">
+                    <div className="md:col-span-6 lg:col-span-5 relative w-full h-[150px] sm:h-[180px] md:h-full min-h-[140px] md:min-h-[220px] rounded-2xl overflow-hidden group/img">
                       <img
                         src={getImageUrl(card.image) || PROJECTS[(parseInt(card.number) - 1) % PROJECTS.length]?.image}
                         alt={card.title}
