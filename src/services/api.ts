@@ -148,32 +148,36 @@ export const eventsAPI = {
     return response.json();
   },
 
-  create: async (formData: FormData) => {
+  create: async (data: FormData | any) => {
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_BASE_URL}/events`, {
       method: 'POST',
-      headers: createFileUploadHeaders(),
-      body: formData,
+      headers: isFormData ? createFileUploadHeaders() : createAuthHeaders(),
+      body: isFormData ? data : JSON.stringify(data),
     });
     
+    const result = await response.json().catch(() => null);
     if (!response.ok) {
-      throw new Error('Failed to create event');
+      throw new Error(result?.message || result?.errors?.[0]?.msg || 'Failed to create event');
     }
     
-    return response.json();
+    return result || { success: true };
   },
 
-  update: async (id: string, formData: FormData) => {
+  update: async (id: string, data: FormData | any) => {
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_BASE_URL}/events/${id}`, {
       method: 'PUT',
-      headers: createFileUploadHeaders(),
-      body: formData,
+      headers: isFormData ? createFileUploadHeaders() : createAuthHeaders(),
+      body: isFormData ? data : JSON.stringify(data),
     });
     
+    const result = await response.json().catch(() => null);
     if (!response.ok) {
-      throw new Error('Failed to update event');
+      throw new Error(result?.message || result?.errors?.[0]?.msg || 'Failed to update event');
     }
     
-    return response.json();
+    return result || { success: true };
   },
 
   delete: async (id: string) => {

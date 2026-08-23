@@ -74,35 +74,35 @@ const validatePost = [
 // Event validation rules
 const validateEvent = [
   body('title')
+    .optional({ checkFalsy: true })
     .trim()
-    .isLength({ min: 5, max: 200 })
-    .withMessage('Title must be between 5 and 200 characters'),
+    .isLength({ min: 2, max: 250 })
+    .withMessage('Title must be between 2 and 250 characters'),
   body('description')
+    .optional({ checkFalsy: true })
     .trim()
-    .isLength({ min: 10, max: 2000 })
-    .withMessage('Description must be between 10 and 2000 characters'),
+    .isLength({ min: 2, max: 5000 })
+    .withMessage('Description must be between 2 and 5000 characters'),
   body('date')
-    .isISO8601()
-    .withMessage('Please provide a valid date'),
+    .optional({ checkFalsy: true }),
   body('time')
-    .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-    .withMessage('Please provide a valid time in HH:MM format'),
+    .optional({ checkFalsy: true })
+    .trim(),
   body('location')
+    .optional({ checkFalsy: true })
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage('Location must be between 2 and 200 characters'),
   body('type')
-    .isIn(['workshop', 'seminar', 'competition', 'conference', 'bootcamp', 'hackathon', 'meetup', 'webinar'])
-    .withMessage('Invalid event type'),
+    .optional({ checkFalsy: true })
+    .trim(),
   body('maxAttendees')
-    .isInt({ min: 1 })
-    .withMessage('Maximum attendees must be at least 1'),
+    .optional({ checkFalsy: true }),
   body('registrationLink')
-    .optional()
-    .isURL()
-    .withMessage('Registration link must be a valid URL'),
+    .optional({ checkFalsy: true })
+    .trim(),
   body('price')
-    .optional()
+    .optional({ checkFalsy: true })
     .isFloat({ min: 0 })
     .withMessage('Price must be a positive number'),
   handleValidationErrors

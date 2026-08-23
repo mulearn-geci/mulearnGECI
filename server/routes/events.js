@@ -1,10 +1,20 @@
 const express = require('express');
 const Event = require('../models/Event');
 const { auth, adminAuth } = require('../middleware/auth');
-const { upload, handleUploadError, deleteFile } = require('../middleware/upload');
+const { upload, handleUploadError, deleteFile, processUploadedFile } = require('../middleware/upload');
 const { validateEvent, validateObjectId, validatePagination } = require('../middleware/validation');
 
 const router = express.Router();
+
+const parseSafe = (val, fallback) => {
+  if (!val) return fallback;
+  if (typeof val !== 'string') return val;
+  try {
+    return JSON.parse(val);
+  } catch (e) {
+    return fallback;
+  }
+};
 
 // @route   GET /api/events
 // @desc    Get all events with filtering and pagination
@@ -12,7 +22,7 @@ const router = express.Router();
 router.get('/', validatePagination, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
     
     // Build filter object
@@ -121,7 +131,14 @@ router.get('/:id', validateObjectId, async (req, res) => {
 // @access  Private (Admin only)
 router.post('/', adminAuth, upload.single('image'), handleUploadError, validateEvent, async (req, res) => {
   try {
-    if (!req.file) {
+    let image = '';
+    if (req.file) {
+      image = processUploadedFile(req.file, 'events');
+    } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
+      image = req.body.image.trim();
+    }
+
+    if (!image) {
       return res.status(400).json({
         success: false,
         message: 'Image is required'
@@ -155,31 +172,31 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
     } = req.body;
 
     const event = new Event({
-      title,
-      description,
-      content,
-      image: `/uploads/events/${req.file.filename}`,
-      imageAlt: imageAlt || title,
-      date: new Date(date),
-      time,
-      endTime,
-      location,
-      venue: venue ? JSON.parse(venue) : undefined,
-      type,
+      title: title ? title.trim() : '',
+      description: description ? description.trim() : '',
+      content: content ? content.trim() : '',
+      image,
+      imageAlt: imageAlt || title || '',
+      date: date ? new Date(date) : new Date(),
+      time: time || '10:00 AM',
+      endTime: endTime || '',
+      location: location ? location.trim() : '',
+      venue: parseSafe(venue, undefined),
+      type: type || 'workshop',
       category: category || 'technical',
-      maxAttendees: parseInt(maxAttendees),
-      registrationLink,
+      maxAttendees: maxAttendees ? parseInt(maxAttendees) : 100,
+      registrationLink: registrationLink ? registrationLink.trim() : '',
       registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : undefined,
       status: status || 'upcoming',
-      featured: featured === 'true',
-      tags: tags ? JSON.parse(tags) : [],
-      organizers: organizers ? JSON.parse(organizers) : [],
-      speakers: speakers ? JSON.parse(speakers) : [],
-      requirements: requirements ? JSON.parse(requirements) : [],
-      agenda: agenda ? JSON.parse(agenda) : [],
+      featured: featured === true || featured === 'true',
+      tags: parseSafe(tags, []),
+      organizers: parseSafe(organizers, []),
+      speakers: parseSafe(speakers, []),
+      requirements: parseSafe(requirements, []),
+      agenda: parseSafe(agenda, []),
       price: price ? parseFloat(price) : 0,
       currency: currency || 'INR',
-      author: req.user.id
+      author: req.user ? (req.user._id || req.user.id) : undefined
     });
 
     await event.save();
@@ -191,7 +208,6 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
       data: event
     });
   } catch (error) {
-    // Delete uploaded file if event creation fails
     if (req.file) {
       deleteFile(req.file.path);
     }
@@ -199,7 +215,7 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
     console.error('Create event error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error while creating event'
+      message: error.message || 'Server error while creating event'
     });
   }
 });
@@ -245,39 +261,37 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
       imageAlt
     } = req.body;
 
-    // Update fields
-    event.title = title || event.title;
-    event.description = description || event.description;
-    event.content = content || event.content;
-    event.date = date ? new Date(date) : event.date;
-    event.time = time || event.time;
-    event.endTime = endTime || event.endTime;
-    event.location = location || event.location;
-    event.venue = venue ? JSON.parse(venue) : event.venue;
-    event.type = type || event.type;
-    event.category = category || event.category;
-    event.maxAttendees = maxAttendees ? parseInt(maxAttendees) : event.maxAttendees;
-    event.currentAttendees = currentAttendees !== undefined ? parseInt(currentAttendees) : event.currentAttendees;
-    event.registrationLink = registrationLink || event.registrationLink;
-    event.registrationDeadline = registrationDeadline ? new Date(registrationDeadline) : event.registrationDeadline;
-    event.status = status || event.status;
-    event.featured = featured !== undefined ? featured === 'true' : event.featured;
-    event.tags = tags ? JSON.parse(tags) : event.tags;
-    event.organizers = organizers ? JSON.parse(organizers) : event.organizers;
-    event.speakers = speakers ? JSON.parse(speakers) : event.speakers;
-    event.requirements = requirements ? JSON.parse(requirements) : event.requirements;
-    event.agenda = agenda ? JSON.parse(agenda) : event.agenda;
-    event.price = price !== undefined ? parseFloat(price) : event.price;
-    event.currency = currency || event.currency;
-    event.imageAlt = imageAlt || event.imageAlt;
+    // Update fields safely
+    if (title) event.title = title.trim();
+    if (description) event.description = description.trim();
+    if (content !== undefined) event.content = content.trim();
+    if (date) event.date = new Date(date);
+    if (time) event.time = time.trim();
+    if (endTime !== undefined) event.endTime = endTime.trim();
+    if (location) event.location = location.trim();
+    if (venue !== undefined) event.venue = parseSafe(venue, event.venue);
+    if (type) event.type = type.trim();
+    if (category) event.category = category.trim();
+    if (maxAttendees !== undefined && !isNaN(parseInt(maxAttendees))) event.maxAttendees = parseInt(maxAttendees);
+    if (currentAttendees !== undefined && !isNaN(parseInt(currentAttendees))) event.currentAttendees = parseInt(currentAttendees);
+    if (registrationLink !== undefined) event.registrationLink = registrationLink.trim();
+    if (registrationDeadline) event.registrationDeadline = new Date(registrationDeadline);
+    if (status) event.status = status;
+    if (featured !== undefined) event.featured = featured === true || featured === 'true';
+    if (tags !== undefined) event.tags = parseSafe(tags, event.tags);
+    if (organizers !== undefined) event.organizers = parseSafe(organizers, event.organizers);
+    if (speakers !== undefined) event.speakers = parseSafe(speakers, event.speakers);
+    if (requirements !== undefined) event.requirements = parseSafe(requirements, event.requirements);
+    if (agenda !== undefined) event.agenda = parseSafe(agenda, event.agenda);
+    if (price !== undefined && !isNaN(parseFloat(price))) event.price = parseFloat(price);
+    if (currency) event.currency = currency;
+    if (imageAlt !== undefined) event.imageAlt = imageAlt;
 
-    // Update image if new one is uploaded
+    // Update image if new one is uploaded or provided
     if (req.file) {
-      // Delete old image
-      if (event.image && event.image.startsWith('/uploads/')) {
-        deleteFile(event.image.substring(1)); // Remove leading slash
-      }
-      event.image = `/uploads/events/${req.file.filename}`;
+      event.image = processUploadedFile(req.file, 'events');
+    } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
+      event.image = req.body.image.trim();
     }
 
     await event.save();
@@ -289,7 +303,6 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
       data: event
     });
   } catch (error) {
-    // Delete uploaded file if update fails
     if (req.file) {
       deleteFile(req.file.path);
     }
@@ -297,7 +310,7 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
     console.error('Update event error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error while updating event'
+      message: error.message || 'Server error while updating event'
     });
   }
 });
