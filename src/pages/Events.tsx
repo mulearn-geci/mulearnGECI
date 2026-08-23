@@ -209,8 +209,8 @@ export function Events() {
                         </div>
                       </div>
 
-                      {!isPast && (
-                        <div className="pt-2">
+                      {!isPast && event.registrationLink && event.registrationLink.trim() !== '' && (
+                        <div className="pt-3 border-t border-gray-100 dark:border-gray-700/60 mt-4">
                           <RegistrationButton
                             eventId={event._id || event.id}
                             eventTitle={event.title}
