@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, X, Sparkles } from 'lucide-react';
 import { postsAPI } from '../services/api';
@@ -34,7 +34,7 @@ export function Gallery() {
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
 
   // Filter state (URL-synced)
-  const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters, toAPIParams } = useFilterState();
+  const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters } = useFilterState();
 
   useEffect(() => {
     const fetchData = async () => {

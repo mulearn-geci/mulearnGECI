@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Users, Clock, X } from 'lucide-react';
 import { eventsAPI } from '../services/api';
@@ -16,7 +16,7 @@ export function Events() {
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
   // Filter state (URL-synced)
-  const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters, toAPIParams } = useFilterState();
+  const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters } = useFilterState();
 
   // Fetch ALL events once (upcoming + completed)
   useEffect(() => {
