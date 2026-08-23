@@ -1,69 +1,117 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Users, Clock, X } from 'lucide-react';
 import { eventsAPI } from '../services/api';
 import { getEventImageUrl } from '../utils/imageUtils';
 import { RegistrationButton } from '../components/RegistrationButton';
+import { FilterBar, EmptyFilterState } from '../components/FilterBar';
+import { useFilterState } from '../hooks/useFilterState';
 
 export function Events() {
-  const [activeTab, setActiveTab] = useState('upcoming');
-  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
-  const [pastEvents, setPastEvents] = useState<any[]>([]);
+  const [allEvents, setAllEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // For enlarged image modal
+  // Image modal
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
 
-  const events = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
+  // Filter state (URL-synced)
+  const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters, toAPIParams } = useFilterState();
 
-  // Fetch events
+  // Fetch ALL events once (upcoming + completed)
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         setIsLoading(true);
-        const [upcomingResponse, pastResponse] = await Promise.all([
+        const [upRes, pastRes] = await Promise.all([
           eventsAPI.getAll('upcoming'),
           eventsAPI.getAll('completed'),
         ]);
-        setUpcomingEvents(upcomingResponse.data || []);
-        setPastEvents(pastResponse.data || []);
+        setAllEvents([...(upRes.data || []), ...(pastRes.data || [])]);
       } catch (error) {
         console.error('Failed to fetch events:', error);
-        alert('Failed to load events');
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchEvents();
   }, []);
+
+  // Derive categories from data
+  const categories = useMemo(() => {
+    const types = new Set<string>();
+    allEvents.forEach(e => { if (e.type) types.add(e.type); });
+    return Array.from(types).sort();
+  }, [allEvents]);
+
+  // Derive month options from data
+  const monthOptions = useMemo(() => {
+    const months = new Map<string, string>();
+    allEvents.forEach(e => {
+      const d = new Date(e.date);
+      if (isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (!months.has(key)) {
+        months.set(key, d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }));
+      }
+    });
+    return Array.from(months.entries())
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([value, label]) => ({ value, label }));
+  }, [allEvents]);
+
+  // Client-side filtering (mirrors what backend would do with toAPIParams())
+  const filteredEvents = useMemo(() => {
+    const now = new Date();
+
+    return allEvents.filter(event => {
+      // Text search
+      if (debouncedSearch) {
+        const q = debouncedSearch.toLowerCase();
+        const inTitle = (event.title || '').toLowerCase().includes(q);
+        const inDesc  = (event.description || '').toLowerCase().includes(q);
+        const inLoc   = (event.location || '').toLowerCase().includes(q);
+        if (!inTitle && !inDesc && !inLoc) return false;
+      }
+
+      // Category (maps to event.type)
+      if (filters.category !== 'all' && event.type !== filters.category) return false;
+
+      // Month
+      if (filters.month !== 'all') {
+        const d = new Date(event.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (key !== filters.month) return false;
+      }
+
+      // Timing
+      if (filters.timing === 'upcoming') {
+        if (new Date(event.date) <= now) return false;
+      } else if (filters.timing === 'past') {
+        if (new Date(event.date) > now) return false;
+      }
+
+      return true;
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [allEvents, debouncedSearch, filters.category, filters.month, filters.timing]);
 
   const openImage = (src: string, alt: string) => {
     const img = new Image();
     img.src = src;
     img.onload = () => {
-    setImageSize({
-      width: img.naturalWidth * 0.5, // scale 50%
-      height: img.naturalHeight * 0.5,
-    });
-    setSelectedImage({ src, alt });
-  }};
-
-  const closeImage = () => {
-    setSelectedImage(null);
+      setImageSize({ width: img.naturalWidth * 0.5, height: img.naturalHeight * 0.5 });
+      setSelectedImage({ src, alt });
+    };
   };
+
+  const closeImage = () => setSelectedImage(null);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white dark:from-gray-900 dark:to-gray-900 dark:text-blue-100 py-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Community Events</h1>
             <p className="text-xl text-blue-100 dark:text-blue-200 max-w-3xl mx-auto leading-relaxed">
               Discover exciting opportunities to learn, network, and grow through our carefully curated events and workshops.
@@ -72,114 +120,116 @@ export function Events() {
         </div>
       </section>
 
-      {/* Events Section */}
+      {/* Filter + Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Tab Navigation */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg transition-colors duration-300">
-              <button
-                onClick={() => setActiveTab('upcoming')}
-                className={`px-6 py-3 rounded-md font-medium transition-colors ${
-                  activeTab === 'upcoming'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                }`}
-              >
-                Upcoming Events
-              </button>
-              <button
-                onClick={() => setActiveTab('past')}
-                className={`px-6 py-3 rounded-md font-medium transition-colors ${
-                  activeTab === 'past'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                }`}
-              >
-                Past Events
-              </button>
-            </div>
+          {/* Filter Bar */}
+          <div className="mb-10">
+            <FilterBar
+              filters={filters}
+              debouncedSearch={debouncedSearch}
+              setFilter={setFilter}
+              clearFilters={clearFilters}
+              hasActiveFilters={hasActiveFilters}
+              categories={categories}
+              monthOptions={monthOptions}
+              showTimingFilter={true}
+              searchPlaceholder="Search events by title, description, or location..."
+              resultCount={isLoading ? undefined : filteredEvents.length}
+            />
           </div>
 
-          {/* Events Grid */}
+          {/* Grid */}
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
               <p className="mt-4 text-gray-600 dark:text-gray-300">Loading events...</p>
             </div>
-          ) : (
+          ) : filteredEvents.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              {events.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                >
-                  <div
-                    className="relative h-48 overflow-hidden cursor-pointer"
-                    onClick={() => openImage(getEventImageUrl(event.image), event.title)}
+              {filteredEvents.map((event, index) => {
+                const eventDate = new Date(event.date);
+                const isPast = eventDate <= new Date();
+
+                return (
+                  <motion.div
+                    key={event._id || event.id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(index * 0.06, 0.5), duration: 0.4 }}
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                   >
-                    <img
-                      src={getEventImageUrl(event.image)}
-                      alt={event.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {event.type}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 leading-tight">
-                      {event.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                      {event.description}
-                    </p>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Calendar className="h-4 w-4 mr-2 text-blue-600" />
-                        <span>
-                          {new Date(event.date).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
+                    <div
+                      className="relative h-48 overflow-hidden cursor-pointer"
+                      onClick={() => openImage(getEventImageUrl(event.image), event.title)}
+                    >
+                      <img
+                        src={getEventImageUrl(event.image)}
+                        alt={event.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium capitalize">
+                          {event.type}
                         </span>
-                        <Clock className="h-4 w-4 ml-4 mr-2 text-blue-600" />
-                        <span>{event.time}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <MapPin className="h-4 w-4 mr-2 text-blue-600" />
-                        <span>{event.location}</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <Users className="h-4 w-4 mr-2 text-blue-600" />
-                        <span>{event.attendees || 0} attendees</span>
-                      </div>
+                      {isPast && (
+                        <div className="absolute top-4 right-4">
+                          <span className="bg-gray-900/70 backdrop-blur-sm text-gray-200 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                            Past
+                          </span>
+                        </div>
+                      )}
                     </div>
 
-                    {activeTab === 'upcoming' && (
-                      <div className="pt-2">
-                        <RegistrationButton
-                          eventId={event.id}
-                          eventTitle={event.title}
-                          registrationLink={event.registrationLink}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 leading-tight">
+                        {event.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
+                        {event.description}
+                      </p>
 
-          {events.length === 0 && (
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                          <Calendar className="h-4 w-4 mr-2 text-blue-600" />
+                          <span>
+                            {eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          </span>
+                          <Clock className="h-4 w-4 ml-4 mr-2 text-blue-600" />
+                          <span>{event.time}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                          <MapPin className="h-4 w-4 mr-2 text-blue-600" />
+                          <span>{event.location}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                          <Users className="h-4 w-4 mr-2 text-blue-600" />
+                          <span>{event.attendees || event.currentAttendees || 0} attendees</span>
+                        </div>
+                      </div>
+
+                      {!isPast && (
+                        <div className="pt-2">
+                          <RegistrationButton
+                            eventId={event._id || event.id}
+                            eventTitle={event.title}
+                            registrationLink={event.registrationLink}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : hasActiveFilters ? (
+            <EmptyFilterState
+              clearFilters={clearFilters}
+              title="No events match your filters"
+              description="Try broadening your search, selecting a different category, or changing the date range."
+            />
+          ) : (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400 text-lg">No events available at the moment.</p>
             </div>
@@ -187,7 +237,7 @@ export function Events() {
         </div>
       </section>
 
-      {/* Enlarged Image Modal (same for desktop + mobile) */}
+      {/* Enlarged Image Modal */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div
@@ -201,8 +251,8 @@ export function Events() {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              className="relative "
-              onClick={(e) => e.stopPropagation()}
+              className="relative"
+              onClick={e => e.stopPropagation()}
             >
               <button
                 onClick={closeImage}
@@ -217,10 +267,10 @@ export function Events() {
                 style={{
                   width: imageSize?.width,
                   height: imageSize?.height,
-                  maxWidth: "90vw",
-                  maxHeight: "90vh",
+                  maxWidth: '90vw',
+                  maxHeight: '90vh',
                   display: 'block',
-              }}
+                }}
               />
             </motion.div>
           </motion.div>
@@ -229,4 +279,3 @@ export function Events() {
     </div>
   );
 }
-

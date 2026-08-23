@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, X, ArrowUpRight, Sparkles, Tag } from 'lucide-react';
+import { Calendar, X, Sparkles } from 'lucide-react';
 import { postsAPI } from '../services/api';
 import { getPostImageUrl } from '../utils/imageUtils';
+import { FilterBar, EmptyFilterState } from '../components/FilterBar';
+import { useFilterState } from '../hooks/useFilterState';
 
 function GalleryImage({ src, alt, onClick }: { src: string; alt: string; onClick: () => void }) {
   return (
@@ -27,10 +29,12 @@ function GalleryImage({ src, alt, onClick }: { src: string; alt: string; onClick
 export function Gallery() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // For enlarged image modal
+  // Image modal
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
+
+  // Filter state (URL-synced)
+  const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters, toAPIParams } = useFilterState();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,63 +51,93 @@ export function Gallery() {
     fetchData();
   }, []);
 
-  // Sort posts by eventDate or createdAt descending (newest first)
-  const sortedPosts = [...posts].sort((a, b) => {
-    const dateA = new Date(a.eventDate || a.createdAt).getTime();
-    const dateB = new Date(b.eventDate || b.createdAt).getTime();
-    return dateB - dateA;
-  });
+  // Derive categories from data
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    posts.forEach(p => { if (p.category) cats.add(p.category); });
+    return Array.from(cats).sort();
+  }, [posts]);
 
-  const categories = ['all', ...Array.from(new Set(posts.map(p => p.category).filter(Boolean)))];
+  // Derive month options from data
+  const monthOptions = useMemo(() => {
+    const months = new Map<string, string>();
+    posts.forEach(p => {
+      const d = new Date(p.eventDate || p.createdAt);
+      if (isNaN(d.getTime())) return;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (!months.has(key)) {
+        months.set(key, d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }));
+      }
+    });
+    return Array.from(months.entries())
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([value, label]) => ({ value, label }));
+  }, [posts]);
 
-  const filteredPosts = sortedPosts.filter(post => {
-    if (selectedCategory === 'all') return true;
-    return post.category === selectedCategory;
-  });
+  // Client-side filtering
+  const filteredPosts = useMemo(() => {
+    return posts.filter(post => {
+      // Text search
+      if (debouncedSearch) {
+        const q = debouncedSearch.toLowerCase();
+        const inTitle = (post.title || '').toLowerCase().includes(q);
+        const inDesc  = (post.description || '').toLowerCase().includes(q);
+        if (!inTitle && !inDesc) return false;
+      }
 
-  const openImage = (src: string, alt: string) => {
-    setSelectedImage({ src, alt });
-  };
+      // Category
+      if (filters.category !== 'all' && post.category !== filters.category) return false;
 
-  const closeImage = () => {
-    setSelectedImage(null);
-  };
+      // Month
+      if (filters.month !== 'all') {
+        const d = new Date(post.eventDate || post.createdAt);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (key !== filters.month) return false;
+      }
+
+      return true;
+    }).sort((a, b) => {
+      const dA = new Date(a.eventDate || a.createdAt).getTime();
+      const dB = new Date(b.eventDate || b.createdAt).getTime();
+      return dB - dA;
+    });
+  }, [posts, debouncedSearch, filters.category, filters.month]);
+
+  const openImage = (src: string, alt: string) => setSelectedImage({ src, alt });
+  const closeImage = () => setSelectedImage(null);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
       <main className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center space-x-2 text-xs uppercase tracking-wider font-extrabold text-blue-600 dark:text-blue-400 mb-3 bg-blue-50 dark:bg-blue-950 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm">
             <Sparkles className="w-4 h-4 text-amber-400" />
             <span>µLearn GECI • Campus Moments</span>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-white">
-            Campus Gallery & Events
+            Campus Gallery
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">
             Explore photos, event recaps, hackathon highlights, and orientation sessions from the µLearn GECI community.
           </p>
+        </div>
 
-          {/* Category Filter Pills */}
-          {categories.length > 2 && (
-            <div className="flex flex-wrap justify-center gap-2 mt-8">
-              {categories.map((cat: string) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                    selectedCategory === cat
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
-                  }`}
-                >
-                  {cat === 'all' ? 'All Photos' : cat}
-                </button>
-              ))}
-            </div>
-          )}
+        {/* Filter Bar */}
+        <div className="mb-10">
+          <FilterBar
+            filters={filters}
+            debouncedSearch={debouncedSearch}
+            setFilter={setFilter}
+            clearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+            categories={categories}
+            monthOptions={monthOptions}
+            showTimingFilter={false}
+            searchPlaceholder="Search gallery by title or caption..."
+            resultCount={isLoading ? undefined : filteredPosts.length}
+          />
         </div>
 
         {/* Content Grid */}
@@ -114,11 +148,11 @@ export function Gallery() {
                 key={index}
                 className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden animate-pulse border border-gray-200 dark:border-gray-800"
               >
-                <div className="h-64 bg-gray-200 dark:bg-gray-800"></div>
+                <div className="h-64 bg-gray-200 dark:bg-gray-800" />
                 <div className="p-6 space-y-3">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/3"></div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
+                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full" />
                 </div>
               </div>
             ))}
@@ -126,7 +160,7 @@ export function Gallery() {
         ) : filteredPosts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, index) => {
-              const displayDate = post.eventDate 
+              const displayDate = post.eventDate
                 ? new Date(post.eventDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
                 : new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
@@ -135,7 +169,7 @@ export function Gallery() {
                   key={post._id || index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.06, duration: 0.4 }}
+                  transition={{ delay: Math.min(index * 0.06, 0.5), duration: 0.4 }}
                   className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-blue-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
@@ -166,59 +200,30 @@ export function Gallery() {
                         {post.title}
                       </h3>
 
-                      {/* Location */}
-                      {post.location && (
-                        <div className="flex items-center space-x-1.5 text-xs text-gray-500 dark:text-gray-400 mb-3">
-                          <MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                          <span className="line-clamp-1">{post.location}</span>
-                        </div>
-                      )}
-
                       {/* Description */}
                       {post.description && (
                         <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3">
                           {post.description}
                         </p>
                       )}
-
-                      {/* Tags */}
-                      {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-3">
-                          {post.tags.slice(0, 3).map((tag: string, i: number) => (
-                            <span key={i} className="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md flex items-center space-x-1">
-                              <Tag className="w-2.5 h-2.5" />
-                              <span>#{tag}</span>
-                            </span>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
-
-                  {/* Optional Action Link */}
-                  {post.registrationLink && (
-                    <div className="p-6 pt-0 border-t border-gray-100 dark:border-gray-800/60 mt-4">
-                      <a
-                        href={post.registrationLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full mt-4 py-2.5 px-4 rounded-xl font-bold text-xs inline-flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all"
-                      >
-                        <span>View Event Details</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </a>
-                    </div>
-                  )}
                 </motion.article>
               );
             })}
           </div>
+        ) : hasActiveFilters ? (
+          <EmptyFilterState
+            clearFilters={clearFilters}
+            title="No photos match your filters"
+            description="Try broadening your search, selecting a different category, or changing the month."
+          />
         ) : (
           <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-8">
             <div className="text-gray-400 dark:text-gray-500 mb-4">
               <Sparkles className="mx-auto h-12 w-12 text-blue-500 animate-pulse" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Photos in this Category</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Photos Yet</h3>
             <p className="text-gray-500 dark:text-gray-400 text-sm">New moments, event highlights, and orientations will appear here soon.</p>
           </div>
         )}
@@ -239,7 +244,7 @@ export function Gallery() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="relative max-w-5xl max-h-[90vh] bg-gray-900 rounded-3xl overflow-hidden shadow-2xl border border-white/20 p-2"
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <button
                 onClick={closeImage}
