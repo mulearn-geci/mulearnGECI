@@ -71,6 +71,11 @@ const eventSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  attendees: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   registrationLink: {
     type: String,
     trim: true,

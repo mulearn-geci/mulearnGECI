@@ -157,6 +157,8 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
       type,
       category,
       maxAttendees,
+      currentAttendees,
+      attendees,
       registrationLink,
       registrationDeadline,
       status,
@@ -170,6 +172,10 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
       currency,
       imageAlt
     } = req.body;
+
+    const count = currentAttendees !== undefined && !isNaN(parseInt(currentAttendees))
+      ? parseInt(currentAttendees)
+      : (attendees !== undefined && !isNaN(parseInt(attendees)) ? parseInt(attendees) : 0);
 
     const event = new Event({
       title: title ? title.trim() : '',
@@ -185,6 +191,8 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
       type: type || 'workshop',
       category: category || 'technical',
       maxAttendees: maxAttendees ? parseInt(maxAttendees) : 100,
+      currentAttendees: count,
+      attendees: count,
       registrationLink: registrationLink ? registrationLink.trim() : '',
       registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : undefined,
       status: status || 'upcoming',
@@ -273,7 +281,13 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
     if (type) event.type = type.trim();
     if (category) event.category = category.trim();
     if (maxAttendees !== undefined && !isNaN(parseInt(maxAttendees))) event.maxAttendees = parseInt(maxAttendees);
-    if (currentAttendees !== undefined && !isNaN(parseInt(currentAttendees))) event.currentAttendees = parseInt(currentAttendees);
+    const updateCount = currentAttendees !== undefined && !isNaN(parseInt(currentAttendees))
+      ? parseInt(currentAttendees)
+      : (attendees !== undefined && !isNaN(parseInt(attendees)) ? parseInt(attendees) : undefined);
+    if (updateCount !== undefined) {
+      event.currentAttendees = updateCount;
+      event.attendees = updateCount;
+    }
     if (registrationLink !== undefined) event.registrationLink = registrationLink.trim();
     if (registrationDeadline) event.registrationDeadline = new Date(registrationDeadline);
     if (status) event.status = status;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Upload, X, Calendar, Clock, MapPin, Sparkles } from 'lucide-react';
+import { ArrowLeft, Upload, X, Calendar, Clock, MapPin, Users, Tag, Link as LinkIcon, FileText, Sparkles, Award } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { eventsAPI } from '../../services/api';
 import { getEventImageUrl } from '../../utils/imageUtils';
@@ -12,12 +12,16 @@ interface EditEventFormData {
   content?: string;
   date: string;
   time: string;
+  endTime?: string;
   location: string;
   type: string;
-  category?: string;
-  maxAttendees?: number;
-  status?: string;
+  category: string;
+  attendees: number;
+  maxAttendees: number;
+  status: string;
+  featured: boolean;
   registrationLink?: string;
+  registrationDeadline?: string;
 }
 
 const compressImageFile = (file: File): Promise<string> => {
@@ -90,12 +94,18 @@ export function EditEvent() {
           setValue('date', new Date(event.date).toISOString().split('T')[0]);
         }
         setValue('time', event.time || '');
+        setValue('endTime', event.endTime || '');
         setValue('location', event.location || '');
         setValue('type', event.type || 'workshop');
         setValue('category', event.category || 'technical');
+        setValue('attendees', event.attendees || event.currentAttendees || 0);
         setValue('maxAttendees', event.maxAttendees || 100);
         setValue('status', event.status || 'upcoming');
+        setValue('featured', event.featured === true);
         setValue('registrationLink', event.registrationLink || '');
+        if (event.registrationDeadline) {
+          setValue('registrationDeadline', new Date(event.registrationDeadline).toISOString().split('T')[0]);
+        }
         
         if (event.image) {
           setImagePreview(getEventImageUrl(event.image));
@@ -148,12 +158,17 @@ export function EditEvent() {
         content: data.content ? data.content.trim() : (currentEvent?.content || ''),
         date: data.date,
         time: data.time.trim(),
+        endTime: data.endTime ? data.endTime.trim() : '',
         location: data.location.trim(),
         type: data.type || currentEvent?.type || 'workshop',
         category: data.category || currentEvent?.category || 'technical',
+        attendees: !isNaN(Number(data.attendees)) ? Number(data.attendees) : 0,
+        currentAttendees: !isNaN(Number(data.attendees)) ? Number(data.attendees) : 0,
         maxAttendees: data.maxAttendees ? Number(data.maxAttendees) : (currentEvent?.maxAttendees || 100),
         status: data.status || currentEvent?.status || 'upcoming',
+        featured: data.featured === true,
         registrationLink: data.registrationLink ? data.registrationLink.trim() : '',
+        registrationDeadline: data.registrationDeadline || undefined,
         image: finalImageDataUrl || currentEvent?.image
       };
 
@@ -190,14 +205,14 @@ export function EditEvent() {
           </button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Edit Event</h1>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Update event schedule, venue, registration, or banner</p>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Update event schedule, venue, attendees, registration, or banner</p>
           </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 transition-colors">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* Event Image */}
+            {/* 1. Event Banner Image */}
             <div>
               <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Event Banner Image
@@ -246,7 +261,7 @@ export function EditEvent() {
               </div>
             </div>
 
-            {/* Event Title */}
+            {/* 2. Event Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Event Title *
@@ -265,7 +280,7 @@ export function EditEvent() {
               )}
             </div>
 
-            {/* Description */}
+            {/* 3. Short Description */}
             <div>
               <label htmlFor="description" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Short Description / Overview *
@@ -284,8 +299,8 @@ export function EditEvent() {
               )}
             </div>
 
-            {/* Date & Time */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* 4. Date & Timing Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="date" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
                   <Calendar className="w-4 h-4 text-blue-500" />
@@ -302,37 +317,53 @@ export function EditEvent() {
               <div>
                 <label htmlFor="time" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
                   <Clock className="w-4 h-4 text-blue-500" />
-                  <span>Event Time *</span>
+                  <span>Start Time *</span>
                 </label>
                 <input
                   type="text"
                   id="time"
                   {...register('time', { required: 'Time is required' })}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., 10:00 AM - 1:00 PM"
+                  placeholder="e.g., 10:00 AM"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="endTime" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  <span>End Time (Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="endTime"
+                  {...register('endTime')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  placeholder="e.g., 01:00 PM"
                 />
               </div>
             </div>
 
-            {/* Location & Type */}
+            {/* 5. Location & Venue */}
+            <div>
+              <label htmlFor="location" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                <MapPin className="w-4 h-4 text-blue-500" />
+                <span>Location / Venue *</span>
+              </label>
+              <input
+                type="text"
+                id="location"
+                {...register('location', { required: 'Location is required' })}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                placeholder="e.g., Seminar Hall 1, Main Block / Google Meet"
+              />
+            </div>
+
+            {/* 6. Event Classification (Type & Category) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="location" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <MapPin className="w-4 h-4 text-blue-500" />
-                  <span>Location / Venue *</span>
-                </label>
-                <input
-                  type="text"
-                  id="location"
-                  {...register('location', { required: 'Location is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., Seminar Hall / Google Meet"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="type" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Event Type *
+                <label htmlFor="type" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <Tag className="w-4 h-4 text-blue-500" />
+                  <span>Event Type *</span>
                 </label>
                 <select
                   id="type"
@@ -349,20 +380,136 @@ export function EditEvent() {
                   <option value="webinar">Webinar</option>
                 </select>
               </div>
+
+              <div>
+                <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <Award className="w-4 h-4 text-blue-500" />
+                  <span>Category</span>
+                </label>
+                <select
+                  id="category"
+                  {...register('category')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer"
+                >
+                  <option value="technical">Technical</option>
+                  <option value="cultural">Cultural</option>
+                  <option value="career">Career</option>
+                  <option value="academic">Academic</option>
+                  <option value="social">Social</option>
+                  <option value="sports">Sports</option>
+                </select>
+              </div>
             </div>
 
-            {/* Registration Link */}
+            {/* 7. Attendees & Capacity Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="attendees" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  <span>Current Attendees / Registered</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  id="attendees"
+                  {...register('attendees')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  placeholder="e.g., 45"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Displayed as '{'{attendees}'} attendees' on the website card</p>
+              </div>
+
+              <div>
+                <label htmlFor="maxAttendees" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <Users className="w-4 h-4 text-gray-400" />
+                  <span>Maximum Capacity / Total Seats</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  id="maxAttendees"
+                  {...register('maxAttendees')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  placeholder="e.g., 100"
+                />
+              </div>
+            </div>
+
+            {/* 8. Registration Links & Deadline */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="registrationLink" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <LinkIcon className="w-4 h-4 text-blue-500" />
+                  <span>Registration URL (Optional)</span>
+                </label>
+                <input
+                  type="url"
+                  id="registrationLink"
+                  {...register('registrationLink')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  placeholder="https://forms.gle/... or https://..."
+                />
+              </div>
+
+              <div>
+                <label htmlFor="registrationDeadline" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <span>Registration Deadline (Optional)</span>
+                </label>
+                <input
+                  type="date"
+                  id="registrationDeadline"
+                  {...register('registrationDeadline')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* 9. Detailed Content (Optional) */}
             <div>
-              <label htmlFor="registrationLink" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Registration URL (Optional)
+              <label htmlFor="content" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                <FileText className="w-4 h-4 text-blue-500" />
+                <span>Full Story / Agenda / Prerequisites (Optional)</span>
               </label>
-              <input
-                type="url"
-                id="registrationLink"
-                {...register('registrationLink')}
+              <textarea
+                id="content"
+                rows={4}
+                {...register('content')}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="https://forms.gle/... or https://..."
+                placeholder="Detailed schedule, prerequisites, speakers, and instructions..."
               />
+            </div>
+
+            {/* 10. Status & Featured Toggle */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-2">
+              <div>
+                <label htmlFor="status" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  Event Status
+                </label>
+                <select
+                  id="status"
+                  {...register('status')}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer"
+                >
+                  <option value="upcoming">Upcoming</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed / Past</option>
+                  <option value="postponed">Postponed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div className="flex items-center space-x-3 pt-6">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  {...register('featured')}
+                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-700 cursor-pointer"
+                />
+                <label htmlFor="featured" className="text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer">
+                  Mark as Featured Event
+                </label>
+              </div>
             </div>
 
             {/* Actions */}

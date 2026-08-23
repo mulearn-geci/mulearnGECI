@@ -152,56 +152,61 @@ export function AdminEvents() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredEvents.map((event, index) => (
               <motion.div
-                key={event.id}
+                key={event._id || event.id || index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="flex">
-                  <div className="relative w-1/3 h-48 overflow-hidden">
+                <div className="flex flex-col sm:flex-row">
+                  <div className="relative sm:w-1/3 h-48 overflow-hidden bg-gray-900">
                     <img
                       src={getEventImageUrl(event.image)}
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-4 left-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
-                        {event.status}
+                    <div className="absolute top-3 left-3">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(event.status || 'upcoming')}`}>
+                        {event.status || 'upcoming'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex-1 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 leading-tight">
+                  <div className="flex-1 p-5 sm:p-6">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 rounded-full">
+                        {event.type || 'Event'}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-tight">
                       {event.title}
                     </h3>
                     
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                        <CalendarIcon className="h-4 w-4 mr-2 text-blue-500" />
-                        <span>{event.date} at {event.time}</span>
+                    <div className="space-y-1.5 mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center">
+                        <CalendarIcon className="h-3.5 w-3.5 mr-2 text-blue-500 shrink-0" />
+                        <span>{new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} at {event.time}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                        <MapPin className="h-4 w-4 mr-2 text-blue-500" />
-                        <span>{event.location}</span>
+                      <div className="flex items-center">
+                        <MapPin className="h-3.5 w-3.5 mr-2 text-blue-500 shrink-0" />
+                        <span className="line-clamp-1">{event.location}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                        <Users className="h-4 w-4 mr-2 text-blue-500" />
-                        <span>{event.attendees}/{event.maxAttendees} attendees</span>
+                      <div className="flex items-center">
+                        <Users className="h-3.5 w-3.5 mr-2 text-blue-500 shrink-0" />
+                        <span>{event.attendees || event.currentAttendees || 0}/{event.maxAttendees || 100} attendees</span>
                       </div>
                     </div>
 
                     {/* Progress bar for attendees */}
-                    <div className="mb-4">
+                    <div className="mb-3">
                       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                         <span>Capacity</span>
-                        <span>{Math.round((event.attendees / event.maxAttendees) * 100)}%</span>
+                        <span>{Math.min(100, Math.round(((event.attendees || event.currentAttendees || 0) / (event.maxAttendees || 100)) * 100))}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                         <div 
-                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${(event.attendees / event.maxAttendees) * 100}%` }}
+                          className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, Math.round(((event.attendees || event.currentAttendees || 0) / (event.maxAttendees || 100)) * 100))}%` }}
                         ></div>
                       </div>
                     </div>
