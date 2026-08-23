@@ -65,6 +65,14 @@ function AppContent() {
             } 
           />
           <Route 
+            path="/admin/gallery" 
+            element={
+              <ProtectedRoute>
+                <AdminPosts />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/admin/posts" 
             element={
               <ProtectedRoute>
@@ -105,6 +113,14 @@ function AppContent() {
             } 
           />
           <Route 
+            path="/admin/gallery/create" 
+            element={
+              <ProtectedRoute>
+                <CreatePost />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/admin/posts/create" 
             element={
               <ProtectedRoute>
@@ -117,6 +133,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <CreateEvent />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/gallery/edit/:id" 
+            element={
+              <ProtectedRoute>
+                <EditPost />
               </ProtectedRoute>
             } 
           />

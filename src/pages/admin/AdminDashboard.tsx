@@ -5,7 +5,7 @@ import {
   BarChart, 
   Users, 
   Calendar, 
-  FileText, 
+  Image, 
   TrendingUp, 
   Eye,
   Edit,
@@ -69,7 +69,7 @@ export function AdminDashboard() {
   }, []);
 
   const handleEditPost = (post: any) => {
-    navigate(`/admin/posts/edit/${post._id}`);
+    navigate(`/admin/gallery/edit/${post._id}`);
   };
 
   const handleEditEvent = (event: any) => {
@@ -81,7 +81,7 @@ export function AdminDashboard() {
   };
 
   const handleViewPost = (post: any) => {
-    window.open(`/posts/${post._id}`, '_blank');
+    window.open('/gallery', '_blank');
   };
 
   const handleViewEvent = (event: any) => {
@@ -89,9 +89,9 @@ export function AdminDashboard() {
   };
 
   const statsData = [
-    { title: 'Total Posts', value: stats.totalPosts.toString(), change: `${stats.publishedPosts} published`, icon: FileText, color: 'blue' },
+    { title: 'Gallery Items', value: stats.totalPosts.toString(), change: `${stats.publishedPosts} published`, icon: Image, color: 'blue' },
     { title: 'Total Events', value: stats.totalEvents.toString(), change: `${stats.upcomingEvents} upcoming`, icon: Calendar, color: 'green' },
-    { title: 'Draft Posts', value: stats.draftPosts.toString(), change: 'Needs review', icon: AlertCircle, color: 'orange' },
+    { title: 'Draft Gallery', value: stats.draftPosts.toString(), change: 'Needs review', icon: AlertCircle, color: 'orange' },
     { title: 'Completed Events', value: stats.completedEvents.toString(), change: 'Past events', icon: CheckCircle, color: 'purple' }
   ];
 
@@ -113,11 +113,11 @@ export function AdminDashboard() {
           </div>
           <div className="flex space-x-4">
             <Link
-              to="/admin/posts"
+              to="/admin/gallery"
               className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
             >
               <Plus className="h-4 w-4" />
-              <span>New Post</span>
+              <span>New Gallery Item</span>
             </Link>
             <Link
               to="/admin/events"
@@ -171,7 +171,7 @@ export function AdminDashboard() {
 
         {/* Content Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Posts */}
+          {/* Recent Gallery Items */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -179,9 +179,9 @@ export function AdminDashboard() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-300"
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Posts</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Gallery Items</h2>
               <Link
-                to="/admin/posts"
+                to="/admin/gallery"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium"
               >
                 View All
@@ -224,14 +224,14 @@ export function AdminDashboard() {
                       <button 
                         onClick={() => handleViewPost(post)}
                         className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                        title="View post"
+                        title="View in gallery"
                       >
                         <ExternalLink className="h-4 w-4" />
                       </button>
                       <button 
                         onClick={() => handleEditPost(post)}
                         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                        title="Edit post"
+                        title="Edit gallery item"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
@@ -240,10 +240,10 @@ export function AdminDashboard() {
                 ))
               ) : (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <FileText className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-700" />
-                  <p>No posts yet</p>
-                  <Link to="/admin/posts/create" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm">
-                    Create your first post
+                  <Image className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-700" />
+                  <p>No gallery items yet</p>
+                  <Link to="/admin/gallery/create" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm">
+                    Add your first gallery item
                   </Link>
                 </div>
               )}

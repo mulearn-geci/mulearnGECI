@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  FileText, 
+  Image, 
   Calendar, 
   Users,
   GraduationCap,
@@ -29,7 +29,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Homepage Customizer', href: '/admin/homepage', icon: Sparkles },
-    { name: 'Posts', href: '/admin/posts', icon: FileText },
+    { name: 'Gallery', href: '/admin/gallery', icon: Image },
     { name: 'Events', href: '/admin/events', icon: Calendar },
     { name: 'Execom Team', href: '/admin/execom', icon: Users },
     { name: 'Alumni Network', href: '/admin/alumni', icon: GraduationCap },

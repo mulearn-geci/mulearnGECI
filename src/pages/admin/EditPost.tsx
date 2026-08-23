@@ -95,9 +95,9 @@ export function EditPost() {
           setImagePreview(getPostImageUrl(post.image));
         }
       } catch (error) {
-        console.error('Failed to fetch post:', error);
-        alert('Failed to load post');
-        navigate('/admin/posts');
+        console.error('Failed to fetch gallery item:', error);
+        alert('Failed to load gallery item');
+        navigate('/admin/gallery');
       } finally {
         setIsLoading(false);
       }
@@ -151,11 +151,11 @@ export function EditPost() {
       };
 
       await postsAPI.update(id, payload);
-      alert('Post updated successfully!');
-      navigate('/admin/posts');
+      alert('Gallery item updated successfully!');
+      navigate('/admin/gallery');
     } catch (error: any) {
-      console.error('Update post error:', error);
-      alert(error.message || 'Failed to update post. Please try again.');
+      console.error('Update gallery item error:', error);
+      alert(error.message || 'Failed to update gallery item. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -176,14 +176,14 @@ export function EditPost() {
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => navigate('/admin/posts')}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            onClick={() => navigate('/admin/gallery')}
+            className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Post / Event</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">Update event information, description, date, and photo</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Gallery Item</h1>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Update showcase details, description, date, and photo displayed on the public Gallery page</p>
           </div>
         </div>
 
@@ -193,7 +193,7 @@ export function EditPost() {
             {/* 1. Image */}
             <div>
               <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Post Image / Event Banner
+                Gallery Photo / Showcase Banner
               </label>
               <div className="space-y-4">
                 {imagePreview ? (
@@ -206,7 +206,7 @@ export function EditPost() {
                     <button
                       type="button"
                       onClick={removeImage}
-                      className="absolute top-3 right-3 p-2 bg-red-600/90 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg"
+                      className="absolute top-3 right-3 p-2 bg-red-600/90 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
                       title="Remove image"
                     >
                       <X className="h-4 w-4" />
@@ -219,17 +219,17 @@ export function EditPost() {
                 ) : (
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-gray-50 dark:bg-gray-900/50">
                     <Upload className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload a replacement image</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG (automatically compressed)</p>
+                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload new image or drag & drop</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG from camera or phone</p>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
                       className="hidden"
-                      id="image-edit-upload"
+                      id="image-upload"
                     />
                     <label
-                      htmlFor="image-edit-upload"
+                      htmlFor="image-upload"
                       className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shadow-md transition-all"
                     >
                       Choose New Image
@@ -240,16 +240,19 @@ export function EditPost() {
             </div>
 
             {/* 2. Title & Category */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
                 <label htmlFor="title" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Event / Post Title *
+                  Title / Event Name *
                 </label>
                 <input
                   type="text"
                   id="title"
-                  {...register('title', { required: 'Title is required', minLength: { value: 2, message: 'Minimum 2 characters' } })}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  {...register('title', { required: 'Title is required' })}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors ${
+                    errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                  }`}
+                  placeholder="e.g., Preface 2.0 Orientation"
                 />
                 {errors.title && (
                   <p className="mt-1 text-xs text-red-500 font-medium">{errors.title.message}</p>
@@ -258,21 +261,15 @@ export function EditPost() {
 
               <div>
                 <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Category / Type
+                  Category *
                 </label>
-                <select
+                <input
+                  type="text"
                   id="category"
                   {...register('category')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                >
-                  <option value="Orientation & Event">Orientation & Event</option>
-                  <option value="Workshop & Bootcamp">Workshop & Bootcamp</option>
-                  <option value="Hackathon & Sprint">Hackathon & Sprint</option>
-                  <option value="Competition & Quiz">Competition & Quiz</option>
-                  <option value="Announcement">Announcement</option>
-                  <option value="Achievement">Achievement</option>
-                  <option value="Community Story">Community Story</option>
-                </select>
+                  placeholder="e.g., Workshop, Hackathon, Orientation, Meetup"
+                />
               </div>
             </div>
 
@@ -301,37 +298,37 @@ export function EditPost() {
                   id="location"
                   {...register('location')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., Seminar Hall / Main Auditorium, GECI"
+                  placeholder="e.g., College Auditorium / Online"
                 />
               </div>
             </div>
 
-            {/* 4. Description */}
+            {/* 4. Short Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                <FileText className="w-4 h-4 text-blue-500" />
-                <span>Description / Overview</span>
+              <label htmlFor="description" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Short Summary / Caption *
               </label>
-              <textarea
+              <input
+                type="text"
                 id="description"
-                rows={3}
                 {...register('description')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="Brief summary of the post..."
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                placeholder="Brief summary displayed on gallery cards"
               />
             </div>
 
-            {/* 5. Content */}
+            {/* 5. Detailed Content / Story */}
             <div>
-              <label htmlFor="content" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Detailed Content / Notes (Optional)
+              <label htmlFor="content" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                <FileText className="w-4 h-4 text-blue-500" />
+                <span>Full Story / Description (Optional)</span>
               </label>
               <textarea
                 id="content"
-                rows={5}
+                rows={4}
                 {...register('content')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="Full recap, agenda, speakers, participating branches, or outcomes..."
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                placeholder="Detailed highlights, key takeaways, and event achievements..."
               />
             </div>
 
@@ -347,6 +344,7 @@ export function EditPost() {
                   id="tags"
                   {...register('tags')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  placeholder="e.g., preface, orientation, mulearn, geckerala"
                 />
               </div>
 
@@ -360,6 +358,7 @@ export function EditPost() {
                   id="registrationLink"
                   {...register('registrationLink')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  placeholder="https://..."
                 />
               </div>
             </div>
@@ -368,7 +367,7 @@ export function EditPost() {
             <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
-                onClick={() => navigate('/admin/posts')}
+                onClick={() => navigate('/admin/gallery')}
                 className="px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium cursor-pointer"
               >
                 Cancel
