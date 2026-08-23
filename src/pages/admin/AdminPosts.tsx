@@ -251,7 +251,6 @@ export function AdminPosts() {
           </div>
         </div>
       </div>
-      </div>
 
       <ConfirmationModal
         isOpen={showDeleteModal}
