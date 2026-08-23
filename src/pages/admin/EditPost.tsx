@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Upload, X, Calendar, MapPin, Tag, Link as LinkIcon, FileText, Sparkles } from 'lucide-react';
+import { ArrowLeft, Upload, X, Calendar, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { postsAPI } from '../../services/api';
 import { getPostImageUrl } from '../../utils/imageUtils';
@@ -9,12 +9,8 @@ import { getPostImageUrl } from '../../utils/imageUtils';
 interface EditPostFormData {
   title: string;
   description: string;
-  content: string;
   category: string;
   eventDate: string;
-  location: string;
-  tags: string;
-  registrationLink: string;
 }
 
 const compressImageFile = (file: File): Promise<string> => {
@@ -59,6 +55,15 @@ const compressImageFile = (file: File): Promise<string> => {
   });
 };
 
+const POPULAR_CATEGORIES = [
+  'Event',
+  'Orientation',
+  'Workshop',
+  'Hackathon',
+  'Campus Life',
+  'Showcase'
+];
+
 export function EditPost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +73,8 @@ export function EditPost() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<EditPostFormData>();
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<EditPostFormData>();
+  const currentCategory = watch('category');
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -81,15 +87,13 @@ export function EditPost() {
         setCurrentPost(post);
         
         setValue('title', post.title || '');
-        setValue('description', post.description || '');
-        setValue('content', post.content || '');
-        setValue('category', post.category || 'Orientation & Event');
+        setValue('description', post.description || post.content || '');
+        setValue('category', post.category || 'Event');
         if (post.eventDate) {
           setValue('eventDate', new Date(post.eventDate).toISOString().split('T')[0]);
+        } else if (post.createdAt) {
+          setValue('eventDate', new Date(post.createdAt).toISOString().split('T')[0]);
         }
-        setValue('location', post.location || '');
-        setValue('tags', Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || ''));
-        setValue('registrationLink', post.registrationLink || '');
         
         if (post.image) {
           setImagePreview(getPostImageUrl(post.image));
@@ -139,12 +143,9 @@ export function EditPost() {
       const payload = {
         title: data.title.trim(),
         description: data.description ? data.description.trim() : '',
-        content: data.content ? data.content.trim() : '',
-        category: data.category || 'Orientation & Event',
+        content: data.description ? data.description.trim() : '',
+        category: data.category || 'Event',
         eventDate: data.eventDate || new Date().toISOString(),
-        location: data.location ? data.location.trim() : '',
-        tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-        registrationLink: data.registrationLink ? data.registrationLink.trim() : '',
         status: 'published',
         image: finalImageDataUrl || currentPost?.image,
         removeImage: !imagePreview ? 'true' : 'false'
@@ -173,7 +174,7 @@ export function EditPost() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="space-y-6 max-w-3xl mx-auto">
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/admin/gallery')}
@@ -182,18 +183,18 @@ export function EditPost() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Gallery Item</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">Update showcase details, description, date, and photo displayed on the public Gallery page</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Edit Gallery Item</h1>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Update photo, caption, date, and description</p>
           </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 transition-colors">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* 1. Image */}
+            {/* 1. Photo */}
             <div>
               <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Gallery Photo / Showcase Banner
+                Gallery Photo
               </label>
               <div className="space-y-4">
                 {imagePreview ? (
@@ -213,13 +214,13 @@ export function EditPost() {
                     </button>
                     <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs text-white flex items-center space-x-1.5 border border-white/20">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Image Optimized</span>
+                      <span>Ready to save</span>
                     </div>
                   </div>
                 ) : (
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-gray-50 dark:bg-gray-900/50">
                     <Upload className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload new image or drag & drop</p>
+                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload new photo</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG from camera or phone</p>
                     <input
                       type="file"
@@ -239,46 +240,31 @@ export function EditPost() {
               </div>
             </div>
 
-            {/* 2. Title & Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Title / Event Name *
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  {...register('title', { required: 'Title is required' })}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors ${
-                    errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
-                  }`}
-                  placeholder="e.g., Preface 2.0 Orientation"
-                />
-                {errors.title && (
-                  <p className="mt-1 text-xs text-red-500 font-medium">{errors.title.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Category *
-                </label>
-                <input
-                  type="text"
-                  id="category"
-                  {...register('category')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., Workshop, Hackathon, Orientation, Meetup"
-                />
-              </div>
+            {/* 2. Caption / Title */}
+            <div>
+              <label htmlFor="title" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Title / Caption *
+              </label>
+              <input
+                type="text"
+                id="title"
+                {...register('title', { required: 'Please enter a title or caption' })}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors ${
+                  errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                }`}
+                placeholder="e.g., Preface 2.0 Orientation"
+              />
+              {errors.title && (
+                <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
+              )}
             </div>
 
-            {/* 3. Event Date & Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 3. Date & Category */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="eventDate" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
                   <Calendar className="w-4 h-4 text-blue-500" />
-                  <span>Event Date</span>
+                  <span>Date</span>
                 </label>
                 <input
                   type="date"
@@ -289,82 +275,55 @@ export function EditPost() {
               </div>
 
               <div>
-                <label htmlFor="location" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <MapPin className="w-4 h-4 text-blue-500" />
-                  <span>Location / Venue</span>
+                <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <ImageIcon className="w-4 h-4 text-blue-500" />
+                  <span>Category</span>
                 </label>
                 <input
                   type="text"
-                  id="location"
-                  {...register('location')}
+                  id="category"
+                  {...register('category')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., College Auditorium / Online"
+                  placeholder="e.g., Event, Workshop, Hackathon"
                 />
               </div>
             </div>
 
-            {/* 4. Short Description */}
+            {/* Category quick pills */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400 self-center">Quick pick:</span>
+              {POPULAR_CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setValue('category', cat)}
+                  className={`text-xs px-3 py-1 rounded-full border transition-all cursor-pointer ${
+                    currentCategory === cat
+                      ? 'bg-blue-600 text-white border-blue-600 font-semibold'
+                      : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-blue-400'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* 4. Description */}
             <div>
               <label htmlFor="description" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Short Summary / Caption *
-              </label>
-              <input
-                type="text"
-                id="description"
-                {...register('description')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="Brief summary displayed on gallery cards"
-              />
-            </div>
-
-            {/* 5. Detailed Content / Story */}
-            <div>
-              <label htmlFor="content" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                <FileText className="w-4 h-4 text-blue-500" />
-                <span>Full Story / Description (Optional)</span>
+                Description (Optional)
               </label>
               <textarea
-                id="content"
-                rows={4}
-                {...register('content')}
+                id="description"
+                rows={3}
+                {...register('description')}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="Detailed highlights, key takeaways, and event achievements..."
+                placeholder="Add a brief description or notes about this moment..."
               />
-            </div>
-
-            {/* 6. Tags & Link */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="tags" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <Tag className="w-4 h-4 text-blue-500" />
-                  <span>Tags (comma separated)</span>
-                </label>
-                <input
-                  type="text"
-                  id="tags"
-                  {...register('tags')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., preface, orientation, mulearn, geckerala"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="registrationLink" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <LinkIcon className="w-4 h-4 text-blue-500" />
-                  <span>Link / Registration URL (Optional)</span>
-                </label>
-                <input
-                  type="url"
-                  id="registrationLink"
-                  {...register('registrationLink')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="https://..."
-                />
-              </div>
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => navigate('/admin/gallery')}
@@ -380,7 +339,7 @@ export function EditPost() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Saving Changes...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <span>Save Changes</span>

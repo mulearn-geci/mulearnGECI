@@ -99,7 +99,7 @@ export function Gallery() {
                       : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  {cat === 'all' ? 'All Posts' : cat}
+                  {cat === 'all' ? 'All Photos' : cat}
                 </button>
               ))}
             </div>
@@ -218,8 +218,8 @@ export function Gallery() {
             <div className="text-gray-400 dark:text-gray-500 mb-4">
               <Sparkles className="mx-auto h-12 w-12 text-blue-500 animate-pulse" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Posts in this Category</h3>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">New event highlights and orientations will appear here soon.</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Photos in this Category</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">New moments, event highlights, and orientations will appear here soon.</p>
           </div>
         )}
       </main>

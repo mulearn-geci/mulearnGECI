@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Upload, X, Calendar, MapPin, Tag, Link as LinkIcon, FileText, Sparkles } from 'lucide-react';
+import { ArrowLeft, Upload, X, Calendar, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { postsAPI } from '../../services/api';
 
 interface CreatePostFormData {
   title: string;
   description: string;
-  content: string;
   category: string;
   eventDate: string;
-  location: string;
-  tags: string;
-  registrationLink: string;
 }
 
 // Client-side image compression helper to prevent Vercel 4.5MB limit errors
@@ -59,20 +55,31 @@ const compressImageFile = (file: File): Promise<string> => {
   });
 };
 
+const POPULAR_CATEGORIES = [
+  'Event',
+  'Orientation',
+  'Workshop',
+  'Hackathon',
+  'Campus Life',
+  'Showcase'
+];
+
 export function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
   
-  const { register, handleSubmit, formState: { errors } } = useForm<CreatePostFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreatePostFormData>({
     defaultValues: {
-      category: 'Orientation & Event',
+      category: 'Event',
       eventDate: new Date().toISOString().split('T')[0],
-      location: 'Government Engineering College Idukki',
-      tags: 'mulearn, event, campus'
+      title: '',
+      description: ''
     }
   });
+
+  const currentCategory = watch('category');
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -96,13 +103,12 @@ export function CreatePost() {
 
   const onSubmit = async (data: CreatePostFormData) => {
     if (!imagePreview && !selectedImage) {
-      alert('Please upload an image for the gallery item');
+      alert('Please upload a photo for the gallery');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Compress image to ensure payload stays well below 4.5MB
       let finalImageDataUrl = imagePreview;
       if (selectedImage && (!finalImageDataUrl || !finalImageDataUrl.startsWith('data:image'))) {
         finalImageDataUrl = await compressImageFile(selectedImage);
@@ -111,18 +117,18 @@ export function CreatePost() {
       const payload = {
         title: data.title.trim(),
         description: data.description ? data.description.trim() : '',
-        content: data.content ? data.content.trim() : '',
-        category: data.category || 'event',
+        content: data.description ? data.description.trim() : '',
+        category: data.category || 'Event',
         eventDate: data.eventDate || new Date().toISOString(),
-        location: data.location ? data.location.trim() : '',
-        tags: data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-        registrationLink: data.registrationLink ? data.registrationLink.trim() : '',
+        location: '',
+        tags: [],
+        registrationLink: '',
         status: 'published',
         image: finalImageDataUrl
       };
 
       await postsAPI.create(payload);
-      alert('Gallery item published successfully!');
+      alert('Photo added to gallery successfully!');
       navigate('/admin/gallery');
     } catch (error: any) {
       console.error('Create gallery item error:', error);
@@ -134,7 +140,7 @@ export function CreatePost() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="space-y-6 max-w-3xl mx-auto">
         {/* Top Header */}
         <div className="flex items-center space-x-4">
           <button
@@ -144,18 +150,18 @@ export function CreatePost() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add to Gallery</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">Upload event photos, hackathons, orientations, and showcases to display on the public Gallery page</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Add Photo to Gallery</h1>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Upload a photo with a caption and date to showcase on the main website</p>
           </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 transition-colors">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* 1. Post Image Upload */}
+            {/* 1. Photo Upload */}
             <div>
               <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Gallery Photo / Showcase Banner *
+                Gallery Photo *
               </label>
               <div className="space-y-4">
                 {imagePreview ? (
@@ -175,14 +181,14 @@ export function CreatePost() {
                     </button>
                     <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs text-white flex items-center space-x-1.5 border border-white/20">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Optimized & Ready for Upload</span>
+                      <span>Ready to upload</span>
                     </div>
                   </div>
                 ) : (
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-gray-50 dark:bg-gray-900/50">
                     <Upload className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload or drag & drop</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG from camera or phone (automatically compressed)</p>
+                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload photo or drag & drop</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG from camera or phone</p>
                     <input
                       type="file"
                       accept="image/*"
@@ -201,46 +207,31 @@ export function CreatePost() {
               </div>
             </div>
 
-            {/* 2. Title & Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Title / Event Name *
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  {...register('title', { required: 'Title is required' })}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors ${
-                    errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
-                  }`}
-                  placeholder="e.g., Preface 2.0 Orientation"
-                />
-                {errors.title && (
-                  <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  Category *
-                </label>
-                <input
-                  type="text"
-                  id="category"
-                  {...register('category')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., Workshop, Hackathon, Orientation, Meetup"
-                />
-              </div>
+            {/* 2. Caption / Title */}
+            <div>
+              <label htmlFor="title" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Title / Caption *
+              </label>
+              <input
+                type="text"
+                id="title"
+                {...register('title', { required: 'Please enter a title or caption' })}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors ${
+                  errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                }`}
+                placeholder="e.g., Preface 2.0 Orientation, Hackathon 2026, IoT Workshop"
+              />
+              {errors.title && (
+                <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>
+              )}
             </div>
 
-            {/* 3. Event Date & Location */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 3. Date & Category */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="eventDate" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
                   <Calendar className="w-4 h-4 text-blue-500" />
-                  <span>Event Date</span>
+                  <span>Date</span>
                 </label>
                 <input
                   type="date"
@@ -251,82 +242,55 @@ export function CreatePost() {
               </div>
 
               <div>
-                <label htmlFor="location" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <MapPin className="w-4 h-4 text-blue-500" />
-                  <span>Location / Venue</span>
+                <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                  <ImageIcon className="w-4 h-4 text-blue-500" />
+                  <span>Category</span>
                 </label>
                 <input
                   type="text"
-                  id="location"
-                  {...register('location')}
+                  id="category"
+                  {...register('category')}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., College Auditorium / Online"
+                  placeholder="e.g., Event, Workshop, Hackathon"
                 />
               </div>
             </div>
 
-            {/* 4. Short Description */}
+            {/* Category quick pills */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400 self-center">Quick pick:</span>
+              {POPULAR_CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setValue('category', cat)}
+                  className={`text-xs px-3 py-1 rounded-full border transition-all cursor-pointer ${
+                    currentCategory === cat
+                      ? 'bg-blue-600 text-white border-blue-600 font-semibold'
+                      : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-blue-400'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* 4. Description */}
             <div>
               <label htmlFor="description" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Short Summary / Caption *
-              </label>
-              <input
-                type="text"
-                id="description"
-                {...register('description')}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="Brief summary displayed on gallery cards"
-              />
-            </div>
-
-            {/* 5. Detailed Content / Story */}
-            <div>
-              <label htmlFor="content" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                <FileText className="w-4 h-4 text-blue-500" />
-                <span>Full Story / Description (Optional)</span>
+                Description (Optional)
               </label>
               <textarea
-                id="content"
-                rows={4}
-                {...register('content')}
+                id="description"
+                rows={3}
+                {...register('description')}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                placeholder="Detailed highlights, key takeaways, and event achievements..."
+                placeholder="Add a brief description or notes about this moment..."
               />
-            </div>
-
-            {/* 6. Tags & Link */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="tags" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <Tag className="w-4 h-4 text-blue-500" />
-                  <span>Tags (comma separated)</span>
-                </label>
-                <input
-                  type="text"
-                  id="tags"
-                  {...register('tags')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="e.g., preface, orientation, mulearn, geckerala"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="registrationLink" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
-                  <LinkIcon className="w-4 h-4 text-blue-500" />
-                  <span>Link / Registration URL (Optional)</span>
-                </label>
-                <input
-                  type="url"
-                  id="registrationLink"
-                  {...register('registrationLink')}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
-                  placeholder="https://..."
-                />
-              </div>
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => navigate('/admin/gallery')}
@@ -342,10 +306,10 @@ export function CreatePost() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Compressing & Publishing...</span>
+                    <span>Uploading...</span>
                   </>
                 ) : (
-                  <span>Publish to Gallery</span>
+                  <span>Add to Gallery</span>
                 )}
               </button>
             </div>
