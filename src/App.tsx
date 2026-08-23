@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -72,13 +72,10 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
+          {/* Redirect legacy /admin/posts URL to /admin/gallery */}
           <Route 
             path="/admin/posts" 
-            element={
-              <ProtectedRoute>
-                <AdminPosts />
-              </ProtectedRoute>
-            } 
+            element={<Navigate to="/admin/gallery" replace />} 
           />
           <Route 
             path="/admin/events" 
@@ -120,13 +117,10 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
+          {/* Redirect legacy /admin/posts/create URL to /admin/gallery/create */}
           <Route 
             path="/admin/posts/create" 
-            element={
-              <ProtectedRoute>
-                <CreatePost />
-              </ProtectedRoute>
-            } 
+            element={<Navigate to="/admin/gallery/create" replace />} 
           />
           <Route 
             path="/admin/events/create" 
@@ -144,13 +138,10 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
+          {/* Redirect legacy /admin/posts/edit/:id */}
           <Route 
             path="/admin/posts/edit/:id" 
-            element={
-              <ProtectedRoute>
-                <EditPost />
-              </ProtectedRoute>
-            } 
+            element={<Navigate to="/admin/gallery" replace />} 
           />
           <Route 
             path="/admin/events/edit/:id" 
