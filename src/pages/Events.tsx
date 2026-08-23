@@ -149,7 +149,15 @@ export function Events() {
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
               {filteredEvents.map((event, index) => {
                 const eventDate = new Date(event.date);
-                const isPast = eventDate <= new Date();
+                const now = new Date();
+                const isPast = eventDate <= now;
+
+                // If a registration deadline is set, check if it has passed (valid until end of the deadline day)
+                const isRegistrationClosed = event.registrationDeadline
+                  ? new Date(new Date(event.registrationDeadline).setHours(23, 59, 59, 999)) < now
+                  : false;
+
+                const showRegisterButton = !isPast && !isRegistrationClosed && Boolean(event.registrationLink && event.registrationLink.trim() !== '');
 
                 return (
                   <motion.div
@@ -209,12 +217,13 @@ export function Events() {
                         </div>
                       </div>
 
-                      {!isPast && event.registrationLink && event.registrationLink.trim() !== '' && (
+                      {showRegisterButton && (
                         <div className="pt-3 border-t border-gray-100 dark:border-gray-700/60 mt-4">
                           <RegistrationButton
                             eventId={event._id || event.id}
                             eventTitle={event.title}
                             registrationLink={event.registrationLink}
+                            registrationDeadline={event.registrationDeadline}
                           />
                         </div>
                       )}

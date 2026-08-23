@@ -5,16 +5,30 @@ interface RegistrationButtonProps {
   eventId?: string;
   eventTitle?: string;
   registrationLink?: string;
+  registrationDeadline?: string | Date;
   className?: string;
 }
 
 export function RegistrationButton({ 
   registrationLink, 
+  registrationDeadline,
   className = "" 
 }: RegistrationButtonProps) {
   // If no registration link is provided, do not render any button
   if (!registrationLink || typeof registrationLink !== 'string' || registrationLink.trim() === '') {
     return null;
+  }
+
+  // If a registration deadline was set and has passed, automatically disappear
+  if (registrationDeadline) {
+    const deadlineDate = new Date(registrationDeadline);
+    if (!isNaN(deadlineDate.getTime())) {
+      // Allow registration until end of the deadline day (23:59:59)
+      deadlineDate.setHours(23, 59, 59, 999);
+      if (deadlineDate.getTime() < Date.now()) {
+        return null;
+      }
+    }
   }
 
   const rawLink = registrationLink.trim();
