@@ -13,7 +13,9 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { postsAPI, eventsAPI } from '../../services/api';
@@ -338,12 +340,12 @@ export function AdminDashboard() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link
-                to="/admin/posts/create"
+                to="/admin/gallery/create"
                 className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors"
               >
                 <Plus className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-                <p className="font-medium text-gray-700 dark:text-gray-200">New Post</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Create a new post</p>
+                <p className="font-medium text-gray-700 dark:text-gray-200">New Gallery Item</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Upload to showcase</p>
               </Link>
               <Link
                 to="/admin/events/create"
@@ -354,20 +356,20 @@ export function AdminDashboard() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Create a new event</p>
               </Link>
               <Link
-                to="/admin/posts"
-                className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
+                to="/admin/about"
+                className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors"
               >
-                <FileText className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                <p className="font-medium text-gray-700 dark:text-gray-200">Manage Posts</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">View all posts</p>
+                <Info className="h-8 w-8 text-indigo-400 mx-auto mb-2" />
+                <p className="font-medium text-gray-700 dark:text-gray-200">About Page Editor</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Edit Mission, Vision & Photo</p>
               </Link>
               <Link
-                to="/admin/events"
-                className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center hover:border-orange-500 dark:hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900 transition-colors"
+                to="/admin/homepage"
+                className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
               >
-                <Calendar className="h-8 w-8 text-orange-400 mx-auto mb-2" />
-                <p className="font-medium text-gray-700 dark:text-gray-200">Manage Events</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">View all events</p>
+                <Sparkles className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                <p className="font-medium text-gray-700 dark:text-gray-200">Homepage Customizer</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Customize cards & IGs</p>
               </Link>
             </div>
           </motion.div>

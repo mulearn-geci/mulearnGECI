@@ -19,6 +19,7 @@ import { AdminExecom } from './pages/admin/AdminExecom';
 import { AdminAlumni } from './pages/admin/AdminAlumni';
 import { AdminLeaderboard } from './pages/admin/AdminLeaderboard';
 import { AdminHomepage } from './pages/admin/AdminHomepage';
+import { AdminAbout } from './pages/admin/AdminAbout';
 import { CreatePost } from './pages/admin/CreatePost';
 import { CreateEvent } from './pages/admin/CreateEvent';
 import { EditPost } from './pages/admin/EditPost';
@@ -61,6 +62,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <AdminHomepage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/about" 
+            element={
+              <ProtectedRoute>
+                <AdminAbout />
               </ProtectedRoute>
             } 
           />

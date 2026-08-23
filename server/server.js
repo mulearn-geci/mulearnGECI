@@ -21,6 +21,7 @@ const alumniRoutes = require('./routes/alumni');
 const alumniController = require('./controllers/alumniController');
 const leaderboardRoutes = require('./routes/leaderboard');
 const homepageConfigRoutes = require('./routes/homepageConfig');
+const aboutConfigRoutes = require('./routes/aboutConfig');
 
 // Import middleware
 const logger = require('./utils/logger');
@@ -120,6 +121,7 @@ app.use(['/api/execom', '/execom'], execomRoutes);
 app.use(['/api/alumni', '/alumni'], alumniRoutes);
 app.use(['/api/leaderboard', '/leaderboard'], leaderboardRoutes);
 app.use(['/api/homepage-config', '/homepage-config'], homepageConfigRoutes);
+app.use(['/api/about-config', '/about-config'], aboutConfigRoutes);
 
 // Health check endpoint
 app.get(['/api/health', '/health'], (req, res) => {

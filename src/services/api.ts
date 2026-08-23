@@ -20,6 +20,7 @@ const CACHE_TTL: Record<string, number> = {
   alumni:      10 * 60_000,
   leaderboard: 5 * 60_000,
   homepage:    3 * 60_000,   // 3 min — admin may tweak often
+  about:       5 * 60_000,   // 5 min
   default:     5 * 60_000,
 };
 
@@ -551,6 +552,37 @@ export const homepageAPI = {
       throw new Error(err.message || 'Failed to save homepage configuration');
     }
     invalidateCache('/homepage-config');
+    return response.json();
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// About Page Customizer API
+// ─────────────────────────────────────────────────────────────
+export const aboutAPI = {
+  getConfig: async () => {
+    const url = `${API_BASE_URL}/about-config`;
+    return cachedGet(url);
+  },
+
+  saveConfig: async (config: {
+    hero?: { badge?: string; title?: string; description?: string };
+    mission?: { title?: string; description?: string };
+    vision?: { title?: string; description?: string };
+    image?: string;
+    imageAlt?: string;
+    values?: Array<{ id?: string; icon?: string; title: string; description: string }>;
+  }) => {
+    const response = await fetch(`${API_BASE_URL}/about-config`, {
+      method: 'POST',
+      headers: createAuthHeaders(),
+      body: JSON.stringify(config),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to save about configuration');
+    }
+    invalidateCache('/about-config');
     return response.json();
   }
 };
