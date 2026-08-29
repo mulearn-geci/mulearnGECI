@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Filter, Image as ImageIcon } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { postsAPI } from '../../services/api';
@@ -154,6 +154,12 @@ export function AdminPosts() {
                       {post.status}
                     </span>
                   </div>
+                  {post.images && post.images.length > 1 && (
+                    <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 shadow">
+                      <ImageIcon className="w-3 h-3" />
+                      <span>{post.images.length} photos</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-6 flex flex-col justify-between flex-1">

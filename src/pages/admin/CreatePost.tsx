@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Upload, X, Calendar, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { postsAPI } from '../../services/api';
+import { MultiImageUploader } from '../../components/MultiImageUploader';
 
 interface CreatePostFormData {
   title: string;
@@ -11,49 +12,6 @@ interface CreatePostFormData {
   category: string;
   eventDate: string;
 }
-
-// Client-side image compression helper to prevent Vercel 4.5MB limit errors
-const compressImageFile = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const maxWidth = 1600;
-        const maxHeight = 1200;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth || height > maxHeight) {
-          if (width / height > maxWidth / maxHeight) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          } else {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(event.target?.result as string);
-          return;
-        }
-
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        resolve(dataUrl);
-      };
-      img.onerror = () => reject(new Error('Failed to load image for compression'));
-    };
-    reader.onerror = () => reject(new Error('Failed to read file'));
-  });
-};
 
 const POPULAR_CATEGORIES = [
   'Event',
@@ -66,8 +24,7 @@ const POPULAR_CATEGORIES = [
 
 export function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
   const navigate = useNavigate();
   
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreatePostFormData>({
@@ -81,39 +38,14 @@ export function CreatePost() {
 
   const currentCategory = watch('category');
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      try {
-        const compressed = await compressImageFile(file);
-        setImagePreview(compressed);
-      } catch (err) {
-        const reader = new FileReader();
-        reader.onload = (e) => setImagePreview(e.target?.result as string);
-        reader.readAsDataURL(file);
-      }
-    }
-  };
-
-  const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-  };
-
   const onSubmit = async (data: CreatePostFormData) => {
-    if (!imagePreview && !selectedImage) {
-      alert('Please upload a photo for the gallery');
+    if (images.length === 0) {
+      alert('Please upload at least one photo for the gallery');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      let finalImageDataUrl = imagePreview;
-      if (selectedImage && (!finalImageDataUrl || !finalImageDataUrl.startsWith('data:image'))) {
-        finalImageDataUrl = await compressImageFile(selectedImage);
-      }
-
       const payload = {
         title: data.title.trim(),
         description: data.description ? data.description.trim() : '',
@@ -124,7 +56,8 @@ export function CreatePost() {
         tags: [],
         registrationLink: '',
         status: 'published',
-        image: finalImageDataUrl
+        image: images[0],
+        images: images
       };
 
       await postsAPI.create(payload);
@@ -158,54 +91,14 @@ export function CreatePost() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 transition-colors">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* 1. Photo Upload */}
-            <div>
-              <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Gallery Photo *
-              </label>
-              <div className="space-y-4">
-                {imagePreview ? (
-                  <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-md bg-gray-900">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full max-h-96 object-contain mx-auto"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute top-3 right-3 p-2 bg-red-600/90 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
-                      title="Remove image"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                    <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs text-white flex items-center space-x-1.5 border border-white/20">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Ready to upload</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-gray-50 dark:bg-gray-900/50">
-                    <Upload className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload photo or drag & drop</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG from camera or phone</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label
-                      htmlFor="image-upload"
-                      className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shadow-md transition-all"
-                    >
-                      Choose Image File
-                    </label>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* 1. Photos Upload (Multiple) */}
+            <MultiImageUploader
+              images={images}
+              onChange={setImages}
+              maxImages={10}
+              label="Gallery Photos"
+              helperText="Upload photos for this gallery post. The first image will be shown on the gallery grid card."
+            />
 
             {/* 2. Caption / Title */}
             <div>

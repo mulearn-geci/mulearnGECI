@@ -132,16 +132,27 @@ router.get('/:id', validateObjectId, async (req, res) => {
 router.post('/', adminAuth, upload.single('image'), handleUploadError, validateEvent, async (req, res) => {
   try {
     let image = '';
-    if (req.file) {
-      image = processUploadedFile(req.file, 'events');
-    } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
-      image = req.body.image.trim();
+    let images = [];
+
+    if (req.body.images) {
+      const parsed = parseSafe(req.body.images, []);
+      images = Array.isArray(parsed) ? parsed.filter(Boolean) : (typeof parsed === 'string' ? [parsed] : []);
     }
 
-    if (!image) {
+    if (req.file) {
+      image = processUploadedFile(req.file, 'events');
+      if (!images.includes(image)) images.unshift(image);
+    } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
+      image = req.body.image.trim();
+      if (!images.includes(image)) images.unshift(image);
+    } else if (images.length > 0) {
+      image = images[0];
+    }
+
+    if (!image && images.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Image is required'
+        message: 'At least one event image is required'
       });
     }
 
@@ -182,6 +193,7 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateE
       description: description ? description.trim() : '',
       content: content ? content.trim() : '',
       image,
+      images: images.length > 0 ? images : [image],
       imageAlt: imageAlt || title || '',
       date: date ? new Date(date) : new Date(),
       time: time || '10:00 AM',
@@ -301,11 +313,34 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
     if (currency) event.currency = currency;
     if (imageAlt !== undefined) event.imageAlt = imageAlt;
 
-    // Update image if new one is uploaded or provided
+    // Update image/images if new ones are uploaded or provided
+    let updatedImages = undefined;
+    if (req.body.images !== undefined) {
+      const parsed = parseSafe(req.body.images, []);
+      updatedImages = Array.isArray(parsed) ? parsed.filter(Boolean) : (typeof parsed === 'string' ? [parsed] : []);
+    }
+
     if (req.file) {
-      event.image = processUploadedFile(req.file, 'events');
+      const newImg = processUploadedFile(req.file, 'events');
+      event.image = newImg;
+      if (updatedImages) {
+        if (!updatedImages.includes(newImg)) updatedImages.unshift(newImg);
+        event.images = updatedImages;
+      } else {
+        event.images = [newImg, ...(event.images || []).filter(img => img !== event.image)];
+      }
     } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
       event.image = req.body.image.trim();
+      if (updatedImages) {
+        event.images = updatedImages;
+      } else if (!event.images || event.images.length === 0) {
+        event.images = [event.image];
+      }
+    } else if (updatedImages !== undefined) {
+      event.images = updatedImages;
+      if (updatedImages.length > 0) {
+        event.image = updatedImages[0];
+      }
     }
 
     await event.save();

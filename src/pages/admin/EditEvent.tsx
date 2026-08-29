@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Upload, X, Calendar, Clock, MapPin, Users, Tag, Link as LinkIcon, FileText, Sparkles, Award } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, Users, Tag, Link as LinkIcon, FileText, Award } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { eventsAPI } from '../../services/api';
 import { getEventImageUrl } from '../../utils/imageUtils';
+import { MultiImageUploader } from '../../components/MultiImageUploader';
 
 interface EditEventFormData {
   title: string;
@@ -24,58 +25,15 @@ interface EditEventFormData {
   registrationDeadline?: string;
 }
 
-const compressImageFile = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const maxWidth = 1600;
-        const maxHeight = 1200;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth || height > maxHeight) {
-          if (width / height > maxWidth / maxHeight) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          } else {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(event.target?.result as string);
-          return;
-        }
-
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        resolve(dataUrl);
-      };
-      img.onerror = () => reject(new Error('Failed to load image for compression'));
-    };
-    reader.onerror = () => reject(new Error('Failed to read file'));
-  });
-};
-
 export function EditEvent() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [currentEvent, setCurrentEvent] = useState<any>(null);
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { id } = useParams();
-
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<EditEventFormData>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<any>(null);
+  const [images, setImages] = useState<string[]>([]);
+  
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<EditEventFormData>();
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -107,8 +65,10 @@ export function EditEvent() {
           setValue('registrationDeadline', new Date(event.registrationDeadline).toISOString().split('T')[0]);
         }
         
-        if (event.image) {
-          setImagePreview(getEventImageUrl(event.image));
+        if (event.images && Array.isArray(event.images) && event.images.length > 0) {
+          setImages(event.images.map((img: string) => getEventImageUrl(img)));
+        } else if (event.image) {
+          setImages([getEventImageUrl(event.image)]);
         }
       } catch (error) {
         console.error('Failed to fetch event:', error);
@@ -122,36 +82,16 @@ export function EditEvent() {
     fetchEvent();
   }, [id, setValue, navigate]);
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      try {
-        const compressed = await compressImageFile(file);
-        setImagePreview(compressed);
-      } catch (err) {
-        const reader = new FileReader();
-        reader.onload = (e) => setImagePreview(e.target?.result as string);
-        reader.readAsDataURL(file);
-      }
-    }
-  };
-
-  const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-  };
-
   const onSubmit = async (data: EditEventFormData) => {
     if (!id) return;
 
+    if (images.length === 0) {
+      alert('Please upload at least one image for the event');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      let finalImageDataUrl = imagePreview;
-      if (selectedImage) {
-        finalImageDataUrl = await compressImageFile(selectedImage);
-      }
-
       const payload = {
         title: data.title.trim(),
         description: data.description.trim(),
@@ -169,7 +109,8 @@ export function EditEvent() {
         featured: data.featured === true,
         registrationLink: data.registrationLink ? data.registrationLink.trim() : '',
         registrationDeadline: data.registrationDeadline || undefined,
-        image: finalImageDataUrl || currentEvent?.image
+        image: images.length > 0 ? images[0] : (currentEvent?.image || ''),
+        images: images
       };
 
       await eventsAPI.update(id, payload);
@@ -212,54 +153,14 @@ export function EditEvent() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-8 border border-gray-200 dark:border-gray-700 transition-colors">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* 1. Event Banner Image */}
-            <div>
-              <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Event Banner Image
-              </label>
-              <div className="space-y-4">
-                {imagePreview ? (
-                  <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-md bg-gray-900">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full max-h-80 object-contain mx-auto"
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute top-3 right-3 p-2 bg-red-600/90 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
-                      title="Remove image"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                    <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs text-white flex items-center space-x-1.5 border border-white/20">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Ready to save</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-gray-50 dark:bg-gray-900/50">
-                    <Upload className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold mb-1">Click to upload new banner</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">PNG, JPG, JPEG from camera or computer</p>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                      id="event-image-upload"
-                    />
-                    <label
-                      htmlFor="event-image-upload"
-                      className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shadow-md transition-all"
-                    >
-                      Choose New Image
-                    </label>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* 1. Event Images (Multiple) */}
+            <MultiImageUploader
+              images={images}
+              onChange={setImages}
+              maxImages={10}
+              label="Event Images & Banner Posters"
+              helperText="Upload or update event posters, photos, and highlights. The first image will be used as the primary cover banner."
+            />
 
             {/* 2. Event Title */}
             <div>

@@ -1,12 +1,22 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, X, Sparkles } from 'lucide-react';
+import { Calendar, X, Sparkles, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 import { postsAPI } from '../services/api';
 import { getPostImageUrl } from '../utils/imageUtils';
 import { FilterBar, EmptyFilterState } from '../components/FilterBar';
 import { useFilterState } from '../hooks/useFilterState';
 
-function GalleryImage({ src, alt, onClick }: { src: string; alt: string; onClick: () => void }) {
+function GalleryImage({
+  src,
+  alt,
+  photoCount,
+  onClick
+}: {
+  src: string;
+  alt: string;
+  photoCount?: number;
+  onClick: () => void;
+}) {
   return (
     <div
       className="w-full h-64 bg-gray-900 rounded-t-2xl overflow-hidden cursor-pointer relative group"
@@ -17,9 +27,25 @@ function GalleryImage({ src, alt, onClick }: { src: string; alt: string; onClick
         alt={alt}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
+
+      {/* Multi-photo badge */}
+      {photoCount !== undefined && photoCount > 1 && (
+        <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-md flex items-center gap-1.5 z-10">
+          <Images className="w-3.5 h-3.5 text-blue-400" />
+          <span>{photoCount} Photos</span>
+        </div>
+      )}
+
       <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-        <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20">
-          Click to expand
+        <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5">
+          {photoCount && photoCount > 1 ? (
+            <>
+              <Images className="w-3.5 h-3.5 text-blue-400" />
+              <span>View {photoCount} Photos</span>
+            </>
+          ) : (
+            <span>Click to expand</span>
+          )}
         </span>
       </div>
     </div>
@@ -30,8 +56,13 @@ export function Gallery() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Image modal
-  const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string } | null>(null);
+  // Multi-image Lightbox state
+  const [lightbox, setLightbox] = useState<{
+    images: string[];
+    currentIndex: number;
+    title: string;
+    description?: string;
+  } | null>(null);
 
   // Filter state (URL-synced)
   const { filters, debouncedSearch, setFilter, clearFilters, hasActiveFilters } = useFilterState();
@@ -103,8 +134,57 @@ export function Gallery() {
     });
   }, [posts, debouncedSearch, filters.category, filters.month]);
 
-  const openImage = (src: string, alt: string) => setSelectedImage({ src, alt });
-  const closeImage = () => setSelectedImage(null);
+  const openLightbox = (post: any, initialIndex: number = 0) => {
+    const rawImages = (post.images && Array.isArray(post.images) && post.images.length > 0)
+      ? post.images
+      : (post.image ? [post.image] : []);
+
+    const resolvedImages = rawImages.map((img: string) => getPostImageUrl(img));
+    if (resolvedImages.length === 0) return;
+
+    setLightbox({
+      images: resolvedImages,
+      currentIndex: Math.max(0, Math.min(initialIndex, resolvedImages.length - 1)),
+      title: post.title,
+      description: post.description
+    });
+  };
+
+  const closeLightbox = () => setLightbox(null);
+
+  const nextImage = useCallback(() => {
+    setLightbox(prev => {
+      if (!prev || prev.images.length <= 1) return prev;
+      return {
+        ...prev,
+        currentIndex: (prev.currentIndex + 1) % prev.images.length
+      };
+    });
+  }, []);
+
+  const prevImage = useCallback(() => {
+    setLightbox(prev => {
+      if (!prev || prev.images.length <= 1) return prev;
+      return {
+        ...prev,
+        currentIndex: (prev.currentIndex - 1 + prev.images.length) % prev.images.length
+      };
+    });
+  }, []);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightbox) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') nextImage();
+      else if (e.key === 'ArrowLeft') prevImage();
+      else if (e.key === 'Escape') closeLightbox();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightbox, nextImage, prevImage]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
@@ -164,6 +244,10 @@ export function Gallery() {
                 ? new Date(post.eventDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
                 : new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
+              const postPhotos = post.images && Array.isArray(post.images) && post.images.length > 0
+                ? post.images
+                : (post.image ? [post.image] : []);
+
               return (
                 <motion.article
                   key={post._id || index}
@@ -173,11 +257,12 @@ export function Gallery() {
                   className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-blue-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
-                    {post.image && (
+                    {postPhotos.length > 0 && (
                       <GalleryImage
-                        src={getPostImageUrl(post.image)}
+                        src={getPostImageUrl(postPhotos[0])}
                         alt={post.title}
-                        onClick={() => openImage(getPostImageUrl(post.image), post.title)}
+                        photoCount={postPhotos.length}
+                        onClick={() => openLightbox(post, 0)}
                       />
                     )}
 
@@ -196,7 +281,10 @@ export function Gallery() {
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-display text-xl font-bold text-gray-900 dark:text-white mb-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <h3
+                        onClick={() => openLightbox(post, 0)}
+                        className="font-display text-xl font-bold text-gray-900 dark:text-white mb-2 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors cursor-pointer"
+                      >
                         {post.title}
                       </h3>
 
@@ -229,36 +317,103 @@ export function Gallery() {
         )}
       </main>
 
-      {/* Enlarged Image Modal */}
+      {/* Multi-Image Interactive Lightbox Modal */}
       <AnimatePresence>
-        {selectedImage && (
+        {lightbox && (
           <motion.div
-            className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-2 sm:p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={closeImage}
+            onClick={closeLightbox}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-5xl max-h-[90vh] bg-gray-900 rounded-3xl overflow-hidden shadow-2xl border border-white/20 p-2"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative max-w-5xl w-full max-h-[92vh] bg-gray-950 rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col justify-between"
               onClick={e => e.stopPropagation()}
             >
-              <button
-                onClick={closeImage}
-                className="absolute top-4 right-4 z-10 bg-black/70 text-white rounded-full p-2.5 hover:bg-red-600 transition-colors shadow-lg"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.alt}
-                className="w-full max-h-[85vh] object-contain rounded-2xl"
-              />
-              <div className="p-4 text-center">
-                <p className="text-white font-bold text-lg">{selectedImage.alt}</p>
+              {/* Top Controls Bar */}
+              <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
+                {/* Photo counter */}
+                <div className="pointer-events-auto bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20 shadow-md">
+                  {lightbox.images.length > 1 ? (
+                    <span>{lightbox.currentIndex + 1} / {lightbox.images.length}</span>
+                  ) : (
+                    <span>Photo</span>
+                  )}
+                </div>
+
+                {/* Close Button */}
+                <button
+                  onClick={closeLightbox}
+                  className="pointer-events-auto bg-black/70 hover:bg-red-600 text-white rounded-full p-2.5 transition-colors shadow-lg border border-white/20"
+                  title="Close (Esc)"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Main Image Area with Previous / Next Arrows */}
+              <div className="relative flex items-center justify-center w-full min-h-[50vh] max-h-[75vh] p-2 pt-14">
+                {/* Previous Button */}
+                {lightbox.images.length > 1 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-blue-600 text-white p-2.5 sm:p-3 rounded-full transition-all duration-200 backdrop-blur-md shadow-xl border border-white/20 group"
+                    title="Previous photo (Left Arrow)"
+                  >
+                    <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+                  </button>
+                )}
+
+                {/* Active Image */}
+                <img
+                  key={lightbox.currentIndex}
+                  src={lightbox.images[lightbox.currentIndex]}
+                  alt={`${lightbox.title} - ${lightbox.currentIndex + 1}`}
+                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
+                />
+
+                {/* Next Button */}
+                {lightbox.images.length > 1 && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-blue-600 text-white p-2.5 sm:p-3 rounded-full transition-all duration-200 backdrop-blur-md shadow-xl border border-white/20 group"
+                    title="Next photo (Right Arrow)"
+                  >
+                    <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                )}
+              </div>
+
+              {/* Bottom Caption & Thumbnail Dots */}
+              <div className="p-4 sm:p-6 bg-gray-900/90 border-t border-white/10 text-center space-y-2">
+                <p className="text-white font-bold text-base sm:text-lg">{lightbox.title}</p>
+                {lightbox.description && (
+                  <p className="text-xs sm:text-sm text-gray-300 max-w-2xl mx-auto line-clamp-2">
+                    {lightbox.description}
+                  </p>
+                )}
+
+                {/* Thumbnail dots indicator */}
+                {lightbox.images.length > 1 && (
+                  <div className="flex items-center justify-center gap-1.5 pt-1 overflow-x-auto max-w-md mx-auto py-1">
+                    {lightbox.images.map((_, dotIdx) => (
+                      <button
+                        key={dotIdx}
+                        onClick={() => setLightbox(prev => prev ? { ...prev, currentIndex: dotIdx } : null)}
+                        className={`h-2 rounded-full transition-all duration-200 ${
+                          dotIdx === lightbox.currentIndex
+                            ? 'w-6 bg-blue-500'
+                            : 'w-2 bg-gray-600 hover:bg-gray-400'
+                        }`}
+                        title={`Go to photo ${dotIdx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

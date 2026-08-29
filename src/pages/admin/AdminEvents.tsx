@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Users, Calendar as CalendarIcon, MapPin, Search, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Calendar as CalendarIcon, MapPin, Search, Filter, Image as ImageIcon } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { eventsAPI } from '../../services/api';
@@ -170,6 +170,12 @@ export function AdminEvents() {
                         {event.status || 'upcoming'}
                       </span>
                     </div>
+                    {event.images && event.images.length > 1 && (
+                      <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 shadow">
+                        <ImageIcon className="w-3 h-3" />
+                        <span>{event.images.length} photos</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1 p-5 sm:p-6">

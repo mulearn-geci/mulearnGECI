@@ -19,8 +19,11 @@ const eventSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    required: [true, 'Image is required']
+    required: false
   },
+  images: [{
+    type: String
+  }],
   imageAlt: {
     type: String,
     default: ''
@@ -170,6 +173,15 @@ eventSchema.pre('save', function(next) {
 
   if (eventDateTime < now && this.status === 'upcoming') {
     this.status = 'completed';
+  }
+
+  // Synchronize primary image and images array
+  if (Array.isArray(this.images) && this.images.length > 0) {
+    if (!this.image) {
+      this.image = this.images[0];
+    }
+  } else if (this.image) {
+    this.images = [this.image];
   }
   
   next();

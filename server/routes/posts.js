@@ -106,18 +106,32 @@ router.get('/:id', validateObjectId, async (req, res) => {
 router.post('/', adminAuth, upload.single('image'), handleUploadError, validatePost, async (req, res) => {
   try {
     let image = '';
-    
+    let images = [];
+
+    if (req.body.images) {
+      try {
+        const parsed = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+        images = Array.isArray(parsed) ? parsed.filter(Boolean) : (typeof parsed === 'string' ? [parsed] : []);
+      } catch (e) {
+        images = [];
+      }
+    }
+
     // Support file upload or base64 Data URL sent in body
     if (req.file) {
       image = processUploadedFile(req.file, 'posts');
+      if (!images.includes(image)) images.unshift(image);
     } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim() !== '') {
       image = req.body.image.trim();
+      if (!images.includes(image)) images.unshift(image);
+    } else if (images.length > 0) {
+      image = images[0];
     }
 
-    if (!image) {
+    if (!image && images.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Post image is required'
+        message: 'At least one post image is required'
       });
     }
 
@@ -152,6 +166,7 @@ router.post('/', adminAuth, upload.single('image'), handleUploadError, validateP
       eventDate: eventDate ? new Date(eventDate) : undefined,
       location: location ? location.trim() : '',
       image,
+      images: images.length > 0 ? images : [image],
       imageAlt: imageAlt || title || '',
       tags: parsedTags,
       status: status || 'published',
@@ -230,13 +245,41 @@ router.put('/:id', adminAuth, validateObjectId, upload.single('image'), handleUp
       }
     }
 
-    // Update image
+    let updatedImages = undefined;
+    if (req.body.images !== undefined) {
+      try {
+        const parsed = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+        updatedImages = Array.isArray(parsed) ? parsed.filter(Boolean) : (typeof parsed === 'string' ? [parsed] : []);
+      } catch (e) {
+        updatedImages = [];
+      }
+    }
+
+    // Update image/images
     if (req.file) {
-      post.image = processUploadedFile(req.file, 'posts');
+      const newImg = processUploadedFile(req.file, 'posts');
+      post.image = newImg;
+      if (updatedImages) {
+        if (!updatedImages.includes(newImg)) updatedImages.unshift(newImg);
+        post.images = updatedImages;
+      } else {
+        post.images = [newImg, ...(post.images || []).filter(img => img !== post.image)];
+      }
     } else if (bodyImage && typeof bodyImage === 'string' && bodyImage.trim() !== '') {
       post.image = bodyImage.trim();
+      if (updatedImages) {
+        post.images = updatedImages;
+      } else if (!post.images || post.images.length === 0) {
+        post.images = [post.image];
+      }
     } else if (removeImage === 'true') {
       post.image = '';
+      post.images = [];
+    } else if (updatedImages !== undefined) {
+      post.images = updatedImages;
+      if (updatedImages.length > 0) {
+        post.image = updatedImages[0];
+      }
     }
 
     await post.save();
