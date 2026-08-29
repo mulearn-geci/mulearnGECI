@@ -549,7 +549,7 @@ export function AdminHomepage() {
               {cards.map((card, idx) => (
                 <div
                   key={card.id || idx}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 relative"
+                  className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
@@ -598,15 +598,15 @@ export function AdminHomepage() {
                     {/* Image Upload & URL Input */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-1">Card Photo / Image</label>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <input
                           type="text"
                           placeholder="Paste Image URL or Upload File"
                           value={card.image}
                           onChange={(e) => updateCard(idx, 'image', e.target.value)}
-                          className="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
+                          className="flex-1 min-w-0 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white truncate"
                         />
-                        <label className="cursor-pointer inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors shadow-sm flex-shrink-0">
+                        <label className="cursor-pointer inline-flex items-center justify-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors shadow-sm flex-shrink-0">
                           <Upload className="w-3.5 h-3.5" />
                           <span>Upload File</span>
                           <input
@@ -632,7 +632,7 @@ export function AdminHomepage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-1">Target Link</label>
                         <input
@@ -661,7 +661,7 @@ export function AdminHomepage() {
 
         {/* ─── TAB 2: ABOUT SECTION & PHOTOS ───────────────────────────────────── */}
         {activeTab === 'about' && (
-          <div className="space-y-8 bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="space-y-8 bg-white dark:bg-gray-800 p-4 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
                 About µLearn GECI Text & Showcase Photos
@@ -757,15 +757,15 @@ export function AdminHomepage() {
                     Photo 1 (Tall Main Photo)
                   </span>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input
                       type="text"
                       placeholder="Paste Image URL or Upload"
                       value={about.photo1}
                       onChange={(e) => setAbout((prev) => ({ ...prev, photo1: e.target.value }))}
-                      className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
+                      className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white truncate"
                     />
-                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
+                    <label className="cursor-pointer inline-flex items-center justify-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                       <input
@@ -797,15 +797,15 @@ export function AdminHomepage() {
                     Photo 2 (Top Right Photo)
                   </span>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input
                       type="text"
                       placeholder="Paste Image URL or Upload"
                       value={about.photo2}
                       onChange={(e) => setAbout((prev) => ({ ...prev, photo2: e.target.value }))}
-                      className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
+                      className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white truncate"
                     />
-                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
+                    <label className="cursor-pointer inline-flex items-center justify-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                       <input
@@ -837,15 +837,15 @@ export function AdminHomepage() {
                     Photo 3 (Bottom Right Photo)
                   </span>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input
                       type="text"
                       placeholder="Paste Image URL or Upload"
                       value={about.photo3}
                       onChange={(e) => setAbout((prev) => ({ ...prev, photo3: e.target.value }))}
-                      className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
+                      className="flex-1 min-w-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white truncate"
                     />
-                    <label className="cursor-pointer inline-flex items-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
+                    <label className="cursor-pointer inline-flex items-center justify-center space-x-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-2.5 rounded-xl text-xs flex-shrink-0 transition-colors">
                       <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                       <input
@@ -896,7 +896,7 @@ export function AdminHomepage() {
               {igs.map((ig, idx) => (
                 <div
                   key={ig.id || idx}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 relative"
+                  className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
@@ -922,7 +922,7 @@ export function AdminHomepage() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-1">Domain Sub-tag</label>
                         <input
@@ -979,7 +979,7 @@ export function AdminHomepage() {
               {execoms.map((member, idx) => (
                 <div
                   key={member.id || idx}
-                  className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 relative"
+                  className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-4 relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3">
                     <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
@@ -1028,15 +1028,15 @@ export function AdminHomepage() {
                     {/* Member Photo Upload & URL Input */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-1">Member Photo Image</label>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <input
                           type="text"
                           placeholder="Paste URL or Upload File"
                           value={member.image}
                           onChange={(e) => updateExecom(idx, 'image', e.target.value)}
-                          className="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white"
+                          className="flex-1 min-w-0 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-white truncate"
                         />
-                        <label className="cursor-pointer inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors shadow-sm flex-shrink-0">
+                        <label className="cursor-pointer inline-flex items-center justify-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors shadow-sm flex-shrink-0">
                           <Upload className="w-3.5 h-3.5" />
                           <span>Upload File</span>
                           <input
