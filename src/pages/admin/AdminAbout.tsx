@@ -22,8 +22,7 @@ import {
   Upload, 
   Trash2, 
   Plus, 
-  AlertCircle,
-  X
+  AlertCircle
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { aboutAPI } from '../../services/api';
@@ -104,7 +103,6 @@ export function AdminAbout() {
   const [imageAlt, setImageAlt] = useState(DEFAULT_CONFIG.imageAlt);
   const [values, setValues] = useState<ValueItem[]>(DEFAULT_CONFIG.values);
 
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -114,7 +112,6 @@ export function AdminAbout() {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        setIsLoading(true);
         const res = await aboutAPI.getConfig();
         if (res && res.data) {
           const d = res.data;
@@ -127,8 +124,6 @@ export function AdminAbout() {
         }
       } catch (err) {
         console.error('Failed to load about config:', err);
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchConfig();
@@ -208,7 +203,7 @@ export function AdminAbout() {
     <AdminLayout title="About Page Customizer">
       <div className="max-w-6xl mx-auto space-y-6 pb-12">
         {/* Top Header Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700/80">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-700/80">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <div className="flex items-center space-x-2 mb-2">

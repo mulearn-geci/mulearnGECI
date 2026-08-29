@@ -99,14 +99,14 @@ export function AdminEvents() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Events Management</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">Create, edit, and manage your community events</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Events Management</h1>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">Create, edit, and manage your community events</p>
           </div>
           <button 
             onClick={handleNewEvent}
-            className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-2"
+            className="bg-green-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-2 w-full sm:w-auto justify-center text-sm"
           >
             <Plus className="h-5 w-5" />
             <span>New Event</span>
@@ -253,7 +253,7 @@ export function AdminEvents() {
         {/* Statistics */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-300">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Events Statistics</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {events.filter(e => e.status === 'Upcoming').length}

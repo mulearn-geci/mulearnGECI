@@ -419,38 +419,38 @@ export function AdminHomepage() {
 
   return (
     <AdminLayout>
-      <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         
         {/* Header Title & Action Buttons */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-gray-800 p-8 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-gray-800 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div>
             <div className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Homepage & Customizer Studio</span>
             </div>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
               Customize Homepage Cards, Photos & Content
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
               Upload local image files or paste image URLs to replace photos across cards, Execom team slots, Interest Groups, and About section.
             </p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3">
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-400 text-white font-bold py-3.5 px-6 rounded-2xl text-sm transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
+              className="inline-flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-400 text-white font-bold py-2.5 sm:py-3.5 px-4 sm:px-6 rounded-xl sm:rounded-2xl text-xs sm:text-sm transition-all shadow-lg shadow-blue-600/20 cursor-pointer flex-1 sm:flex-initial"
             >
               {isSaving ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                  <span>Saving Changes...</span>
+                  <span>Saving...</span>
                 </>
               ) : savedSuccess ? (
                 <>
                   <CheckCircle className="w-4 h-4 text-green-300" />
-                  <span>Changes Saved Live!</span>
+                  <span>Saved Live!</span>
                 </>
               ) : (
                 <>
@@ -463,9 +463,9 @@ export function AdminHomepage() {
               href="/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold py-3.5 px-5 rounded-2xl text-sm transition-colors"
+              className="inline-flex items-center justify-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold py-2.5 sm:py-3.5 px-3.5 sm:px-5 rounded-xl sm:rounded-2xl text-xs sm:text-sm transition-colors flex-1 sm:flex-initial"
             >
-              <span>Preview Homepage</span>
+              <span>Preview</span>
               <ExternalLink className="w-4 h-4" />
             </a>
           </div>

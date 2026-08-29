@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  BarChart, 
-  Users, 
   Calendar, 
   Image, 
-  TrendingUp, 
-  Eye,
-  Edit,
-  Plus,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  ExternalLink,
-  Sparkles,
-  Info
+  Edit, 
+  Plus, 
+  CheckCircle, 
+  AlertCircle, 
+  ExternalLink, 
+  Sparkles, 
+  Info, 
+  FileText 
 } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { postsAPI, eventsAPI } from '../../services/api';
@@ -78,11 +74,7 @@ export function AdminDashboard() {
     navigate(`/admin/events/edit/${event._id}`);
   };
 
-  const handleViewAnalytics = () => {
-    navigate('/admin/analytics');
-  };
-
-  const handleViewPost = (post: any) => {
+  const handleViewPost = (_post: any) => {
     window.open('/gallery', '_blank');
   };
 
@@ -108,25 +100,27 @@ export function AdminDashboard() {
     <AdminLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">Welcome back! Here's what's happening with µLearn.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">Welcome back! Here's what's happening with µLearn.</p>
           </div>
-          <div className="flex space-x-4">
+          <div className="flex space-x-3 w-full sm:w-auto">
             <Link
               to="/admin/gallery"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-1.5 sm:space-x-2 text-sm flex-1 sm:flex-initial justify-center"
             >
-              <Plus className="h-4 w-4" />
-              <span>New Gallery Item</span>
+              <Plus className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden xs:inline">New Gallery</span>
+              <span className="xs:hidden">Gallery</span>
             </Link>
             <Link
               to="/admin/events"
-              className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-2"
+              className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-1.5 sm:space-x-2 text-sm flex-1 sm:flex-initial justify-center"
             >
-              <Plus className="h-4 w-4" />
-              <span>New Event</span>
+              <Plus className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden xs:inline">New Event</span>
+              <span className="xs:hidden">Event</span>
             </Link>
           </div>
         </div>
@@ -289,7 +283,7 @@ export function AdminDashboard() {
                   <div key={event._id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900 dark:text-white truncate">{event.title}</h3>
-                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-gray-500 dark:text-gray-400">
                         <span>{new Date(event.date).toLocaleDateString()}</span>
                         <span>{event.location}</span>
                         <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 rounded-full text-xs">
@@ -338,7 +332,7 @@ export function AdminDashboard() {
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-300"
           >
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <Link
                 to="/admin/gallery/create"
                 className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors"

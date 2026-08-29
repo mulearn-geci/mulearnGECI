@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Eye, Search, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { postsAPI } from '../../services/api';
@@ -48,11 +48,6 @@ export function AdminPosts() {
     }
   };
 
-  const handleViewDetails = (post: any) => {
-    console.log('View gallery details:', post);
-    alert(`Viewing details for: ${post.title}`);
-  };
-
   const handleNewPost = () => {
     navigate('/admin/gallery/create');
   };
@@ -84,14 +79,14 @@ export function AdminPosts() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gallery Management</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">Upload, edit, and manage photos and event showcases displayed on the public Gallery page</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Gallery Management</h1>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">Upload, edit, and manage photos and event showcases displayed on the public Gallery page</p>
           </div>
           <button 
             onClick={handleNewPost}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2 cursor-pointer shadow-md"
+            className="bg-blue-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2 cursor-pointer shadow-md w-full sm:w-auto justify-center text-sm"
           >
             <Plus className="h-5 w-5" />
             <span>Add to Gallery</span>
@@ -223,7 +218,7 @@ export function AdminPosts() {
         {/* Statistics */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors duration-300">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Gallery Statistics</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {posts.filter(p => p.status?.toLowerCase() === 'published').length}

@@ -59,7 +59,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           className="fixed inset-0 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         >
-          <div className="fixed inset-0 bg-gray-600 dark:bg-gray-900 bg-opacity-75"></div>
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/60 backdrop-blur-sm"></div>
         </div>
       )}
 
@@ -151,8 +151,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <Menu className="h-6 w-6" />
             </button>
 
-            {/* Quick Switch Tabs */}
-            <div className="flex items-center bg-gray-100 dark:bg-gray-900/80 p-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto max-w-full scrollbar-none">
+            {/* Quick Switch Tabs — hidden on mobile, visible on md+ */}
+            <div className="hidden md:flex items-center bg-gray-100 dark:bg-gray-900/80 p-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto max-w-full scrollbar-none">
               {quickTabs.map((tab) => {
                 const active = isActive(tab.href);
                 return (
@@ -171,6 +171,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 );
               })}
             </div>
+
+            {/* Mobile: show current page name */}
+            <span className="md:hidden text-sm font-bold text-gray-700 dark:text-gray-200 truncate">
+              {navigation.find(n => isActive(n.href))?.name || 'Admin'}
+            </span>
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
