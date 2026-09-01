@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Calendar, Clock, MapPin, Users, Tag, Link as LinkIcon, FileText, Award } from 'lucide-react';

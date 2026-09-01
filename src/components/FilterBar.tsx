@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, X, Calendar, SlidersHorizontal } from 'lucide-react';
 import type { FilterState } from '../hooks/useFilterState';
 

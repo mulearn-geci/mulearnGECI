@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, Users, Calendar as CalendarIcon, MapPin, Search, Filter, Image as ImageIcon } from 'lucide-react';

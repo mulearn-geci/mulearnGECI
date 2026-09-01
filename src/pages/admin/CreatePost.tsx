@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Image as ImageIcon } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { postsAPI } from '../../services/api';
 import { MultiImageUploader } from '../../components/MultiImageUploader';
