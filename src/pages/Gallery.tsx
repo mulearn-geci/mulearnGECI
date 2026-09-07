@@ -62,6 +62,8 @@ export function Gallery() {
     currentIndex: number;
     title: string;
     description?: string;
+    category?: string;
+    date?: string;
   } | null>(null);
 
   // Filter state (URL-synced)
@@ -142,11 +144,17 @@ export function Gallery() {
     const resolvedImages = rawImages.map((img: string) => getPostImageUrl(img));
     if (resolvedImages.length === 0) return;
 
+    const displayDate = post.eventDate
+      ? new Date(post.eventDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+      : (post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : undefined);
+
     setLightbox({
       images: resolvedImages,
       currentIndex: Math.max(0, Math.min(initialIndex, resolvedImages.length - 1)),
       title: post.title,
-      description: post.description
+      description: post.description,
+      category: post.category,
+      date: displayDate
     });
   };
 
@@ -296,6 +304,20 @@ export function Gallery() {
                       )}
                     </div>
                   </div>
+
+                  {/* Card Action Footer */}
+                  {postPhotos.length > 0 && (
+                    <div className="px-6 pb-6 pt-0">
+                      <button
+                        onClick={() => openLightbox(post, 0)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors group/btn"
+                      >
+                        <Images className="w-3.5 h-3.5 text-blue-500" />
+                        <span>{postPhotos.length > 1 ? `View all ${postPhotos.length} photos` : 'View photo'}</span>
+                        <ChevronRight className="w-3.5 h-3.5 ml-0.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+                  )}
                 </motion.article>
               );
             })}
@@ -356,7 +378,7 @@ export function Gallery() {
               </div>
 
               {/* Main Image Area with Previous / Next Arrows */}
-              <div className="relative flex items-center justify-center w-full min-h-[50vh] max-h-[75vh] p-2 pt-14">
+              <div className="relative flex items-center justify-center w-full min-h-[35vh] sm:min-h-[45vh] max-h-[65vh] p-2 pt-14 flex-1">
                 {/* Previous Button */}
                 {lightbox.images.length > 1 && (
                   <button
@@ -373,7 +395,7 @@ export function Gallery() {
                   key={lightbox.currentIndex}
                   src={lightbox.images[lightbox.currentIndex]}
                   alt={`${lightbox.title} - ${lightbox.currentIndex + 1}`}
-                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
+                  className="max-h-[55vh] sm:max-h-[60vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
                 />
 
                 {/* Next Button */}
@@ -389,12 +411,31 @@ export function Gallery() {
               </div>
 
               {/* Bottom Caption & Thumbnail Dots */}
-              <div className="p-4 sm:p-6 bg-gray-900/90 border-t border-white/10 text-center space-y-2">
-                <p className="text-white font-bold text-base sm:text-lg">{lightbox.title}</p>
+              <div className="p-4 sm:p-6 bg-gray-900/95 border-t border-white/10 text-center space-y-3 shrink-0">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2 flex-wrap mb-1">
+                    {lightbox.category && (
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/30">
+                        {lightbox.category}
+                      </span>
+                    )}
+                    {lightbox.date && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                        <Calendar className="h-3 w-3 text-blue-400" />
+                        {lightbox.date}
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-white font-bold text-base sm:text-lg leading-snug">{lightbox.title}</h2>
+                </div>
+
+                {/* Full Description (no line-clamp, scrollable if very long) */}
                 {lightbox.description && (
-                  <p className="text-xs sm:text-sm text-gray-300 max-w-2xl mx-auto line-clamp-2">
-                    {lightbox.description}
-                  </p>
+                  <div className="max-w-3xl mx-auto max-h-40 sm:max-h-52 overflow-y-auto px-3 py-1 text-left sm:text-center">
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed whitespace-pre-line">
+                      {lightbox.description}
+                    </p>
+                  </div>
                 )}
 
                 {/* Thumbnail dots indicator */}
