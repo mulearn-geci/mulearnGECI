@@ -40,11 +40,11 @@ export function Events() {
     fetchEvents();
   }, []);
 
-  // Derive categories from data
+  // Derive unique categories from data (from event.category field)
   const categories = useMemo(() => {
-    const types = new Set<string>();
-    allEvents.forEach(e => { if (e.type) types.add(e.type); });
-    return Array.from(types).sort();
+    const cats = new Set<string>();
+    allEvents.forEach(e => { if (e.category) cats.add(e.category); });
+    return Array.from(cats).sort();
   }, [allEvents]);
 
   // Derive month options from data
@@ -77,8 +77,8 @@ export function Events() {
         if (!inTitle && !inDesc && !inLoc) return false;
       }
 
-      // Category (maps to event.type)
-      if (filters.category !== 'all' && event.type !== filters.category) return false;
+      // Category filter (matches event.category)
+      if (filters.category !== 'all' && event.category !== filters.category) return false;
 
       // Month
       if (filters.month !== 'all') {

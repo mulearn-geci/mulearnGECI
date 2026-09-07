@@ -24,15 +24,19 @@ interface CreateEventFormData {
   registrationDeadline?: string;
 }
 
+const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Cultural', 'Career', 'Sports'];
+
 export function CreateEvent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+  const [categoryPreset, setCategoryPreset] = useState('Technical');
+  const [customCategory, setCustomCategory] = useState('');
   const navigate = useNavigate();
   
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateEventFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<CreateEventFormData>({
     defaultValues: {
       type: 'workshop',
-      category: 'technical',
+      category: 'Technical',
       status: 'upcoming',
       attendees: 0,
       maxAttendees: 100,
@@ -61,7 +65,9 @@ export function CreateEvent() {
         endTime: data.endTime ? data.endTime.trim() : '',
         location: data.location.trim(),
         type: data.type || 'workshop',
-        category: data.category || 'technical',
+        category: categoryPreset === 'other'
+          ? (customCategory.trim() || 'Other')
+          : (categoryPreset || 'Technical'),
         attendees: !isNaN(Number(data.attendees)) ? Number(data.attendees) : 0,
         currentAttendees: !isNaN(Number(data.attendees)) ? Number(data.attendees) : 0,
         maxAttendees: !isNaN(Number(data.maxAttendees)) ? Number(data.maxAttendees) : 100,
@@ -233,22 +239,42 @@ export function CreateEvent() {
               </div>
 
               <div>
-                <label htmlFor="category" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                <label htmlFor="categoryPreset" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
                   <Award className="w-4 h-4 text-blue-500" />
                   <span>Category</span>
                 </label>
                 <select
-                  id="category"
-                  {...register('category')}
+                  id="categoryPreset"
+                  value={categoryPreset}
+                  onChange={e => {
+                    setCategoryPreset(e.target.value);
+                    if (e.target.value !== 'other') {
+                      setValue('category', e.target.value);
+                      setCustomCategory('');
+                    } else {
+                      setValue('category', '');
+                    }
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer"
                 >
-                  <option value="technical">Technical</option>
-                  <option value="cultural">Cultural</option>
-                  <option value="career">Career</option>
-                  <option value="academic">Academic</option>
-                  <option value="social">Social</option>
-                  <option value="sports">Sports</option>
+                  {PRESET_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                  <option value="other">Other (type custom)…</option>
                 </select>
+                {categoryPreset === 'other' && (
+                  <input
+                    type="text"
+                    value={customCategory}
+                    onChange={e => {
+                      setCustomCategory(e.target.value);
+                      setValue('category', e.target.value);
+                    }}
+                    placeholder="e.g., Inter-college, Alumni Meet…"
+                    className="mt-2 w-full px-4 py-3 border border-blue-400 dark:border-blue-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  />
+                )}
+                <input type="hidden" {...register('category')} />
               </div>
             </div>
 
