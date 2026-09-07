@@ -61,8 +61,8 @@ const eventSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['technical', 'cultural', 'sports', 'academic', 'social', 'career'],
-    default: 'technical'
+    default: 'Technical',
+    trim: true
   },
   maxAttendees: {
     type: Number,

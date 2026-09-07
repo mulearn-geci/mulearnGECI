@@ -24,7 +24,7 @@ interface CreateEventFormData {
   registrationDeadline?: string;
 }
 
-const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Cultural', 'Career', 'Sports'];
+const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Career'];
 
 export function CreateEvent() {
   const [isSubmitting, setIsSubmitting] = useState(false);

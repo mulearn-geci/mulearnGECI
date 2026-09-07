@@ -25,7 +25,7 @@ interface EditEventFormData {
   registrationDeadline?: string;
 }
 
-const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Cultural', 'Career', 'Sports'];
+const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Career'];
 
 export function EditEvent() {
   const { id } = useParams<{ id: string }>();
