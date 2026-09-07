@@ -26,6 +26,7 @@ interface EditEventFormData {
 }
 
 const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Career'];
+const PRESET_TYPES = ['Workshop', 'Hackathon', 'Seminar', 'Bootcamp', 'Competition', 'Meetup', 'Conference', 'Webinar'];
 
 export function EditEvent() {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +35,8 @@ export function EditEvent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<any>(null);
   const [images, setImages] = useState<string[]>([]);
+  const [typePreset, setTypePreset] = useState('Workshop');
+  const [customType, setCustomType] = useState('');
   const [categoryPreset, setCategoryPreset] = useState('Technical');
   const [customCategory, setCustomCategory] = useState('');
   
@@ -58,7 +61,17 @@ export function EditEvent() {
         setValue('time', event.time || '');
         setValue('endTime', event.endTime || '');
         setValue('location', event.location || '');
-        setValue('type', event.type || 'workshop');
+        // Pre-populate type picker
+        const rawType: string = event.type || 'Workshop';
+        const matchedType = PRESET_TYPES.find(t => t.toLowerCase() === rawType.toLowerCase());
+        if (matchedType) {
+          setTypePreset(matchedType);
+          setValue('type', matchedType);
+        } else {
+          setTypePreset('other');
+          setCustomType(rawType);
+          setValue('type', rawType);
+        }
         // Pre-populate category picker
         const rawCat: string = event.category || 'Technical';
         const matched = PRESET_CATEGORIES.find(p => p.toLowerCase() === rawCat.toLowerCase());
@@ -114,7 +127,9 @@ export function EditEvent() {
         time: data.time.trim(),
         endTime: data.endTime ? data.endTime.trim() : '',
         location: data.location.trim(),
-        type: data.type || 'workshop',
+        type: typePreset === 'other'
+          ? (customType.trim() || 'Other')
+          : (typePreset || 'Workshop'),
         category: categoryPreset === 'other'
           ? (customCategory.trim() || 'Other')
           : (categoryPreset || 'Technical'),
@@ -278,24 +293,42 @@ export function EditEvent() {
             {/* 6. Event Classification (Type & Category) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="type" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
+                <label htmlFor="typePreset" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-1.5">
                   <Tag className="w-4 h-4 text-blue-500" />
                   <span>Event Type *</span>
                 </label>
                 <select
-                  id="type"
-                  {...register('type')}
+                  id="typePreset"
+                  value={typePreset}
+                  onChange={e => {
+                    setTypePreset(e.target.value);
+                    if (e.target.value !== 'other') {
+                      setValue('type', e.target.value);
+                      setCustomType('');
+                    } else {
+                      setValue('type', '');
+                    }
+                  }}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer"
                 >
-                  <option value="workshop">Workshop</option>
-                  <option value="hackathon">Hackathon</option>
-                  <option value="seminar">Seminar</option>
-                  <option value="bootcamp">Bootcamp</option>
-                  <option value="competition">Competition</option>
-                  <option value="meetup">Meetup</option>
-                  <option value="conference">Conference</option>
-                  <option value="webinar">Webinar</option>
+                  {PRESET_TYPES.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                  <option value="other">Other (type custom)…</option>
                 </select>
+                {typePreset === 'other' && (
+                  <input
+                    type="text"
+                    value={customType}
+                    onChange={e => {
+                      setCustomType(e.target.value);
+                      setValue('type', e.target.value);
+                    }}
+                    placeholder="e.g., Talk, Ideathon, Exhibition…"
+                    className="mt-2 w-full px-4 py-3 border border-blue-400 dark:border-blue-500 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                  />
+                )}
+                <input type="hidden" {...register('type')} />
               </div>
 
               <div>
