@@ -353,7 +353,7 @@ export function Gallery() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative max-w-5xl w-full max-h-[92vh] bg-gray-950 rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col justify-between"
+              className="relative max-w-5xl w-full max-h-[92vh] bg-gray-950 rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col"
               onClick={e => e.stopPropagation()}
             >
               {/* Top Controls Bar */}
@@ -378,7 +378,7 @@ export function Gallery() {
               </div>
 
               {/* Main Image Area with Previous / Next Arrows */}
-              <div className="relative flex items-center justify-center w-full min-h-[35vh] sm:min-h-[45vh] max-h-[65vh] px-2 pt-14 pb-6 flex-1">
+              <div className="relative flex items-center justify-center w-full min-h-[35vh] sm:min-h-[45vh] max-h-[55vh] px-2 pt-14 pb-6 flex-1">
                 {/* Previous Button */}
                 {lightbox.images.length > 1 && (
                   <button
@@ -395,7 +395,7 @@ export function Gallery() {
                   key={lightbox.currentIndex}
                   src={lightbox.images[lightbox.currentIndex]}
                   alt={`${lightbox.title} - ${lightbox.currentIndex + 1}`}
-                  className="max-h-[55vh] sm:max-h-[60vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
+                  className="max-h-[50vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
                 />
 
                 {/* Next Button */}
@@ -411,27 +411,28 @@ export function Gallery() {
               </div>
 
               {/* Bottom Caption & Thumbnail Dots */}
-              <div className="px-5 pt-5 pb-5 sm:px-7 sm:pt-6 sm:pb-6 bg-gray-900/95 border-t-2 border-white/15 text-center space-y-3 shrink-0">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-2 flex-wrap mb-1">
+              <div className="px-5 pt-5 pb-5 sm:px-7 sm:pt-6 sm:pb-6 bg-gray-900/95 border-t-2 border-white/15 space-y-4 shrink-0 overflow-y-auto max-h-[35vh]">
+                {/* Title + Badges */}
+                <div className="text-center space-y-2">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
                     {lightbox.category && (
                       <span className="text-[10px] uppercase tracking-wider font-extrabold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/30">
                         {lightbox.category}
                       </span>
                     )}
                     {lightbox.date && (
-                      <span className="inline-flex items-center gap-1 text-[11px] text-gray-400 font-medium">
-                        <Calendar className="h-3 w-3 text-blue-400" />
+                      <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
+                        <Calendar className="h-3.5 w-3.5 text-blue-400" />
                         {lightbox.date}
                       </span>
                     )}
                   </div>
-                  <h2 className="text-white font-bold text-base sm:text-lg leading-snug">{lightbox.title}</h2>
+                  <h2 className="text-white font-bold text-lg sm:text-xl leading-snug">{lightbox.title}</h2>
                 </div>
 
-                {/* Full Description (no line-clamp, scrollable if very long) */}
+                {/* Full Description */}
                 {lightbox.description && (
-                  <div className="max-w-3xl mx-auto max-h-40 sm:max-h-52 overflow-y-auto px-3 py-1 text-left sm:text-center">
+                  <div className="max-w-3xl mx-auto text-left sm:text-center">
                     <p className="text-xs sm:text-sm text-gray-300 leading-relaxed whitespace-pre-line">
                       {lightbox.description}
                     </p>

@@ -16,6 +16,13 @@ export function Events() {
     images: string[];
     currentIndex: number;
     title: string;
+    description?: string;
+    type?: string;
+    category?: string;
+    date?: string;
+    time?: string;
+    location?: string;
+    attendees?: number;
   } | null>(null);
 
   // Filter state (URL-synced)
@@ -106,10 +113,22 @@ export function Events() {
     const resolved = rawImages.map((img: string) => getEventImageUrl(img));
     if (resolved.length === 0) return;
 
+    const eventDate = new Date(event.date);
+    const displayDate = !isNaN(eventDate.getTime())
+      ? eventDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : undefined;
+
     setLightbox({
       images: resolved,
       currentIndex: Math.max(0, Math.min(initialIndex, resolved.length - 1)),
-      title: event.title
+      title: event.title,
+      description: event.description,
+      type: event.type,
+      category: event.category,
+      date: displayDate,
+      time: event.time,
+      location: event.location,
+      attendees: event.attendees || event.currentAttendees || 0
     });
   };
 
@@ -316,7 +335,7 @@ export function Events() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative max-w-5xl w-full max-h-[92vh] bg-gray-950 rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col justify-between"
+              className="relative max-w-5xl w-full max-h-[92vh] bg-gray-950 rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col"
               onClick={e => e.stopPropagation()}
             >
               {/* Top Controls Bar */}
@@ -339,7 +358,7 @@ export function Events() {
               </div>
 
               {/* Main Image Area with Previous / Next Arrows */}
-              <div className="relative flex items-center justify-center w-full min-h-[50vh] max-h-[75vh] p-2 pt-14">
+              <div className="relative flex items-center justify-center w-full min-h-[35vh] sm:min-h-[45vh] max-h-[55vh] px-2 pt-14 pb-6 flex-1">
                 {lightbox.images.length > 1 && (
                   <button
                     onClick={(e) => { e.stopPropagation(); prevImage(); }}
@@ -354,7 +373,7 @@ export function Events() {
                   key={lightbox.currentIndex}
                   src={lightbox.images[lightbox.currentIndex]}
                   alt={`${lightbox.title} - ${lightbox.currentIndex + 1}`}
-                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
+                  className="max-h-[50vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 select-none"
                 />
 
                 {lightbox.images.length > 1 && (
@@ -368,10 +387,65 @@ export function Events() {
                 )}
               </div>
 
-              {/* Bottom Caption & Thumbnail Dots */}
-              <div className="p-4 sm:p-6 bg-gray-900/90 border-t border-white/10 text-center space-y-2">
-                <p className="text-white font-bold text-base sm:text-lg">{lightbox.title}</p>
+              {/* Bottom Caption, Details & Thumbnail Dots */}
+              <div className="px-5 pt-5 pb-5 sm:px-7 sm:pt-6 sm:pb-6 bg-gray-900/95 border-t-2 border-white/15 space-y-4 shrink-0 overflow-y-auto max-h-[35vh]">
+                {/* Title + Badges */}
+                <div className="text-center space-y-2">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    {lightbox.type && (
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-blue-600/30 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/30">
+                        {lightbox.type}
+                      </span>
+                    )}
+                    {lightbox.category && (
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                        {lightbox.category}
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-white font-bold text-lg sm:text-xl leading-snug">{lightbox.title}</h2>
+                </div>
 
+                {/* Event Details Row */}
+                {(lightbox.date || lightbox.time || lightbox.location || lightbox.attendees !== undefined) && (
+                  <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm text-gray-400">
+                    {lightbox.date && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-blue-400" />
+                        {lightbox.date}
+                      </span>
+                    )}
+                    {lightbox.time && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-blue-400" />
+                        {lightbox.time}
+                      </span>
+                    )}
+                    {lightbox.location && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-blue-400" />
+                        {lightbox.location}
+                      </span>
+                    )}
+                    {lightbox.attendees !== undefined && lightbox.attendees > 0 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 text-blue-400" />
+                        {lightbox.attendees} attendees
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Full Description */}
+                {lightbox.description && (
+                  <div className="max-w-3xl mx-auto text-left sm:text-center">
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed whitespace-pre-line">
+                      {lightbox.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Thumbnail dots indicator */}
                 {lightbox.images.length > 1 && (
                   <div className="flex items-center justify-center gap-1.5 pt-1 overflow-x-auto max-w-md mx-auto py-1">
                     {lightbox.images.map((_, dotIdx) => (
@@ -396,3 +470,4 @@ export function Events() {
     </div>
   );
 }
+
