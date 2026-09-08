@@ -378,7 +378,7 @@ export function Gallery() {
               </div>
 
               {/* Main Image Area with Previous / Next Arrows */}
-              <div className="relative flex items-center justify-center w-full min-h-[35vh] sm:min-h-[45vh] max-h-[65vh] p-2 pt-14 flex-1">
+              <div className="relative flex items-center justify-center w-full min-h-[35vh] sm:min-h-[45vh] max-h-[65vh] px-2 pt-14 pb-6 flex-1">
                 {/* Previous Button */}
                 {lightbox.images.length > 1 && (
                   <button
@@ -411,7 +411,7 @@ export function Gallery() {
               </div>
 
               {/* Bottom Caption & Thumbnail Dots */}
-              <div className="p-4 sm:p-6 bg-gray-900/95 border-t border-white/10 text-center space-y-3 shrink-0">
+              <div className="px-5 pt-5 pb-5 sm:px-7 sm:pt-6 sm:pb-6 bg-gray-900/95 border-t-2 border-white/15 text-center space-y-3 shrink-0">
                 <div className="space-y-1">
                   <div className="flex items-center justify-center gap-2 flex-wrap mb-1">
                     {lightbox.category && (
