@@ -420,10 +420,10 @@ export function CreateEvent() {
             </div>
 
             {/* 11. Pinning & Auto-Disappear Settings */}
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/5 via-transparent to-blue-500/5 border border-amber-200/60 dark:border-amber-700/40 space-y-5">
+            <div className="p-5 rounded-2xl bg-gray-50/50 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 space-y-5">
               <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700/60 pb-3">
                 <div className="flex items-center space-x-2.5">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
                     <Pin className="w-5 h-5 rotate-45" />
                   </div>
                   <div>
@@ -437,14 +437,14 @@ export function CreateEvent() {
                 {/* Pinning option */}
                 <div>
                   <label htmlFor="pinDuration" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1.5 flex items-center space-x-1.5">
-                    <Pin className="w-4 h-4 text-amber-500" />
+                    <Pin className="w-4 h-4 text-blue-500" />
                     <span>Pin Event to Top</span>
                   </label>
                   <select
                     id="pinDuration"
                     value={pinDuration}
                     onChange={e => setPinDuration(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer text-sm"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer text-sm"
                   >
                     <option value="none">🚫 Do not pin (Default)</option>
                     <option value="always">📌 Always (Pinned indefinitely)</option>
