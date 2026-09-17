@@ -3,6 +3,73 @@ const { sendSuccess, sendError, sendCreated } = require('../utils/responseHandle
 const { deleteFile, processUploadedFile } = require('../middleware/upload');
 const logger = require('../utils/logger');
 
+const calculatePinAndExpiry = ({ isPinned, pinDuration, pinnedUntil, disappearAfter, expiresAt, date, time }) => {
+  const now = new Date();
+
+  // 1. Calculate Pinning
+  let finalIsPinned = isPinned === true || isPinned === 'true';
+  let finalPinDuration = pinDuration || 'none';
+  let finalPinnedUntil = null;
+
+  if (finalPinDuration === 'none') {
+    finalIsPinned = false;
+    finalPinnedUntil = null;
+  } else if (finalPinDuration === 'always') {
+    finalIsPinned = true;
+    finalPinnedUntil = null;
+  } else if (finalPinDuration === '1day') {
+    finalIsPinned = true;
+    finalPinnedUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  } else if (finalPinDuration === '1week') {
+    finalIsPinned = true;
+    finalPinnedUntil = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  } else if (finalPinDuration === '1month') {
+    finalIsPinned = true;
+    finalPinnedUntil = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  } else if (pinnedUntil) {
+    finalPinnedUntil = new Date(pinnedUntil);
+    finalIsPinned = finalPinnedUntil > now;
+  }
+
+  // 2. Calculate Disappear / Expiry
+  let finalDisappearAfter = disappearAfter || 'never';
+  let finalExpiresAt = null;
+
+  if (finalDisappearAfter === '1day') {
+    finalExpiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  } else if (finalDisappearAfter === '1week') {
+    finalExpiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  } else if (finalDisappearAfter === '1month') {
+    finalExpiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  } else if (finalDisappearAfter === '1day_after_event' || finalDisappearAfter === '1week_after_event') {
+    let baseDate = date ? new Date(date) : new Date();
+    if (isNaN(baseDate.getTime())) baseDate = new Date();
+    if (time && typeof time === 'string') {
+      const match = time.match(/(\d+):(\d+)\s*(AM|PM)?/i);
+      if (match) {
+        let h = parseInt(match[1]);
+        const m = parseInt(match[2]);
+        const meridiem = match[3] ? match[3].toUpperCase() : null;
+        if (meridiem === 'PM' && h < 12) h += 12;
+        if (meridiem === 'AM' && h === 12) h = 0;
+        baseDate.setHours(h, m, 0, 0);
+      }
+    }
+    const daysToAdd = finalDisappearAfter === '1day_after_event' ? 1 : 7;
+    finalExpiresAt = new Date(baseDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+  } else if (expiresAt) {
+    finalExpiresAt = new Date(expiresAt);
+  }
+
+  return {
+    isPinned: finalIsPinned,
+    pinDuration: finalPinDuration,
+    pinnedUntil: finalPinnedUntil,
+    disappearAfter: finalDisappearAfter,
+    expiresAt: finalExpiresAt
+  };
+};
+
 const eventController = {
   // Get all events with filtering and pagination
   getAllEvents: async (req, res) => {
@@ -10,6 +77,16 @@ const eventController = {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const skip = (page - 1) * limit;
+
+      // Auto-unpin expired pinned events
+      try {
+        await Event.updateMany(
+          { isPinned: true, pinnedUntil: { $ne: null, $lte: new Date() } },
+          { $set: { isPinned: false } }
+        );
+      } catch (e) {
+        logger.error('Error auto-unpinning expired events:', { error: e.message });
+      }
       
       // Build filter object
       const filter = {};
@@ -20,13 +97,32 @@ const eventController = {
       if (req.query.featured) filter.featured = req.query.featured === 'true';
       if (req.query.author) filter.author = req.query.author;
       
+      const conditions = [];
+
+      // Filter out expired events for public users
+      if (req.query.includeExpired !== 'true') {
+        conditions.push({
+          $or: [
+            { expiresAt: { $exists: false } },
+            { expiresAt: null },
+            { expiresAt: { $gt: new Date() } }
+          ]
+        });
+      }
+
       if (req.query.search) {
-        filter.$or = [
-          { title: { $regex: req.query.search, $options: 'i' } },
-          { description: { $regex: req.query.search, $options: 'i' } },
-          { location: { $regex: req.query.search, $options: 'i' } },
-          { tags: { $in: [new RegExp(req.query.search, 'i')] } }
-        ];
+        conditions.push({
+          $or: [
+            { title: { $regex: req.query.search, $options: 'i' } },
+            { description: { $regex: req.query.search, $options: 'i' } },
+            { location: { $regex: req.query.search, $options: 'i' } },
+            { tags: { $in: [new RegExp(req.query.search, 'i')] } }
+          ]
+        });
+      }
+
+      if (conditions.length > 0) {
+        filter.$and = conditions;
       }
 
       // Date filtering
@@ -36,10 +132,10 @@ const eventController = {
         if (req.query.dateTo) filter.date.$lte = new Date(req.query.dateTo);
       }
 
-      // Get events with pagination
+      // Get events with pagination (pinned first)
       const events = await Event.find(filter)
         .populate('author', 'name email')
-        .sort({ date: 1, createdAt: -1 })
+        .sort({ isPinned: -1, date: 1, createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
@@ -88,9 +184,20 @@ const eventController = {
       const {
         title, description, content, date, time, endTime, location,
         venue, type, category, maxAttendees, registrationLink,
-        registrationDeadline, status, featured, tags, organizers,
+        registrationDeadline, status, featured, isPinned, pinDuration,
+        pinnedUntil, disappearAfter, expiresAt, tags, organizers,
         speakers, requirements, agenda, price, currency, imageAlt
       } = req.body;
+
+      const pinAndExpiry = calculatePinAndExpiry({
+        isPinned,
+        pinDuration,
+        pinnedUntil,
+        disappearAfter,
+        expiresAt,
+        date,
+        time
+      });
 
       const event = new Event({
         title,
@@ -110,6 +217,11 @@ const eventController = {
         registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : undefined,
         status: status || 'upcoming',
         featured: featured === 'true',
+        isPinned: pinAndExpiry.isPinned,
+        pinDuration: pinAndExpiry.pinDuration,
+        pinnedUntil: pinAndExpiry.pinnedUntil,
+        disappearAfter: pinAndExpiry.disappearAfter,
+        expiresAt: pinAndExpiry.expiresAt,
         tags: tags ? JSON.parse(tags) : [],
         organizers: organizers ? JSON.parse(organizers) : [],
         speakers: speakers ? JSON.parse(speakers) : [],
@@ -150,6 +262,7 @@ const eventController = {
         title, description, content, date, time, endTime, location,
         venue, type, category, maxAttendees, currentAttendees,
         registrationLink, registrationDeadline, status, featured,
+        isPinned, pinDuration, pinnedUntil, disappearAfter, expiresAt,
         tags, organizers, speakers, requirements, agenda,
         price, currency, imageAlt
       } = req.body;
@@ -171,6 +284,23 @@ const eventController = {
       if (registrationDeadline) event.registrationDeadline = new Date(registrationDeadline);
       if (status) event.status = status;
       if (featured !== undefined) event.featured = featured === 'true';
+
+      if (isPinned !== undefined || pinDuration !== undefined || pinnedUntil !== undefined || disappearAfter !== undefined || expiresAt !== undefined) {
+        const pinAndExpiry = calculatePinAndExpiry({
+          isPinned: isPinned !== undefined ? isPinned : event.isPinned,
+          pinDuration: pinDuration !== undefined ? pinDuration : event.pinDuration,
+          pinnedUntil: pinnedUntil !== undefined ? pinnedUntil : event.pinnedUntil,
+          disappearAfter: disappearAfter !== undefined ? disappearAfter : event.disappearAfter,
+          expiresAt: expiresAt !== undefined ? expiresAt : event.expiresAt,
+          date: date || event.date,
+          time: time || event.time
+        });
+        event.isPinned = pinAndExpiry.isPinned;
+        event.pinDuration = pinAndExpiry.pinDuration;
+        event.pinnedUntil = pinAndExpiry.pinnedUntil;
+        event.disappearAfter = pinAndExpiry.disappearAfter;
+        event.expiresAt = pinAndExpiry.expiresAt;
+      }
       if (tags) event.tags = JSON.parse(tags);
       if (organizers) event.organizers = JSON.parse(organizers);
       if (speakers) event.speakers = JSON.parse(speakers);

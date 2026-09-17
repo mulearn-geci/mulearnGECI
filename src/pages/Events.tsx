@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Users, Clock, X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, X, ChevronLeft, ChevronRight, Images, Pin } from 'lucide-react';
 import { eventsAPI } from '../services/api';
 import { getEventImageUrl } from '../utils/imageUtils';
 import { RegistrationButton } from '../components/RegistrationButton';
@@ -23,6 +23,7 @@ export function Events() {
     time?: string;
     location?: string;
     attendees?: number;
+    isPinned?: boolean;
   } | null>(null);
 
   // Filter state (URL-synced)
@@ -75,6 +76,9 @@ export function Events() {
     const now = new Date();
 
     return allEvents.filter(event => {
+      // Exclude expired / disappeared events
+      if (event.expiresAt && new Date(event.expiresAt) <= now) return false;
+
       // Text search
       if (debouncedSearch) {
         const q = debouncedSearch.toLowerCase();
@@ -102,7 +106,13 @@ export function Events() {
       }
 
       return true;
-    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }).sort((a, b) => {
+      const isAPinned = Boolean(a.isPinned && (!a.pinnedUntil || new Date(a.pinnedUntil) > now));
+      const isBPinned = Boolean(b.isPinned && (!b.pinnedUntil || new Date(b.pinnedUntil) > now));
+      if (isAPinned && !isBPinned) return -1;
+      if (!isAPinned && isBPinned) return 1;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
   }, [allEvents, debouncedSearch, filters.category, filters.month, filters.timing]);
 
   const openLightbox = (event: any, initialIndex: number = 0) => {
@@ -128,7 +138,8 @@ export function Events() {
       date: displayDate,
       time: event.time,
       location: event.location,
-      attendees: event.attendees || event.currentAttendees || 0
+      attendees: event.attendees || event.currentAttendees || 0,
+      isPinned: Boolean(event.isPinned && (!event.pinnedUntil || new Date(event.pinnedUntil) > new Date()))
     });
   };
 
@@ -247,13 +258,19 @@ export function Events() {
                           {event.type}
                         </span>
                       </div>
-                      {isPast && (
-                        <div className="absolute top-4 right-4">
+                      <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+                        {Boolean(event.isPinned && (!event.pinnedUntil || new Date(event.pinnedUntil) > now)) && (
+                          <span className="bg-amber-500 text-white px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-md shadow-amber-500/20">
+                            <Pin className="w-3.5 h-3.5 rotate-45" />
+                            <span>Pinned</span>
+                          </span>
+                        )}
+                        {isPast && (
                           <span className="bg-gray-900/70 backdrop-blur-sm text-gray-200 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
                             Past
                           </span>
-                        </div>
-                      )}
+                        )}
+                      </div>
                       {eventPhotos.length > 1 && (
                         <div className="absolute bottom-3 right-3 bg-black/75 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-full border border-white/20 shadow-md flex items-center gap-1.5 z-10">
                           <Images className="w-3.5 h-3.5 text-blue-400" />
@@ -400,6 +417,12 @@ export function Events() {
                     {lightbox.category && (
                       <span className="text-[10px] uppercase tracking-wider font-extrabold bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
                         {lightbox.category}
+                      </span>
+                    )}
+                    {lightbox.isPinned && (
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/30 flex items-center gap-1">
+                        <Pin className="w-3 h-3 rotate-45" />
+                        Pinned
                       </span>
                     )}
                   </div>

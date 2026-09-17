@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Calendar, Clock, MapPin, Users, Tag, Link as LinkIcon, FileText, Award } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, Users, Tag, Link as LinkIcon, FileText, Award, Pin, EyeOff } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { eventsAPI } from '../../services/api';
 import { MultiImageUploader } from '../../components/MultiImageUploader';
@@ -22,6 +22,8 @@ interface CreateEventFormData {
   featured: boolean;
   registrationLink?: string;
   registrationDeadline?: string;
+  pinDuration?: string;
+  disappearAfter?: string;
 }
 
 const PRESET_CATEGORIES = ['Technical', 'Academic', 'Social', 'Career'];
@@ -34,6 +36,8 @@ export function CreateEvent() {
   const [customType, setCustomType] = useState('');
   const [categoryPreset, setCategoryPreset] = useState('Technical');
   const [customCategory, setCustomCategory] = useState('');
+  const [pinDuration, setPinDuration] = useState('none');
+  const [disappearAfter, setDisappearAfter] = useState('never');
   const navigate = useNavigate();
   
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<CreateEventFormData>({
@@ -78,6 +82,9 @@ export function CreateEvent() {
         maxAttendees: !isNaN(Number(data.maxAttendees)) ? Number(data.maxAttendees) : 100,
         status: data.status || 'upcoming',
         featured: data.featured === true,
+        isPinned: pinDuration !== 'none',
+        pinDuration: pinDuration,
+        disappearAfter: disappearAfter,
         registrationLink: data.registrationLink ? data.registrationLink.trim() : '',
         registrationDeadline: data.registrationDeadline || undefined,
         image: images[0],
@@ -409,6 +416,79 @@ export function CreateEvent() {
                 <label htmlFor="featured" className="text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer">
                   Mark as Featured Event
                 </label>
+              </div>
+            </div>
+
+            {/* 11. Pinning & Auto-Disappear Settings */}
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/5 via-transparent to-blue-500/5 border border-amber-200/60 dark:border-amber-700/40 space-y-5">
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700/60 pb-3">
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <Pin className="w-5 h-5 rotate-45" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white">Pinning & Auto-Disappear Options</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Control event prominence and automatic cleanup</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Pinning option */}
+                <div>
+                  <label htmlFor="pinDuration" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1.5 flex items-center space-x-1.5">
+                    <Pin className="w-4 h-4 text-amber-500" />
+                    <span>Pin Event to Top</span>
+                  </label>
+                  <select
+                    id="pinDuration"
+                    value={pinDuration}
+                    onChange={e => setPinDuration(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer text-sm"
+                  >
+                    <option value="none">🚫 Do not pin (Default)</option>
+                    <option value="always">📌 Always (Pinned indefinitely)</option>
+                    <option value="1day">⏱️ Pin for 1 Day (24 hours)</option>
+                    <option value="1week">⏱️ Pin for 1 Week (7 days)</option>
+                    <option value="1month">⏱️ Pin for 1 Month (30 days)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                    {pinDuration === 'none' && 'Event will follow standard chronological sorting.'}
+                    {pinDuration === 'always' && 'Event will stay pinned at the top of the events page until manually changed.'}
+                    {pinDuration === '1day' && 'Event will stay at the top for 24 hours, then automatically unpin.'}
+                    {pinDuration === '1week' && 'Event will stay at the top for 7 days, then automatically unpin.'}
+                    {pinDuration === '1month' && 'Event will stay at the top for 30 days, then automatically unpin.'}
+                  </p>
+                </div>
+
+                {/* Disappear option */}
+                <div>
+                  <label htmlFor="disappearAfter" className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1.5 flex items-center space-x-1.5">
+                    <EyeOff className="w-4 h-4 text-blue-500" />
+                    <span>Auto-Disappear / Expiry</span>
+                  </label>
+                  <select
+                    id="disappearAfter"
+                    value={disappearAfter}
+                    onChange={e => setDisappearAfter(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer text-sm"
+                  >
+                    <option value="never">♾️ Never (Keep in archive)</option>
+                    <option value="1day">⏱️ Disappear after 1 Day</option>
+                    <option value="1week">⏱️ Disappear after 1 Week</option>
+                    <option value="1month">⏱️ Disappear after 1 Month</option>
+                    <option value="1day_after_event">📅 Disappear 1 Day after Event Date</option>
+                    <option value="1week_after_event">📅 Disappear 1 Week after Event Date</option>
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                    {disappearAfter === 'never' && 'Event remains visible to the public in upcoming/past events.'}
+                    {disappearAfter === '1day' && 'Event will disappear from the public website 24 hours after publishing.'}
+                    {disappearAfter === '1week' && 'Event will disappear from the public website 7 days after publishing.'}
+                    {disappearAfter === '1month' && 'Event will disappear from the public website 30 days after publishing.'}
+                    {disappearAfter === '1day_after_event' && 'Event will disappear from the public website 24 hours after the scheduled event date.'}
+                    {disappearAfter === '1week_after_event' && 'Event will disappear from the public website 7 days after the scheduled event date.'}
+                  </p>
+                </div>
               </div>
             </div>
 

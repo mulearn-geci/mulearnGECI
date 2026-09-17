@@ -102,6 +102,28 @@ const eventSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isPinned: {
+    type: Boolean,
+    default: false
+  },
+  pinDuration: {
+    type: String,
+    enum: ['none', 'always', '1day', '1week', '1month'],
+    default: 'none'
+  },
+  pinnedUntil: {
+    type: Date,
+    default: null
+  },
+  disappearAfter: {
+    type: String,
+    enum: ['never', '1day', '1week', '1month', '1day_after_event', '1week_after_event'],
+    default: 'never'
+  },
+  expiresAt: {
+    type: Date,
+    default: null
+  },
   tags: [{
     type: String,
     trim: true
@@ -200,5 +222,8 @@ eventSchema.index({ author: 1 });
 eventSchema.index({ slug: 1 });
 eventSchema.index({ type: 1, category: 1 });
 eventSchema.index({ featured: 1, date: 1 });
+eventSchema.index({ isPinned: -1, date: 1 });
+eventSchema.index({ expiresAt: 1 });
+eventSchema.index({ pinnedUntil: 1 });
 
 module.exports = mongoose.model('Event', eventSchema);

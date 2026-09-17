@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Users, Calendar as CalendarIcon, MapPin, Search, Filter, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Calendar as CalendarIcon, MapPin, Search, Filter, Image as ImageIcon, Pin, EyeOff } from 'lucide-react';
 import { AdminLayout } from '../../components/AdminLayout';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { eventsAPI } from '../../services/api';
@@ -19,7 +19,14 @@ export function AdminEvents() {
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || event.status.toLowerCase() === statusFilter.toLowerCase();
+    const isExpired = event.expiresAt && new Date(event.expiresAt) <= new Date();
+
+    let matchesStatus = true;
+    if (statusFilter === 'expired') {
+      matchesStatus = Boolean(isExpired);
+    } else if (statusFilter !== 'all') {
+      matchesStatus = event.status.toLowerCase() === statusFilter.toLowerCase();
+    }
     return matchesSearch && matchesStatus;
   });
 
@@ -76,12 +83,17 @@ export function AdminEvents() {
     const fetchEvents = async () => {
       try {
         setIsLoading(true);
-        const response = await eventsAPI.getAll();
+        // Include expired events for admin view
+        const response = await eventsAPI.getAll(undefined, undefined, true);
 
-        // ✅ Sort by createdAt (newest first)
-      const sortedEvents = (response.data || []).sort(
-        (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+        // Sort: Active Pinned first, then newest createdAt
+        const sortedEvents = (response.data || []).sort((a: any, b: any) => {
+          const aPinned = Boolean(a.isPinned && (!a.pinnedUntil || new Date(a.pinnedUntil) > new Date()));
+          const bPinned = Boolean(b.isPinned && (!b.pinnedUntil || new Date(b.pinnedUntil) > new Date()));
+          if (aPinned && !bPinned) return -1;
+          if (!aPinned && bPinned) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
 
         setEvents(sortedEvents);
       } catch (error) {
@@ -131,12 +143,13 @@ export function AdminEvents() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors"
+                className="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors cursor-pointer"
               >
                 <option value="all">All Status</option>
                 <option value="upcoming">Upcoming</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
+                <option value="expired">Expired / Disappeared</option>
               </select>
             </div>
           </div>
@@ -165,11 +178,32 @@ export function AdminEvents() {
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 left-3">
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(event.status || 'upcoming')}`}>
                         {event.status || 'upcoming'}
                       </span>
                     </div>
+
+                    {/* Top right badges: Pinned & Expiry */}
+                    <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-10">
+                      {event.isPinned && (!event.pinnedUntil || new Date(event.pinnedUntil) > new Date()) && (
+                        <span className="bg-amber-500 text-white px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 shadow">
+                          <Pin className="w-3 h-3 rotate-45" />
+                          <span>Pinned</span>
+                        </span>
+                      )}
+                      {event.expiresAt && (
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 shadow ${
+                          new Date(event.expiresAt) <= new Date()
+                            ? 'bg-red-600 text-white'
+                            : 'bg-indigo-600 text-white'
+                        }`}>
+                          <EyeOff className="w-3 h-3" />
+                          <span>{new Date(event.expiresAt) <= new Date() ? 'Disappeared' : 'Expiring'}</span>
+                        </span>
+                      )}
+                    </div>
+
                     {event.images && event.images.length > 1 && (
                       <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1 shadow">
                         <ImageIcon className="w-3 h-3" />
@@ -187,6 +221,36 @@ export function AdminEvents() {
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 leading-tight">
                       {event.title}
                     </h3>
+
+                    {/* Active Pin & Disappear Status Info */}
+                    {(event.isPinned || event.expiresAt) && (
+                      <div className="space-y-1 mb-2.5">
+                        {event.isPinned && (
+                          <div className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                            <Pin className="w-3 h-3 rotate-45 shrink-0" />
+                            <span>
+                              {event.pinnedUntil
+                                ? `Pinned until ${new Date(event.pinnedUntil).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`
+                                : 'Pinned indefinitely (Always)'}
+                            </span>
+                          </div>
+                        )}
+                        {event.expiresAt && (
+                          <div className={`text-[11px] font-semibold flex items-center gap-1.5 ${
+                            new Date(event.expiresAt) <= new Date()
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-indigo-600 dark:text-indigo-400'
+                          }`}>
+                            <EyeOff className="w-3 h-3 shrink-0" />
+                            <span>
+                              {new Date(event.expiresAt) <= new Date()
+                                ? `Disappeared on ${new Date(event.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} (Hidden from public)`
+                                : `Disappears on ${new Date(event.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     
                     <div className="space-y-1.5 mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                       <div className="flex items-center">

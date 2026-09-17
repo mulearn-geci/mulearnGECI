@@ -231,10 +231,11 @@ export const postsAPI = {
 // Events API
 // ─────────────────────────────────────────────────────────────
 export const eventsAPI = {
-  getAll: async (status?: string, limit?: number) => {
+  getAll: async (status?: string, limit?: number, includeExpired?: boolean) => {
     const params = new URLSearchParams();
     if (status) params.append('status', status);
     if (limit) params.append('limit', limit.toString());
+    if (includeExpired) params.append('includeExpired', 'true');
     
     const url = `${API_BASE_URL}/events?${params}`;
     return cachedGet(url);
